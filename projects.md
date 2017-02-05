@@ -2,6 +2,7 @@
 layout: page
 title: Current Projects
 permalink: /projects/
+order: 5
 ---
 
 
@@ -14,6 +15,9 @@ Electronics
 -----------
 
 tinkery stuff that runs on juice
+[3D Printing Stuff][3dprints]
+
+[3dprints]: 3dprinter/
 
 Robotics
 --------
