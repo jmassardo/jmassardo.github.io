@@ -23,3 +23,5 @@ group :jekyll_plugins do
    gem "jekyll-feed", "~> 0.6"
    gem "jekyll-paginate-v2"
 end
+#We'll reenable once we get html-proofer working properly 
+#gem 'html-proofer'
