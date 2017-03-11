@@ -1,8 +1,0 @@
----
-layout: post
-title:  "New Blog!"
-date:   2017-03-09 19:59:00 -0600
-categories: test
----
-
-So I decided to change blogging tools again. I've been playing with some DevOps type tools and I needed something a little more real world for a test, so why not the website. I'm setting up some CI (Continuos Intergration) tools to watch Github. Anytime there's a new commit, that will trigger the CI tool to run prep the new code for deployment, run some automatic tests, deploy the new code, and finally notify me that it's done. 

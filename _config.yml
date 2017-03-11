@@ -1,72 +1,63 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
+# Site Info
 title: DXRF
-author: James Massardo
-email: james@dxrf.com
-description: > # this means to ignore newlines until "baseurl:"
-  Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, and Microsoft ConfigMgr fanatic
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jamesmassardo
-github_username:  jmassardo
+tagline: 'Ramblings and musings from a Technology Enthusiast'
+description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>. Made by <a href="http://codinfox.github.io" target="_blank">@codinfox</a>.'
+#baseurl: "/"
+#url: http://www.dxrf.com
+logo: '/public/logo.png'
 
-############################################################
-# Site configuration for the Jekyll 3 Pagination Plugin
-# The values here represent the defaults if nothing is set
-pagination:
-
-  # Site-wide kill switch, disabled here it doesn't run at all 
-  enabled: true
-
-  # How many objects per paginated page, used to be `paginate` (default: 0, means all)
-  per_page: 5
-
-  # The permalink structure for the paginated pages (this can be any level deep)
-  permalink: '/page/:num/'
-
-  # Optional additional suffix for the title of the paginated pages (the prefix is inherited from the template page)
-  title_suffix: ' - page :num'
-
-  # Limit how many pagenated pages to create (default: 0, means all)
-  limit: 0
-
-  # Optional, defines the field that the posts should be sorted on (omit to default to 'date')
-  sort_field: 'date'
-
-  # Optional, sorts the posts in reverse order (omit to default decending or sort_reverse: true)
-  sort_reverse: true
-
-  # The default category to use, just leave this as 'posts' to get a backwards-compatible behavior (all posts)
-  category: 'posts'
-
-  # Optional, the default tag to use, omit to disable
-  tag: 'cool'
-
-  # Optional, the default locale to use, omit to disable (depends on a field 'locale' to be specified in the posts, 
-  # in reality this can be any value, suggested are the Microsoft locale-codes (e.g. en_US, en_GB) or simply the ISO-639 language code )
-  locale: 'en_US' 
-
-############################################################
-
-# Build settings
-markdown: kramdown
-# theme: minima
+# Site configurations
 gems:
-  - jekyll-feed
-  - jekyll-paginate-v2
-exclude:
-  - Gemfile
-  - Gemfile.lock
+  - jekyll-paginate
+markdown: kramdown
+kramdown:
+  input: GFM
+excerpt_separator: "<!-- more -->"
+sass:
+  style: compressed
+  sass_dir: _scss    
+paginate: 5
+paginate_path: '/blog/page:num'
+permalink: pretty
+
+version: 1.0.0
+
+# About/contact
+author:
+  name: James Massardo
+  description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
+  #gravatar: 3c2986ad7ac1f2230ea3596f44563328 # md5 hash of your email address
+  contact:
+    linkedin:  https://www.linkedin.com/in/james-massardo-3931a626/
+    github:    https://github.com/jmassardo
+    facebook:  https://www.facebook.com/james.massardo
+    twitter:   https://twitter.com/jamesmassardo
+    #weibo:     http://weibo.com/41173780
+    email:     mailto:james@dxrf.com
+
+# Navigation (2nd level links supported)
+nav:
+  Home:           
+    - '/'
+  Blog:           
+    - '/blog/'
+    - { Categories: '/blog/categories/' }
+    - { Tags: '/blog/tags/' }
+  About:          
+    - '/about/'
+  Projects:
+    - '/projects/'
+
+# Where are tags and categories displayed
+tag_page: '/blog/tags/'
+category_page: '/blog/categories/'
+
+hero:
+  image: https://imgs.xkcd.com/comics/circuit_diagram.png
+  caption: Welcome to my world! <br><small> Thanks <a href="https://xkcd.com/730/">XKCD</a> for another awesome comic</small>
+
+# Puglins
+mathjax: true # whether support mathjax
+google_analytics_token: 'UA-00000000-1' # leave blank if you don't want google analytics
+disqus_short_name: 'your_short_name' # leave blank if you don't want disqus
+
