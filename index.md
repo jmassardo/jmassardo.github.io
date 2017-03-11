@@ -5,6 +5,6 @@
 layout: default
 ---
 <div class="hero">
-  <img src="{{ site.baseurl }}{{ site.hero.image }}" />
+  <a href="{{ site.hero.imageurl }}"><img src="{{ site.baseurl }}{{ site.hero.image }}" /></a>
   <p>{{ site.hero.caption }}</p>
 </div>

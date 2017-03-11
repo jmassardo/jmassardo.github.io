@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>DXRF</title>
- <link href="/atom.xml" rel="self"/>
- <link href="/"/>
- <updated>2017-03-10T22:23:28-06:00</updated>
- <id></id>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2017-03-10T22:47:53-06:00</updated>
+ <id>http://localhost:4000</id>
  <author>
    <name>James Massardo</name>
    <email></email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>New Blog!</title>
-   <link href="/blog/2017/03/09/new-blog/"/>
+   <link href="http://localhost:4000/blog/2017/03/09/new-blog/"/>
    <updated>2017-03-09T19:59:00-06:00</updated>
-   <id>/blog/2017/03/09/new-blog</id>
+   <id>http://localhost:4000/blog/2017/03/09/new-blog</id>
    <content type="html">&lt;p&gt;So I decided to change blogging tools again. I’ve been playing with some DevOps type tools and I needed something a little more real world for a test, so why not the website. I’m setting up some CI (Continous Intergration) tools to watch Github. Anytime there’s a new commit, that will trigger the CI tool to run prep the new code for deployment, run some automatic tests, deploy the new code, and finally notify me that it’s done.&lt;/p&gt;
 </content>
  </entry>

@@ -54,7 +54,8 @@ category_page: '/blog/categories/'
 
 hero:
   image: https://imgs.xkcd.com/comics/circuit_diagram.png
-  caption: Welcome to my world! <br><small> Thanks <a href="https://xkcd.com/730/">XKCD</a> for another awesome comic</small>
+  imageurl: https://xkcd.com/730/
+  caption: Welcome to my world! <br><small> Thanks <a href="https://xkcd.com/">XKCD</a> for another awesome comic</small>
 
 # Puglins
 mathjax: true # whether support mathjax
