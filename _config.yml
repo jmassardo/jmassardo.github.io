@@ -26,7 +26,7 @@ version: 1.0.0
 author:
   name: James Massardo
   description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
-  #gravatar: 3c2986ad7ac1f2230ea3596f44563328 # md5 hash of your email address
+  gravatar: e1c60f4afa864fc91dbb12048dbac6b5 # md5 hash of your email address
   contact:
     linkedin:  https://www.linkedin.com/in/james-massardo-3931a626/
     github:    https://github.com/jmassardo
