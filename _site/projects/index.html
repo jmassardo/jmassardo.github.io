@@ -226,7 +226,8 @@ MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], proces
 <p>We’re deploying <a href="https://www.chef.io">Chef</a> at work so I’ve been tinkering with it.</p>
 
 <h3 id="docker">Docker</h3>
-<p>Part of the new tech behind this site is <a href="https://www.docker.com">Docker</a>. Docker is a containerization tool. Basically that means that the site runs in a tiny bubble instead of on a big server. The idea is that new posts go to <a href="https://www.github.com">Github</a>, then <a href="https://www.jenkins.com">Jenkins</a> sees the commit and pulls the new code. It then runs it through a proofer/verification process. If it doesn’t detect any errors, it spins up a new container with the new code and pushes it to the host. It will make one final check and if all looks good, it will swap the site over to the new container and destroy the old one.</p>
+<p>Part of the new tech behind this site is <a href="https://www.docker.com">Docker</a>. Docker is a containerization tool. Basically that means that the site runs in a tiny bubble instead of on a big server. 
+The idea is that new posts go to <a href="https://www.github.com">Github</a>, then <a href="https://www.jenkins.com">Jenkins</a> sees the commit and pulls the new code. It then runs it through a proofer/verification process. If it doesn’t detect any errors, it spins up a new container with the new code and pushes it to the host. It will make one final check and if all looks good, it will swap the site over to the new container and destroy the old one.</p>
 
 <h3 id="python">Python</h3>
 <p>We’ve been experimenting with vision processing with our FRC robots. Now that we’re on our 3rd year with FRC, we’ve got a couple robots but not enough controllers. The actual RoboRIO controllers are quite expensive so we’ve been looking for an alternative. We settled on <a href="http://www.team221.com/robotopen/gs.html">RobotOpen</a> since it’s built in a similar fashion and terminology to the FRC software. Plus it’s open source so we can tailor it to our needs. The first thing is we want to run <a href="https://www.raspberrypi.org/">Raspberry Pi’s</a>. This presents a problem since the RobotOpen libraries are for Arduino so we started porting them to <a href="https://github.com/jmassardo/RobotOpen-RP3-Python-Library">Python</a>.</p>
@@ -237,7 +238,9 @@ MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], proces
 <h2 id="electronics">Electronics</h2>
 <h3 id="arduino">Arduino</h3>
 
-<p>###</p>
+<h3 id="raspberry-pi">Raspberry Pi</h3>
+
+<h3 id="custom-circuits">Custom Circuits</h3>
 
 <h2 id="robotics">Robotics</h2>
 

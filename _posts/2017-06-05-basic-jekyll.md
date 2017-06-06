@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Basic Jeykell!"
-date:   2017-06-05 21:16:00 -0600
+title:  "Basic Jeykll!"
+date:   2017-06-05 21:16:00 -0500
 category: Blog
 tags: [blog]
 ---
@@ -12,6 +12,7 @@ First off, you need to install Jekyll. I'm currently using a Mac and I have the 
 
 Ok, hopefully you got it installed so let's actually do something with it.
 
+{% highlight shell %}
 # Install Jekyll and Bundler gems through RubyGems
 ~ $ gem install jekyll bundler
 
@@ -25,13 +26,15 @@ Ok, hopefully you got it installed so let's actually do something with it.
 ~/myblog $ bundle exec jekyll serve
 
 # Now browse to http://localhost:4000
+{% endhighlight %}
 
 (Yeah, I know, looks familar, eh? That's cause I copied it straight from the [Quickstart guide](https://jekyllrb.com/docs/quickstart/)... It works, why reinvent the wheel...)
 
 Next is to create a post.
-
+{% highlight shell %}
 # Create post file using the following format
 # YEAR-MONTH-DAY-title.MARKUP 
 ~/myblog $ touch _posts/2017-06-05-basic-jekyll.md
+{% endhighlight %}
 
 From there, add your header and start writing. [Post Docs](https://jekyllrb.com/docs/posts/)

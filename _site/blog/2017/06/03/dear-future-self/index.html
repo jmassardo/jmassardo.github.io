@@ -11,7 +11,7 @@
 
   <title>
     
-      Blog &middot; DXRF
+      Dear Future Self &middot; DXRF
     
   </title>
 
@@ -130,7 +130,7 @@ MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], proces
       
 
       <span class="foldable">
-        <a class="sidebar-nav-item active" href="/blog/">
+        <a class="sidebar-nav-item " href="/blog/">
           Blog
         </a>
 
@@ -219,128 +219,46 @@ MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], proces
       </div>
 
       <div class="container content">
-        <div class="posts">
+        <div class="post">
+  <h1 class="post-title">Dear Future Self</h1>
+  <span class="post-date">03 Jun 2017</span>
+   | 
   
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/blog/2017/06/05/basic-jekyll/">
-        Basic Jeykll!
-      </a>
-    </h1>
-
-    <span class="post-date">05 Jun 2017</span>
-     | 
-    
     <a href="/blog/tags/#blog" class="post-tag">blog</a>
-    
-    
-
-    <article>
-      <p>I guess I should blog some of the stuff I’m tinkering with so I don’t forget what I’m learning. I’m going to start at the base and log a few bits and commands about getting started with <a href="https://jekyllrb.com/">Jekyll</a>.</p>
-
-<p>First off, you need to install Jekyll. I’m currently using a Mac and I have the full build of Ruby installed for some Chef tinkering so I was able to follow the <a href="https://jekyllrb.com/docs/quickstart/">Jekyll Quickstart</a>. I did have to change the install path as described on the <a href="https://jekyllrb.com/docs/troubleshooting/">Jekyll Troubleshooting</a> page.</p>
-
-<p>Ok, hopefully you got it installed so let’s actually do something with it.</p>
-
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="c"># Install Jekyll and Bundler gems through RubyGems</span>
-~ <span class="nv">$ </span>gem install jekyll bundler
-
-<span class="c"># Create a new Jekyll site at ./myblog</span>
-~ <span class="nv">$ </span>jekyll new myblog
-
-<span class="c"># Change into your new directory</span>
-~ <span class="nv">$ </span><span class="nb">cd </span>myblog
-
-<span class="c"># Build the site on the preview server</span>
-~/myblog <span class="nv">$ </span>bundle <span class="nb">exec </span>jekyll serve
-
-<span class="c"># Now browse to http://localhost:4000</span></code></pre></figure>
-
-<p>(Yeah, I know, looks familar, eh? That’s cause I copied it straight from the <a href="https://jekyllrb.com/docs/quickstart/">Quickstart guide</a>… It works, why reinvent the wheel…)</p>
-
-<p>Next is to create a post.</p>
-
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="c"># Create post file using the following format</span>
-<span class="c"># YEAR-MONTH-DAY-title.MARKUP </span>
-~/myblog <span class="nv">$ </span>touch _posts/2017-06-05-basic-jekyll.md</code></pre></figure>
-
-<p>From there, add your header and start writing. <a href="https://jekyllrb.com/docs/posts/">Post Docs</a></p>
-
-    <article>
-    <div class="post-more">
-      
-      <a href="/blog/2017/06/05/basic-jekyll/#disqus_thread"> <i class="fa fa-comments" aria-hidden="true"></i>Comment</a>&nbsp;
-      
-      <a href="/blog/2017/06/05/basic-jekyll/"><i class="fa fa-plus-circle" aria-hidden="true"></i>Read more</a>
-    </div>
-  </div>
   
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/blog/2017/06/03/dear-future-self/">
-        Dear Future Self
-      </a>
-    </h1>
-
-    <span class="post-date">03 Jun 2017</span>
-     | 
-    
-    <a href="/blog/tags/#blog" class="post-tag">blog</a>
-    
-    
-
-    <article>
-      <p>I met a lot of really awesome people at ChefConf. One guy, named Daniel —- and I were joking about blogging stuff and we said we should start a blog named Dear Future Self. Technologists come in contact with so much information, there’s no way anyone can remember it all. A lot of the stuff on this blog is literally so I don’t have to remember everything.</p>
+  
+  <article>
+    <p>I met a lot of really awesome people at ChefConf. One guy, named Daniel —- and I were joking about blogging stuff and we said we should start a blog named Dear Future Self. Technologists come in contact with so much information, there’s no way anyone can remember it all. A lot of the stuff on this blog is literally so I don’t have to remember everything.</p>
 
 <p>So Dear Future self, please enjoy all this stuff :)</p>
 
-    <article>
-    <div class="post-more">
-      
-      <a href="/blog/2017/06/03/dear-future-self/#disqus_thread"> <i class="fa fa-comments" aria-hidden="true"></i>Comment</a>&nbsp;
-      
-      <a href="/blog/2017/06/03/dear-future-self/"><i class="fa fa-plus-circle" aria-hidden="true"></i>Read more</a>
-    </div>
-  </div>
-  
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/blog/2017/03/09/new-blog/">
-        New Blog!
-      </a>
-    </h1>
-
-    <span class="post-date">09 Mar 2017</span>
-     | 
-    
-    <a href="/blog/tags/#blog" class="post-tag">blog</a>
-    
-    
-
-    <article>
-      <p>So I decided to change blogging tools again. I’ve been playing with some DevOps type tools and I needed something a little more real world for a test, so why not the website. I’m setting up some CI (Continous Intergration) tools to watch Github. Anytime there’s a new commit, that will trigger the CI tool to run prep the new code for deployment, run some automatic tests, deploy the new code, and finally notify me that it’s done.</p>
-
-    <article>
-    <div class="post-more">
-      
-      <a href="/blog/2017/03/09/new-blog/#disqus_thread"> <i class="fa fa-comments" aria-hidden="true"></i>Comment</a>&nbsp;
-      
-      <a href="/blog/2017/03/09/new-blog/"><i class="fa fa-plus-circle" aria-hidden="true"></i>Read more</a>
-    </div>
-  </div>
-  
+  </article>
 </div>
 
-<div class="pagination">
-  
-    <span class="pagination-item older">Older</span>
-  
-  
-    <span class="pagination-item newer">Newer</span>
-  
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/blog/2017/06/05/basic-jekyll/">
+            Basic Jeykll!
+            <small>05 Jun 2017</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/blog/2017/03/09/new-blog/">
+            New Blog!
+            <small>09 Mar 2017</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
 </div>
-
-
       </div>
     </div>
 
