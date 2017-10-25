@@ -2,7 +2,7 @@
 set -e # halt script on error
 
 #install ftp client
-apt-get install ncftp
+sudo apt-get install ncftp
 
 #build with Jekyll
 bundle exec jekyll build
