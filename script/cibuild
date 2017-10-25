@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 set -e # halt script on error
 
+#install ftp client
+sudo apt-get install ncftp
+
+#build with Jekyll
 bundle exec jekyll build
+
+#run some basic HTML tests - Will fix later...
 #bundle exec htmlproofer ./_site
+
+ncftpput -R -v -u $ftp_user -p $ftp_pass $ftp_server $ftp_dest $ftp_src
