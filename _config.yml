@@ -1,5 +1,5 @@
 # Site Info
-title: DXRF
+title: James Massardo - DXRF
 tagline: 'Ramblings and musings from a Technology Enthusiast'
 description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
 #baseurl: "/"
@@ -30,7 +30,7 @@ author:
   description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
   gravatar: e1c60f4afa864fc91dbb12048dbac6b5 # md5 hash of your email address
   contact:
-    linkedin:  https://www.linkedin.com/in/james-massardo-3931a626/
+    linkedin:  https://www.linkedin.com/in/james-massardo/
     github:    https://github.com/jmassardo
     facebook:  https://www.facebook.com/james.massardo
     twitter:   https://twitter.com/jamesmassardo
