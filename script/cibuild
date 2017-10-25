@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -e # halt script on error
 
-#install ftp client
-sudo apt-get install ncftp
-
 #build with Jekyll
 bundle exec jekyll build
 
