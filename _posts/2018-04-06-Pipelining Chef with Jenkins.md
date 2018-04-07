@@ -5,8 +5,6 @@ date:   2018-04-06 14:39:00 -0600
 category: Blog
 tags: [blog, ci/cd, chef]
 ---
-# REMOVE BEFORE PUBLISHING
-
 ## Summary
 
 Today, I'm going to detail out how we are setting up our pipelining process for all things Chef for our business unit partners. This process uses a combination of [Chef](https://www.chef.io), [Jenkins](https://jenkins.io/), [GitHub](https://github.com), a custom Jenkins [Shared Library](https://github.com/jkhy/Chef-Pipeline-SharedLibrary_PUBLIC), and some custom developed [utilities](https://github.com/jkhy/Chef-Pipeline-Automation_PUBLIC).
