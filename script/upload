@@ -2,4 +2,4 @@
 sudo apt-get install ncftp
 
 cd ./_site
-ncftpput -R -v -u $ftp_user -p $ftp_pass $ftp_server $ftp_dest *
+ncftpput -m -R -v -u $ftp_user -p $ftp_pass $ftp_server $ftp_dest *
