@@ -16,7 +16,7 @@ kramdown:
 excerpt_separator: "<!-- more -->"
 sass:
   style: compressed
-  sass_dir: _scss    
+  sass_dir: _scss
 paginate: 5
 paginate_path: '/blog/page:num'
 permalink: pretty
@@ -39,13 +39,13 @@ author:
 
 # Navigation (2nd level links supported)
 nav:
-  Home:           
+  Home:
     - '/'
-  Blog:           
+  Blog:
     - '/blog/'
     - { Categories: '/blog/categories/' }
     - { Tags: '/blog/tags/' }
-  Resume:          
+  Resume:
     - '/resume/'
   Projects:
     - '/projects/'

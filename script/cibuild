@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -e # halt script on error
-
-#build with Jekyll
-bundle exec jekyll build
-
-#run some basic HTML tests - Will fix later...
-#bundle exec htmlproofer ./_site

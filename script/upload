@@ -1,6 +1,0 @@
-#install ftp client
-sudo apt-get install ncftp
-
-cd ./_site
-ncftpput -d ../upload_log -m -R -v -u $ftp_user -p $ftp_pass $ftp_server $ftp_dest *
-cat ../upload_log
