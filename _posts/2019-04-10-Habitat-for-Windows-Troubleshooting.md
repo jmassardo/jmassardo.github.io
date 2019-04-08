@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Habitat for Windows Troubleshooting"
-date:   2019-02-05 13:49:00 -0600
+date:   2019-04-10 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
 ---
@@ -69,6 +69,8 @@ Tell me more about the cache
 Where are the logs (Get-SupervisorLog)
 
 Where are the folders? What stuff goes where? Why do we have multiple folders? Possibly a tree output with descriptions
+
+https://www.habitat.sh/docs/reference/#sup-log-keys
 
 ### Variables
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Habitat for Windows Basics"
-date:   2019-02-05 13:49:00 -0600
+date:   2019-04-08 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
 ---
