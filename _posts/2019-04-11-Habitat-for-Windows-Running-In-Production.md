@@ -13,13 +13,17 @@ Greetings! Today, I'll be sharing some notes about running [Habitat](https://www
 
 Great! So we've done some awesome work to package all our apps in Habitat and we've done a ton of testing. Now what?
 
-### Rings
+### Running the Supervisor
 
-### Channels/Updates
+As with most things Habitat, we have options. Let's compare our options:
 
-### Security
+| Option          | Pros | Cons |
+| ------          | ---- | ---- |
+| Windows Service | Built-in log management | Not viable for apps with UI |
+| Scheduled Task  | Good for running the supervisor as a specific user | Requires additional setup. Same logging requirements as Startup script |
+| Startup script  | Useful with apps that require User Interaction | No built-in logging. Script must redirect stdout to file and handle log rotation independently |
 
-### Windows Service
+#### Window Service
 
 ``` PowerShell
 hab pkg install core/windows-service
@@ -28,5 +32,11 @@ Start-Service -ServiceName Habitat
 ```
 
 > NOTE: Windows services are not able to interact with a user session so if you need to launch any type of UI, consider using a scheduled task or other method.
+
+### Rings
+
+### Channels/Updates
+
+### Security
 
 ## Closing
