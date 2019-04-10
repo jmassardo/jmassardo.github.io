@@ -35,7 +35,7 @@ Highly motivated Technologist specializing in configuration management, systems 
 
 #### Automation
 
-Chef Automate, Chef Server, Jenkins, Terraform, Test Kitchen, TravisCI
+Chef Automate, Chef Server, Habitat, Jenkins, Terraform, Test Kitchen, TravisCI
 
 #### Development
 
@@ -43,7 +43,7 @@ Eclipse, Git, GitHub, Visual Studio
 
 #### Microsoft
 
-Active Directory, Azure, Certificate Services, Group Policy, IIS, Microsoft Deployment Toolkit, Office 365, SQL Server, System Center(Configuration Manager/InTune, Operations Manager, Orchestrator), Windows Client,Windows Server
+Active Directory, Azure, Certificate Services, Group Policy, IIS, Microsoft Deployment Toolkit, Office 365, SQL Server, System Center (Configuration Manager/InTune, Operations Manager, Orchestrator), Windows Client, Windows Server
 
 #### Other
 
@@ -51,7 +51,8 @@ Apple/Mac, AWS, Docker, Kanban Tool, Linux (CentOS/Ubuntu), Spacewalk, Trello, V
 
 ### MANAGEMENT
 
-* ~4 yrs. Experience in IT Leadership as a working Supervisor/Manager. Successfully developed 3 independent teams and transitioned to other managers or newly promoted supervisors.
+* ~4 yrs. Experience in IT Leadership as a working Supervisor/Manager.
+* Successfully developed 3 independent teams and transitioned to other managers or newly promoted supervisors.
 * Assist in managing ~$10M in budget.
 * Lead a distributed team including remote employees.
 
@@ -59,9 +60,14 @@ Apple/Mac, AWS, Docker, Kanban Tool, Linux (CentOS/Ubuntu), Spacewalk, Trello, V
 
 ## Experience
 
-#### SYSTEMS ENGINEER, ADVANCED | JACK HENRY & ASSOCIATES | 12/2017 - PRESENT
+#### Sr. Customer Architect | Chef Software | 5/2018 - Present
 
-* Duties include developing custom applications for internal customers, working with business units to identify operational deficiencies and develop custom automated workflows, presenting on automation and DevOps topics.
+* As a Customer Architect, my primary role is to help customers get the most value from Chef's products as I can. This includes performing architecture reviews, conducting technical enablement sessions where I teach a new technique or skill, peer programming/reviews, and process coaching. I also develop sample code, demos, and examples along with writing process guides and blog posts about best practices.
+
+#### SYSTEMS ENGINEER, ADVANCED | JACK HENRY & ASSOCIATES | 12/2017 - 5/2018
+
+* As a Systems Engineer, I act as an Automation Evangelist. My goal is to assist other groups in improving their operations through automation. This assistance takes many forms including training, consultation, peer programming, code reviews, and providing architecture/ engineering support. I develop samples and starters for groups that want to eventually own their own automation. I also develop complete automation solutions and custom applications to meet customer requirements.
+* Duties included developing custom applications for internal customers, working with business units to identify operational deficiencies and develop custom automated workflows, presenting on automation and DevOps topics.
 * Custom development
   * Notification system for Datacenter Operations Center (Ruby/RAILS)
   * Server Tagging Web service: automates identification of registry tattoo
