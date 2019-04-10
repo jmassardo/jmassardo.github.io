@@ -9,6 +9,14 @@ tags: [blog, habitat, applications, windows]
 
 Greetings! Today, I'll be reviewing some steps for troubleshooting [Habitat](https://www.habitat.sh) on Windows.
 
+## Habitat executable
+
+If you're running hab commands and it's not doing what you expect or you aren't sure what it's actually doing, try enabling debug logging:
+
+``` PowerShell
+$env:RUST_LOG="debug"; $env:RUST_BACKTRACE=1; hab sup run
+```
+
 ## PowerShell Troubleshooting
 
 So you've written this awesome plan for your app but it throws errors during the build. Now what? How do you troubleshoot those failures since Hab studio cleans up after the build fails? The quickest way is to set breakpoints inside Studio. You can set breakpoints for any cmdlet or function by name to interrupt the build.
