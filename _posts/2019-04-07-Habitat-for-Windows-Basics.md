@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Habitat for Windows Basics"
-date:   2019-04-08 12:00:00 -0600
+date:   2019-04-07 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
 ---
@@ -80,6 +80,8 @@ Ok, cool, but what are those things?
 
 * Config - This directory hold configuration file templates. Habitat uses handlebar helpers to interpolate data. More info [here](https://www.habitat.sh/docs/developing-packages/#add-configuration).
 
+{% raw %}
+
   ```toml
   # Original config file:
   recv_buffer 128
@@ -87,6 +89,8 @@ Ok, cool, but what are those things?
   # Templated config file:
   recv_buffer {{cfg.recv_buffer}}
   ```
+
+{% endraw %}
 
 * default.toml - As I indicated above, this holds the default values used by the app. Let's say we have a plan for a web server. Normally, we'd want it to run on port 80 but there may be times we need it running on another port. This templating allows us to change it at run time instead of building multiple packages for the same app.
 
@@ -255,4 +259,4 @@ Let's look at the structure of the `\hab\` directory and make note of what each 
 
 Congrats on making it through all of that info! Hopefully this post has clarified a few points and was helpful. If you're like me, documentation is invaluable, but it's nice to detail out some of the basics so the documentation actually makes sense!
 
-As always, please fee free to contact me if you have any questions!
+If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Habitat for Windows Troubleshooting"
-date:   2019-04-10 12:00:00 -0600
+date:   2019-04-09 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
 ---
@@ -21,9 +21,9 @@ hab studio enter
 
 # Let's set the breakpoint
 Set-PSBreakpoint -Command Invoke-Install
-  ID Script                      Line Command                     Variable                   Action
-  -- ------                      ---- -------                     --------                   ------
-   0                                  Invoke-Install
+  ID Script Line Command        Variable Action
+  -- ------ ---- -------        -------- ------
+   0             Invoke-Install
 
 # Now let's build
 build
@@ -54,9 +54,9 @@ At C:\src\plan.ps1:18 char:24
 ```PowerShell
 # If you forget the breakpoint id, we can find it
 Get-PSBreakpoint
-  ID Script                      Line Command                     Variable                   Action
-  -- ------                      ---- -------                     --------                   ------
-   0                                  Invoke-Install
+  ID Script Line Command        Variable Action
+  -- ------ ---- -------        -------- ------
+   0             Invoke-Install
 
 # Now let's get rid of the breakpoint and run our build all the way through
 Remove-PSBreakpoint 0
@@ -154,3 +154,5 @@ Promoting/Demoting - So we've got our package built and running in production. A
 ## Closing
 
 As always, I hope you've found some valuable tidbits here. Check back as this post will undoubtedly receive updates as I find new things in Habitat.
+
+If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Habitat for Windows Examples"
-date:   2019-04-09 12:00:00 -0600
+date:   2019-04-08 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
 ---
@@ -275,3 +275,5 @@ if (!(Test-Feature)) {
 I'd like to take credit for writing all these plans but, alas, I can't. Fortunately, the awesome folks on the Habitat team publish these, along with like 600 other core plans, in their github org, [Habitat-sh/Core-plans](https://github.com/habitat-sh/core-plans/blob/master/iis-webserverrole/plan.ps1).
 
 If you run across another significant pattern that isn't here, please let me know so I can update this page!
+
+If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
