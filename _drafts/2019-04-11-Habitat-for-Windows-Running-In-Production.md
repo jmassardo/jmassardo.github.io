@@ -36,13 +36,55 @@ BLDR is Chef's cloud service for storing artifacts. BLDR makes it super easy and
 
 The Habitat Depot is an on-prem version of BLDR. Since it's running in your environments, you have more control over the authentication and access. If you have proprietary code in your packages, this also allows you to keep your code inside your environments.
 
-My personal guidance would be: if you are producing open source code, use BLDR; if you are running your
+My personal guidance would be: if you are producing open source code, use BLDR; if you are running proprietary or protected code, use the Depot.
 
 ### Provisioning
 
 First step is to get the Habitat binaries on our nodes. So how do we do that? Well... If you use [Terraform](https://www.terraform.io), you're in luck. We have a Habitat provisioner for Terraform to simplify this task.
 
+#### Terraform
+
+[Windows](https://github.com/chef-partners/terraform-provisioner-habitat) takes an extra step because the provisioner isn't directly in Terraform yet.
+
+Install plugin:
+
+``` bash
+wget https://github.com/chef-partners/terraform-provisioner-habitat/releases/download/0.1/terraform-provisioner-habitat_dev_v0.1_darwin_amd64.tar.gz
+
+tar -xvf terraform-provisioner-habitat_dev*.tar.gz
+
+mkdir -p ~/.terraform.d/plugins/
+
+mv terraform-provisioner-habitat_dev*/terraform-provisioner-habitat_dev* ~/.terraform.d/plugins/
+```
+
+Now that we have the plugin installed, we can use something like:
+
+``` json
+provisioner "habitat_dev" {
+    peer = ""
+    service {
+      name = "core/sqlserver"
+      topology = "standalone"
+    }
+    connection {
+      type = "winrm"
+      timeout = "10m"
+      user = "${var.win_username}"
+      password = "${var.win_password}"
+    }
+}
+```
+
+#### Other provisioning
+
+Ok, so what about all the folks that can't use Terraform. In that case, we need to install Habitat directly on the nodes. There are two ways: you can use your existing provisioning system to add in steps to [install](https://www.habitat.sh/docs/install-habitat/) the binaries; or you can use the [Habitat cookbook](https://github.com/chef-cookbooks/habitat) on your existing nodes.
+
+> Note: You'll notice the stark absence of sample code for this section. Unfortunately, there are so many permutations of infrastructure management tools that it's impossible to cover them. Fortunately, Habitat is quite easy to install. If you build a way to solve this problem, contact me and I'll add a link to your solution.
+
 ### Running the Supervisor
+
+If you are using a Terraform provisioner, most of these items are taken care of for you. If you are managing your own installation process, you'll need to decide how you want to run the Habitat services.
 
 As with most things Habitat, we have options. Let's compare our options:
 
@@ -65,6 +107,25 @@ Start-Service -ServiceName Habitat
 ### Rings
 
 Everything in one big ring? Multiple rings? Bastion rings?
+
+```text
+Why do we split stuff up?
+
+1) Supervisors in the same service group that need to peer for leader election.
+2) Supervisors across dependent services that rely on service bindings for config/service coordination.
+3) Service discovery (I spun up in this environment -- give me a database)
+4) Perceived ease of delivering global config changes.
+```
+
+```text
+jhud's ways to split
+Most habitat deployments naturally partition by a combo of
+Application or service boundaries
+Logical environments (dev, stage, prod)
+Network failure domains (regional data centers)
+Per-tenant environments (managed services teams, SaaS platforms)
+Microsegmentation / East-West partitioning (netsec)
+```
 
 ### Security
 
