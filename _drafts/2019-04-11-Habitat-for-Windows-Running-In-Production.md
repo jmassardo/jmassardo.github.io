@@ -78,9 +78,11 @@ provisioner "habitat_dev" {
 
 #### Other provisioning
 
-Ok, so what about all the folks that can't use Terraform. In that case, we need to install Habitat directly on the nodes. There are two ways: you can use your existing provisioning system to add in steps to [install](https://www.habitat.sh/docs/install-habitat/) the binaries; or you can use the [Habitat cookbook](https://github.com/chef-cookbooks/habitat) on your existing nodes.
+Ok, so what about all the folks that can't use Terraform. In that case, we need to install Habitat directly on the nodes. There are two ways: if you use Chef, you can use the [Habitat cookbook](https://github.com/chef-cookbooks/habitat) on your existing nodes; if not, you can use your existing provisioning system to add in steps to [install](https://www.habitat.sh/docs/install-habitat/) the binaries. If you don't have a provisioning or configuration management tool, check out [Chef Workstation](https://www.chef.sh). It has the ability to run cookbooks in an ad-hoc fashion, either manually or scripted.
 
 > Note: You'll notice the stark absence of sample code for this section. Unfortunately, there are so many permutations of infrastructure management tools that it's impossible to cover them. Fortunately, Habitat is quite easy to install. If you build a way to solve this problem, contact me and I'll add a link to your solution.
+
+YAY!!! We're done, right? Well... yes and no. We now have Habitat installed but we still need to do a few things...
 
 ### Running the Supervisor
 
@@ -94,7 +96,26 @@ As with most things Habitat, we have options. Let's compare our options:
 | Scheduled Task  | Good for running the supervisor as a specific user | Requires additional setup. Same logging requirements as Startup script |
 | Startup script  | Useful with apps that require User Interaction | No built-in logging. Script must redirect stdout to file and handle log rotation independently |
 
+#### Tasks and Scripts
+
+For the scheduled task and start-up script, you'll need to use either your provisioning system or config. mgmt. tool to create it.
+
+If you use Chef, here's a simple resource to get you started:
+
+``` ruby
+windows_task 'Start Habitat Supervisor' do
+  command 'hab sup run'
+  cwd 'c:/habitat/'
+  run_level :highest
+  frequency :onstart
+end
+```
+
+> NOTE: As I mentioned earlier, you'll need to add additional bits to this resource to log the supervisor output. You'll also need to rotate those logs.
+
 #### Window Service
+
+The Windows Service option is the simplest option. It's also the recommended option for most applications. If you have Chef, you can use the [Habitat cookbook](https://github.com/chef-cookbooks/habitat) to manage the service. Otherwise, use your provisioning/config tools to run the following commands:
 
 ``` PowerShell
 hab pkg install core/windows-service
@@ -102,34 +123,84 @@ hab pkg exec core/windows-service install
 Start-Service -ServiceName Habitat
 ```
 
-> NOTE: Windows services are not able to interact with a user session so if you need to launch any type of UI, consider using a scheduled task or other method.
+> NOTE: Although Windows services are the preferred method, Windows services are not able to interact with a user session so if you need to launch any type of UI, consider using a scheduled task or other method.
 
 ### Rings
 
-Everything in one big ring? Multiple rings? Bastion rings?
+If you aren't familiar with the concept of supervisor rings, essentially, a ring is a way for supervisors to share data amongst each other. This information is normally configuration data that's exported by supervised services or data that's injected into the ring via something like `hab config apply ...`.
 
-```text
-Why do we split stuff up?
+So why would we want a ring? Well... thanks to Josh Hudson and Andrew Defour, I can give you several reasons you want a ring:
 
 1) Supervisors in the same service group that need to peer for leader election.
 2) Supervisors across dependent services that rely on service bindings for config/service coordination.
 3) Service discovery (I spun up in this environment -- give me a database)
 4) Perceived ease of delivering global config changes.
+
+  > This las one sounds a little condescending however, as we talk about building a singular shape for shipping change, configuration changes should follow that same shape just like any other change.
+
+Now that we know some of the reasons why we might want a ring, how do we get one? Technically, we could use one big ring assuming we aren't gossiping a ton of data. In reality, we'll most likely use multiple rings.
+
+Most Habitat deployments naturally partition by:
+
+* A combo of Application or service boundaries
+* Logical environments (dev, stage, prod)
+* Network failure domains (regional data centers)
+* Per-tenant environments (managed services teams, SaaS platforms)
+* Micro-segmentation / East-West partitioning (netsec)
+
+So what about Bastion rings? This is definitely something you should do in large deployments. These should actually be called Permanent Peers because they are still part of a given ring, however, they are there to manage the gossiping of data and don't serve actual content. Let's say we have a web farm, we may designate a trio of servers to host the ring. These systems would be joined with the `--permanent-peer` option so they always attempt to stay connected. Every other supervisor would be peered to these 3 servers using the `--peer` option.
+
+Let's look at an example. We have 3 supervisor systems (192.168.0.1-3). We would run the following commands to start the supervisor and peer them to each other.
+
+``` bash
+# Command for 192.168.0.1
+hab sup run --peer=192.168.0.2 --peer=192.168.0.3
+
+# Command for 192.168.0.2
+hab sup run --peer=192.168.0.1 --peer=192.168.0.3
+
+# Command for 192.168.0.3
+hab sup run --peer=192.168.0.1 --peer=192.168.0.2
 ```
 
-```text
-jhud's ways to split
-Most habitat deployments naturally partition by a combo of
-Application or service boundaries
-Logical environments (dev, stage, prod)
-Network failure domains (regional data centers)
-Per-tenant environments (managed services teams, SaaS platforms)
-Microsegmentation / East-West partitioning (netsec)
-```
+Additional reading on peering [here](https://www.habitat.sh/docs/best-practices/#robust-supervisor-networks).
 
 ### Security
 
-How do we secure the ring?
+Now that we have a basic ring, how do we secure it? There are several pieces, so let's dive right in.
+
+* We need encryption keys to protect our data on the wire so let's generate one:
+
+  ``` bash
+  hab ring key generate yourringname
+  ```
+
+  > NOTE: You’ll need to distribute this key to each of your supervisors in the ring. If you have multiple rings, you'll need to do this step for each ring. Having separate keys for each ring limits your exposure if one of your keys is exposed or compromised.
+
+* We also need a service group key for protecting service group configuration:
+
+  ```bash
+  hab svc key generate servicegroupname.example yourorg
+  ```
+
+  > NOTE: We haven't discussed Service Groups yet although we'll briefly touch on them in the next section. You can read more about them [here](https://www.habitat.sh/docs/using-habitat/#service-groups).
+  
+  Start the Supervisor, specifying both the service group and organization that it belongs to:
+
+  ```bash
+  hab start --org yourorg --group servicegroupname.example yourorigin/yourapp
+  ```
+
+  > NOTE: Only users whose public keys that the Supervisor already has in its cache will be allowed to reconfigure this service group.
+
+* To protect your hab http gateway (holds sensitive config and ring data), set the HAB_SUP_GATEWAY_AUTH_TOKEN environment variable to a value on all of your supervisors.
+Once this is set, the supervisor will use http auth to access the endpoint.
+
+  ```bash
+  export HAB_SUP_GATEWAY_AUTH_TOKEN=<mygatewaypassword>
+  ```
+
+Additional reading on encryption [here](https://www.habitat.sh/docs/using-habitat/#using-encryption).
 
 ### Channels/ Package Updates
 
@@ -147,5 +218,7 @@ How do we monitor the supervisors?
 ## Closing
 
 As you can see, there are a number of things to consider; however, most all of them are small, easy to complete chunks of work. It feels like a ton of work to start with, but it normally only takes a few days to work through all of it.
+
+Special thanks to Josh Hudson and Andrew Defour for letting me use info from their ChefConf 2019 session. I highly recommend checkout out their [presentation](https://chefconf.chef.io/conf-resources/lessons-field-chef-habitat-enterprise-scale/).
 
 As always, if you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
