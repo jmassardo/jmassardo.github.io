@@ -3,7 +3,7 @@ layout: post
 title:  "Pipelining Chef with Jenkins"
 date:   2018-04-06 14:39:00 -0600
 category: Blog
-tags: [blog, ci/cd, chef]
+tags: [blog, ci/cd, chef, pipeline]
 ---
 ## Summary
 

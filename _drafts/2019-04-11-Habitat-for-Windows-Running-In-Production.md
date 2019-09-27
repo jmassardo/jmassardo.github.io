@@ -58,6 +58,8 @@ mkdir -p ~/.terraform.d/plugins/
 mv terraform-provisioner-habitat_dev*/terraform-provisioner-habitat_dev* ~/.terraform.d/plugins/
 ```
 
+> NOTE: This example fetches the macOS binary. If you are on another platform, you'll need to fetch the appropriate [release](https://github.com/chef-partners/terraform-provisioner-habitat/releases/tag/0.1).
+
 Now that we have the plugin installed, we can use something like:
 
 ``` json
@@ -168,6 +170,8 @@ Additional reading on peering [here](https://www.habitat.sh/docs/best-practices/
 ### Security
 
 Now that we have a basic ring, how do we secure it? There are several pieces, so let's dive right in.
+
+# What about rotating keys? how we do deliver new keys and restart supervisors without downtime
 
 * We need encryption keys to protect our data on the wire so let's generate one:
 
