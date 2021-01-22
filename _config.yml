@@ -7,7 +7,7 @@ description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" 
 logo: '/public/logo.png'
 
 # Site configurations
-gems:
+plugins:
   - jekyll-paginate
 markdown: kramdown
 highligher: rouge
@@ -34,6 +34,7 @@ author:
     github:    https://github.com/jmassardo
     facebook:  https://www.facebook.com/james.massardo
     twitter:   https://twitter.com/jamesmassardo
+    instagram: https://www.instagram.com/jamesmassardo/
     #weibo:     http://weibo.com/41173780
     email:     mailto:james@dxrf.com
 

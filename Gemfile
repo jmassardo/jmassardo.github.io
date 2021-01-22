@@ -15,7 +15,9 @@ gem "jekyll-paginate"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.0"
 gem "ffi", ">= 1.9.24"
-gem "nokogiri", ">= 1.10.4"
+gem "nokogiri", ">= 1.11.0.rc4"
+gem "activesupport", ">= 5.2.4.3"
+gem "kramdown", ">= 2.3.0"
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.
 # gem "github-pages", group: :jekyll_plugins
