@@ -7,6 +7,8 @@ tags: [blog, web, github, nginx]
 ---
 ## Summary
 
+***UPDATE:3/16/2021*** I found a very annoying bug with this deployment pattern. See the update here: [Rewriting URLs with Nginx]({% post_url 2021-03-16-nginx-url-rewrites %})
+
 In today's modern Internet, nearly all browsers show a big warning when viewing an insecure/non-ssl site. If you own a single domain name and use [GitHub Pages](https://pages.github.com/) to host your site, this is a simple matter to resolve. One can easily navigate to the project settings (`https://github.com/<USERNAME>/<USERNAME>.github.io/`) and tick the `Enforce HTTPS` setting. 
 
 So what happens if you own multiple domains that point to the same site? Now we have a bit of a mess to untangle.
@@ -33,9 +35,11 @@ Let's look at the high level steps needed. This assumes you have GitHub pages wo
 
 1. Provision VM with public IP address and ports 80-443 open
 1. Install Nginx and provision virtual hosts for each domain name ([Virtual Server How-to](https://linuxize.com/post/how-to-set-up-nginx-server-blocks-on-ubuntu-18-04/))
-1. in the virtual host root directory `/var/www/domain.tld/html`, create an `index.html` page with a meta-refresh (see example below)
+1. ~~in the virtual host root directory `/var/www/domain.tld/html`, create an `index.html` page with a meta-refresh (see example below)~~ - Don't do this...
 1. Update apex and `www` DNS records to point to VM's public IP.
 1. Run [Certbot](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx) to generate SSL certificates
+
+***Don't use this refresh, use the url rewrite from the link above***
 
 Example `index.html`
 ```html
@@ -65,7 +69,7 @@ To-do List
 * Automate VM and cloud infra provisioning (e.g. terraform)
 * Automate Nginx config (e.g. chef/ansible)
 * Automate certbot auto-renewal
-* Add Nginx config to redirect 404's to primary site (e.g. http://www.otherdomain.com/FileThatDoesntExist.html -> https://dxrf.com)
+* ~~Add Nginx config to redirect 404's to primary site (e.g. http://www.otherdomain.com/FileThatDoesntExist.html -> https://dxrf.com)~~ - DONE
 
 ## Closing
 
