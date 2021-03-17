@@ -20,6 +20,8 @@ Generally speaking, unit tests are only needed for custom logic and shouldn't be
 Let's take a look at an example policy. This policy allows requests to `POST` to the `users` path.
 
 ``` rego
+# example.rego
+
 package authz
 
 allow {
@@ -30,6 +32,8 @@ allow {
 
 Now let's take a look at the accompanying unit test.
 ``` rego
+# example_test.rego
+
 test_post_allowed {
     allow with input as {"path": ["users"], "method": "POST"}
 }
@@ -68,7 +72,7 @@ Now that we have a test, let's actually run it. Let's look at two ways we can ac
 There are a few conventions for writing rego tests.
 
 * Tests should be named `<policyname>_test.rego`. E.g. if your policy is `ingress.rego`, then your test should be named `ingress_test.rego`
-* All definitions in the test file should start with `test_` have a descriptive name. E.g. if you policy definition is `allow {...}`, then your test might be named `test_post_allowed {...}`
+* All definitions in the test file should start with `test_` have a descriptive name. E.g. if your policy definition is `allow {...}`, then your test might be named `test_post_allowed {...}`
 
 ## Unit testing in Styra DAS
 
@@ -101,7 +105,7 @@ So how do we test this? Well, we have options:
 
 1. Don't write any tests at all. Since we're only consuming pre-built content, there's really no value in writing tests.
 1. Write your tests so they test the policy as a whole. Provide "known good" input data in the test so all the definitions pass. This way, if a definition is changed, the test will fail.
-1. If we really need to test individual definitions, we can give them specific names so we can call them separately. We loose some of the GUI functionality in DAS by doing this as the definitions become completely custom and not DAS managed. We also need to add an additional definition to include the result of our now custom one into the main DAS policy.
+1. If we really need to test individual definitions, we can give them specific names so we can call them separately. We lose some of the GUI functionality in DAS by doing this as the definitions become completely custom and not DAS managed. We also need to add an additional definition to include the result of our now custom one into the main DAS policy.
 
 Let's look at an example of the last option. We'll use the same `enforce` definitions above but rename them so we can test them individually.
 
@@ -127,9 +131,14 @@ require_audit[decision] {
 
 enforce[decision] {
   block_priv_mode[decision]
+}
+
+enforce[decision] {
   require_audit[decision]
 }
 ```
+
+If you're wondering why there are two `enforce` rules, remember that in Rego, multiple definitions with the same name act as an `OR`. In this case, we're saying that we want `enforce` to be true if either `block_priv_mode` OR `require_audit` are true.
 
 ## Closing
 
