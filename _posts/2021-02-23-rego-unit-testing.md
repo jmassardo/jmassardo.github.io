@@ -111,7 +111,6 @@ Let's look at an example of the last option. We'll use the same `enforce` defini
 
 ```rego
 block_priv_mode[decision] {
-  not excludedNamespaces[input.request.namespace]
   data.library.v1.kubernetes.admission.workload.v1.block_privileged_mode[message]
 
   decision := {
@@ -139,6 +138,50 @@ enforce[decision] {
 ```
 
 If you're wondering why there are two `enforce` rules, remember that in Rego, multiple definitions with the same name act as an `OR`. In this case, we're saying that we want `enforce` to be true if either `block_priv_mode` OR `require_audit` are true.
+
+Now that we've got our DAS policy structured in a way that allows individual unit testing, let's look at an example test.
+
+Two things to note:
+
+* On the second line, we import rules package.
+* Since our rules package is imported as `rules`, we need to use that namespace to call the definitions we want to test. In this example, we use `rules.block_priv_mode`.
+
+```rego
+package policy["com.styra.kubernetes.validating"].test.test
+
+import data.policy["com.styra.kubernetes.validating"].rules.rules
+
+test_block_priv_mode {
+    in := {
+  "kind": "AdmissionReview",
+  "request": {
+    "kind": {
+      "kind": "Pod",
+      "version": "v1"
+    },
+    "object": {
+      "metadata": {
+        "name": "myapp"
+      },
+      "spec": {
+        "containers": [
+          {
+            "image": "nginx:0.1.0",
+            "name": "nginx-frontend", 
+            "securityContext": {
+              "privileged": false
+            }
+          },
+        ]
+      }
+    }
+  }
+}
+
+    actual := rules.block_priv_mode with input as in
+    count(actual) == 0
+}
+```
 
 ## Closing
 
