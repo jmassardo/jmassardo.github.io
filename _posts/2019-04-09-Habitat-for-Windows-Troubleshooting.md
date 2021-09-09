@@ -4,10 +4,11 @@ title:  "Habitat for Windows Troubleshooting"
 date:   2019-04-09 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
+excerpt: "Today, I'll be reviewing some steps for troubleshooting [Habitat](https://www.habitat.sh) on Windows."
 ---
 ## Summary
 
-Greetings! Today, I'll be reviewing some steps for troubleshooting [Habitat](https://www.habitat.sh) on Windows.
+Today, I'll be reviewing some steps for troubleshooting [Habitat](https://www.habitat.sh) on Windows.
 
 ## Habitat executable
 

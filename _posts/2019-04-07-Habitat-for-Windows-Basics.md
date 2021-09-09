@@ -4,10 +4,11 @@ title:  "Habitat for Windows Basics"
 date:   2019-04-07 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
+excerpt: "Today, I'll be introducing some of the basics for[Habitat](https://www.habitat.sh), specifically focusing on Habitat on Windows. I won't be covering all the things as the Habitat website has a tremendous amount of reference material. I will be calling out some things that are either pitfalls or differing between Linux and Windows."
 ---
 ## Summary
 
-Greetings! Today, I'll be introducing some of the basics for[Habitat](https://www.habitat.sh), specifically focusing on Habitat on Windows. I won't be covering all the things as the Habitat website has a tremendous amount of reference material. I will be calling out some things that are either pitfalls or differing between Linux and Windows.
+Today, I'll be introducing some of the basics for[Habitat](https://www.habitat.sh), specifically focusing on Habitat on Windows. I won't be covering all the things as the Habitat website has a tremendous amount of reference material. I will be calling out some things that are either pitfalls or differing between Linux and Windows.
 
 ## Habitat basics
 
@@ -162,7 +163,7 @@ My next post will contain a set of example patterns for the majority of installe
 
 When we talk about Habitat, the concept of contracts between applications is a prominent topic. This is the idea that each app knows what it provides and knows what it needs. Instead of prescribing a series of actions and checks to bring up a particular service (Orchestration), we start everything up and each app will wait until its dependent apps are running before moving on. This type of Choreography drastically reduces the amount of code (and effort) needed to get a service running.
 
-Let's look at a real example. In this case, we have a web server and a database server. In the orchestration model, we'd write code to bring the database up, validate that it's listening, then we'd make sure the web server had the appropriate creds for the DB then bring it up. In the habitat model, we would set the web server to require bindings for the database and export the DB config on the database server.
+Let's look at a real example. In this case, we have a web server and a database server. In the orchestration model, we'd write code to bring the database up, validate that it's listening, then we'd make sure the web server had the appropriate credentials for the DB then bring it up. In the habitat model, we would set the web server to require bindings for the database and export the DB config on the database server.
 
 ```PowerShell
 # Partial plan of web server
@@ -239,7 +240,7 @@ Let's look at the structure of the `\hab\` directory and make note of what each 
 # Each supervised service will have a folder under svc\.
 └── svc
     └── <service-name>
-        # Output of the templatized config files from the \config\ directory in your hab package
+        # Output of the templated config files from the \config\ directory in your hab package
         ├── config
         # Stored data consumed by app, i.e. databases
         ├── data

@@ -4,22 +4,40 @@ title:  "Habitat for Windows Examples"
 date:   2019-04-08 12:00:00 -0600
 category: Blog
 tags: [blog, habitat, applications, windows]
+excerpt: "Today, I'll be outlining some examples and patterns for packaging Windows applications with [Habitat](https://www.habitat.sh)."
 ---
 ## Summary
 
-Greetings! Today, I'll be outlining some examples and patterns for packaging Windows applications with [Habitat](https://www.habitat.sh).
+Today, I'll be outlining some examples and patterns for packaging Windows applications with [Habitat](https://www.habitat.sh).
 
 ## Examples
 
 These are the main types of patterns we see in the field so I'm going to outline the basic info needed to get started. All applications have their own essence/flavor so they may need additional tuning beyond what's outlined here.
 
-* [Zipped Artifact (my_app.zip)](#zipped-artifact)
-* [Executable Binary](#executable-binary)
-* [Git Repository](#git-repository)
-* [Legacy folder](#legacy-folder)
-* [MSI based Installers](#msi-based-installers)
-* [EXE based Installers](#exe-based-installers)
-* [Windows Role/Feature based installs](#windows-role/feature-based-installs)
+- [Summary](#summary)
+- [Examples](#examples)
+  - [Zipped Artifact](#zipped-artifact)
+    - [Background](#background)
+    - [Code](#code)
+  - [Executable Binary](#executable-binary)
+    - [Background](#background-1)
+    - [Code](#code-1)
+  - [Git Repository](#git-repository)
+    - [Background](#background-2)
+    - [Code](#code-2)
+  - [Legacy Folder](#legacy-folder)
+    - [Background](#background-3)
+    - [Code](#code-3)
+  - [MSI Based Installers](#msi-based-installers)
+    - [Background](#background-4)
+    - [Code](#code-4)
+  - [EXE Based Installers](#exe-based-installers)
+    - [Background](#background-5)
+    - [Code](#code-5)
+  - [Windows Role/Feature based installs](#windows-rolefeature-based-installs)
+    - [Background](#background-6)
+    - [Code](#code-6)
+- [Closing](#closing)
 
 ### Zipped Artifact
 
@@ -110,8 +128,9 @@ function Invoke-Install{
 ```
 
 > NOTE: Please take note of the two different dependency types: `$pkg_deps` and `$pkg_build_deps`.
-> * `$pkg_deps` includes dependencies that are needed during runtime.
-> * `$pkg_build_deps` includes dependencies that are only used during the package build. In our example, we only need `core/git` to clone the repo during build so there's no need to include those files when we're running in production.
+>
+> - `$pkg_deps` includes dependencies that are needed during runtime.
+> - `$pkg_build_deps` includes dependencies that are only used during the package build. In our example, we only need `core/git` to clone the repo during build so there's no need to include those files when we're running in production.
 
 ### Legacy Folder
 
@@ -155,9 +174,9 @@ $pkg_binds=@{"database"="username password port"}
 
 Most Windows Admins are familiar with MSI based installers. We really need the files inside the MSI and not the installation instructions so let's use `lessmsi` to extract the MSI file. Depending on the application, you may need to add some additional actions:
 
-* Set up additional app requirements such as registry keys via the `init` hook.
-* Remove these items via the `post-stop` hook
-* Consider using the `reload` and/or `reconfigure` hooks to update registry keys
+- Set up additional app requirements such as registry keys via the `init` hook.
+- Remove these items via the `post-stop` hook
+- Consider using the `reload` and/or `reconfigure` hooks to update registry keys
 
 These actions will allow you to use gossiped data and toml files to update the running config of the app, e.g redirecting an Win32 forms app to a different data base server.
 
@@ -251,7 +270,7 @@ $pkg_license=@("Apache-2.0")
 $pkg_description="Installs Basic IIS Web Server features"
 ```
 
-Hey, wait just a dang minute, where are the callbacks?!? Well... there aren't any. In this case, we can't actually fully package IIS because it's a Windows component. So now what? We still need IIS for our app. We use a different path, the `install` hook. This hook is triggered when you run `hab pkg install ....` We'll use it install the features/roles we need. It's not techncially packaged in Hab but it is "habatized" in the sense that we can track it as a dependency and trigger the install if it's missing.
+Hey, wait just a dang minute, where are the callbacks?!? Well... there aren't any. In this case, we can't actually fully package IIS because it's a Windows component. So now what? We still need IIS for our app. We use a different path, the `install` hook. This hook is triggered when you run `hab pkg install ....` We'll use it install the features/roles we need. It's not technically packaged in Hab but it is "habatized" in the sense that we can track it as a dependency and trigger the install if it's missing.
 
 ```PowerShell
 # Install hook

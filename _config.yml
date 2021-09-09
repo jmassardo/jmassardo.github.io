@@ -9,6 +9,7 @@ logo: '/public/logo.png'
 # Site configurations
 plugins:
   - jekyll-paginate
+  - jekyll-feed
 markdown: kramdown
 highligher: rouge
 kramdown:

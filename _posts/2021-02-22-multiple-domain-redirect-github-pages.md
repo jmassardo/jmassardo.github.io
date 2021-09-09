@@ -4,12 +4,13 @@ title:  "HTTPS for Multiple domains using GitHub pages"
 date:   2021-02-22 15:00:00 -0600
 category: Blog
 tags: [blog, web, github, nginx]
+excerpt: "In today's modern Internet, nearly all browsers show a big warning when viewing an insecure/non-ssl site. If you own a single domain name and use [GitHub Pages](https://pages.github.com/) to host your site, this is a simple matter to resolve. So what happens if you own multiple domains that point to the same site?"
 ---
 ## Summary
 
 ***UPDATE:3/16/2021*** I found a very annoying bug with this deployment pattern. See the update here: [Rewriting URLs with Nginx]({% post_url 2021-03-16-nginx-url-rewrites %})
 
-In today's modern Internet, nearly all browsers show a big warning when viewing an insecure/non-ssl site. If you own a single domain name and use [GitHub Pages](https://pages.github.com/) to host your site, this is a simple matter to resolve. One can easily navigate to the project settings (`https://github.com/<USERNAME>/<USERNAME>.github.io/`) and tick the `Enforce HTTPS` setting. 
+In today's modern Internet, nearly all browsers show a big warning when viewing an insecure/non-ssl site. If you own a single domain name and use [GitHub Pages](https://pages.github.com/) to host your site, this is a simple matter to resolve. One can easily navigate to the project settings (`https://github.com/<USERNAME>/<USERNAME>.github.io/`) and tick the `Enforce HTTPS` setting.
 
 So what happens if you own multiple domains that point to the same site? Now we have a bit of a mess to untangle.
 

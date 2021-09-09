@@ -4,10 +4,11 @@ title:  "Patch all the things!"
 date:   2018-12-10 13:49:00 -0600
 category: Blog
 tags: [blog, chef, linux, mac, patching, updates, windows]
+excerpt: "I recently did a customer call/demo around using Chef to patch Windows systems and I thought this would make a great post. However, I'm going to change one thing, we're going review patching as a fundamental process and cover more than Windows."
 ---
 ## Summary
 
-Greetings! I recently did a customer call/demo around using Chef to patch Windows systems and I thought this would make a great post. However, I'm going to change one thing, we're going review patching as a fundamental process and cover more than Windows.
+I recently did a customer call/demo around using Chef to patch Windows systems and I thought this would make a great post. However, I'm going to change one thing, we're going review patching as a fundamental process and cover more than Windows.
 
 ## Objectives
 
@@ -66,7 +67,7 @@ In regard to patching, if I have a group of nodes that has a specific boot order
 As you can see, the names of the tools within a group may be different; however, they all function using similar patterns. These similarities are what allow us to build a standardized process regardless of platform.
 
 * Repositories provide the content and content control
-* Config. mgmt. tools control the configuration of the client (I know... Mr. Obvious...). This is how we assign maintenance windows, reboot behaviors, etc.
+* Config. management tools control the configuration of the client (I know... Mr. Obvious...). This is how we assign maintenance windows, reboot behaviors, etc.
 * Orchestration tools handle procedural tasks
 
 We want this to be as automated as possible so everything will be set to run on a scheduled basis. The only time it requires manual intervention is when there's a patch we need to exclude. In the examples below, we'll configure the repositories to sync nightly and we'll configure the clients to check on Sunday mornings at 2AM. I can hear what you are thinking again, you're saying "We have a bunch of systems, we can't reboot all of them at once!" And you'd be right. Even if you don't have a large fleet, you still don't want to patch all the things at once.
@@ -237,7 +238,7 @@ include_recipe 'wsus-client::configure'
 
 ## Validation
 
-Now the real question: "Did everything get patched?" How do we answer this question? Apt and Yum have no concept of reporting and the WSUS reports can get unwieldy in a hurry. Enter [Inspec](https://www.inspec.io). Inspec is an open source auditing framework that allows you to test for various compliance and configuration items including patches. Patching baselines exist for both [Linux](https://github.com/dev-sec/linux-patch-baseline) and [Windows](https://github.com/dev-sec/windows-patch-baseline). Inspec can run remotely and collect data on target nodes or you can have it report compliance data to [Chef Automate](https://www.chef.io/automate/) for improved visibility and dashboards.
+Now the real question: "Did everything get patched?" How do we answer this question? Apt and Yum have no concept of reporting and the WSUS reports can get unwieldy in a hurry. Enter [InSpec](https://www.inspec.io). InSpec is an open source auditing framework that allows you to test for various compliance and configuration items including patches. Patching baselines exist for both [Linux](https://github.com/dev-sec/linux-patch-baseline) and [Windows](https://github.com/dev-sec/windows-patch-baseline). InSpec can run remotely and collect data on target nodes or you can have it report compliance data to [Chef Automate](https://www.chef.io/automate/) for improved visibility and dashboards.
 
 ## Closing
 
@@ -250,7 +251,7 @@ Thanks to [@ncerny](https://twitter.com/ndcerny) and [@trevorghess](https://twit
 Here are some tidbits that may help you.
 
 * [WSUS memory limit](https://www.anyresearch.net/wsus-pool-reached-memory-limit/) event log error. You will almost 100% hit this at some point. This is a scaling config so the more clients you have, the more memory WSUS will need.
-* Use attributes to feed required data (maint. window, patch time, reboot behavior, etc.) to the node. This allows you to have one main patching cookbook that get's applied to everything. You can deliver attributes different ways:
+* Use attributes to feed required data (maintenance window, patch time, reboot behavior, etc.) to the node. This allows you to have one main patching cookbook that get's applied to everything. You can deliver attributes different ways:
   * Environments
   * Roles
   * Role/wrapper cookbooks

@@ -4,10 +4,11 @@ title:  "Pipelining Chef with Jenkins"
 date:   2018-04-06 14:39:00 -0600
 category: Blog
 tags: [blog, ci/cd, chef, pipeline]
+excerpt: "Today, I'm going to detail out how we are setting up our pipelining process for all things Chef for our business unit partners. This process uses a combination of [Chef](https://www.chef.io), [Jenkins](https://jenkins.io/), [GitHub](https://github.com), a custom Jenkins [Shared Library](https://github.com/jmassardo/Chef-Jenkins-Library), and some custom developed [utilities](https://github.com/jmassardo/Chef-Jenkins-Library/tree/master/utilities)."
 ---
 ## Summary
 
-Today, I'm going to detail out how we are setting up our pipelining process for all things Chef for our business unit partners. This process uses a combination of [Chef](https://www.chef.io), [Jenkins](https://jenkins.io/), [GitHub](https://github.com), a custom Jenkins [Shared Library](https://github.com/jkhy/Chef-Pipeline-SharedLibrary_PUBLIC), and some custom developed [utilities](https://github.com/jkhy/Chef-Pipeline-Automation_PUBLIC).
+Today, I'm going to detail out how we are setting up our pipelining process for all things Chef for our business unit partners. This process uses a combination of [Chef](https://www.chef.io), [Jenkins](https://jenkins.io/), [GitHub](https://github.com), a custom Jenkins [Shared Library](https://github.com/jmassardo/Chef-Jenkins-Library), and some custom developed [utilities](https://github.com/jmassardo/Chef-Jenkins-Library/tree/master/utilities).
 
 ## Problem
 
@@ -86,12 +87,12 @@ These steps assume you have a working Chef Server and a working Jenkins Server. 
   * Create a `chef_repo` folder and place the `knife.rb` and the `user.pem` files in the Jenkins home directory
 
   ``` bash
-  $ cd /var/lib/jenkins
-  $ mkdir -p chef_repo/.chef
-  $ cp /path/to/my/knife.rb /var/lib/jenkins/chef_repo/.chef/knife.rb
-  $ cp /path/to/my/user.pem /var/lib/jenkins/chef_repo/.chef/user.pem
-  $
-  $ tree /var/jenkins
+  cd /var/lib/jenkins
+  mkdir -p chef_repo/.chef
+  cp /path/to/my/knife.rb /var/lib/jenkins/chef_repo/.chef/knife.rb
+  cp /path/to/my/user.pem /var/lib/jenkins/chef_repo/.chef/user.pem
+  
+  tree /var/jenkins
   chef_repo
   ├── .chef
   │   ├── knife.rb
@@ -103,6 +104,7 @@ Thanks for sticking with me thus far. I'm happy to tell you that all of the grou
 * BU/Environment repository
   * There needs to be one repository for each environment on the Chef Server.
   * The repository follows this structure:
+
     ``` bash
     env_repo
     ├── environments
@@ -123,6 +125,7 @@ Thanks for sticking with me thus far. I'm happy to tell you that all of the grou
     ├── Jenkinsfile
     └── README.md
     ```
+
     * The `Jenkinsfile` for the environments repository should contain the following:
 
     ``` groovy
@@ -145,7 +148,7 @@ Thanks for sticking with me thus far. I'm happy to tell you that all of the grou
   ```
 
   * Once the `Jenkinsfile` is created, create a new pipeline in Jenkins for each cookbook. If the permissions are set correctly in Jenkins, this task can be delegated to the BU further reducing the necessity for outside intervention.
-* Last but certainly not least, Inspec profiles. Profiles follow the standard processes just like cookbooks with the only difference being the function called in the `Jenkinsfile`.
+* Last but certainly not least, InSpec profiles. Profiles follow the standard processes just like cookbooks with the only difference being the function called in the `Jenkinsfile`.
 
 ``` groovy
 // Jenkinsfile

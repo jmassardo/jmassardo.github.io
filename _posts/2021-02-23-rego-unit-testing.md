@@ -4,6 +4,7 @@ title:  "Rego Unit Testing"
 date:   2021-02-23 7:00:00 -0600
 category: Blog
 tags: [blog, unit, testing, rego, das, opa]
+excerpt: "This post is going to outline some basics, interesting tidbits, and caveats on unit testing rego policies."
 ---
 ## Summary
 

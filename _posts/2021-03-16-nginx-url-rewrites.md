@@ -4,6 +4,7 @@ title:  "Rewriting URLs with Nginx"
 date:   2021-03-16 15:00:00 -0600
 category: Blog
 tags: [blog, web, github, nginx]
+excerpt: "In my post 'HTTPS for Multiple domains using GitHub pages', I was originally using a HTML file with a meta redirect. While this technique does work, I discovered a very annoying flaw. Anyone that had an old, or non-ssl link was redirected to the home page instead of the page or post they wanted. This isn't a delightful experience so I started doing some research to find a better path."
 ---
 ## Summary
 
