@@ -3,7 +3,7 @@ layout: post
 title:  "Rego Unit Testing"
 date:   2021-02-23 7:00:00 -0600
 category: Blog
-tags: [blog, unit, testing, rego, das, opa]
+tags: [unit, testing, rego, das, opa]
 excerpt: "This post is going to outline some basics, interesting tidbits, and caveats on unit testing rego policies."
 ---
 ## Summary
@@ -32,6 +32,7 @@ allow {
 ```
 
 Now let's take a look at the accompanying unit test.
+
 ``` rego
 # example_test.rego
 
@@ -63,6 +64,7 @@ Now that we have a test, let's actually run it. Let's look at two ways we can ac
 * Now let's try it with [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa).
   * Let's put our policy definition in a file `example.rego` and our test definition in a file `example_test.rego`
   * Now let's execute the tests by running:
+  
   ``` bash
   % opa test . -v
   data.authz.test_post_allowed: PASS (3.697875ms)

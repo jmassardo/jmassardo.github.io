@@ -3,7 +3,7 @@ layout: post
 title:  "Habitat for Windows Basics"
 date:   2019-04-07 12:00:00 -0600
 category: Blog
-tags: [blog, habitat, applications, windows]
+tags: [habitat, applications, windows]
 excerpt: "Today, I'll be introducing some of the basics for[Habitat](https://www.habitat.sh), specifically focusing on Habitat on Windows. I won't be covering all the things as the Habitat website has a tremendous amount of reference material. I will be calling out some things that are either pitfalls or differing between Linux and Windows."
 ---
 ## Summary

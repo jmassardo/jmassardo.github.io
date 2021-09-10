@@ -3,7 +3,7 @@ layout: post
 title:  "Habitat for Windows Examples"
 date:   2019-04-08 12:00:00 -0600
 category: Blog
-tags: [blog, habitat, applications, windows]
+tags: [habitat, applications, windows]
 excerpt: "Today, I'll be outlining some examples and patterns for packaging Windows applications with [Habitat](https://www.habitat.sh)."
 ---
 ## Summary

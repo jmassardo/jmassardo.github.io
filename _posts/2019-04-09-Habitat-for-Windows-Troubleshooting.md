@@ -3,7 +3,7 @@ layout: post
 title:  "Habitat for Windows Troubleshooting"
 date:   2019-04-09 12:00:00 -0600
 category: Blog
-tags: [blog, habitat, applications, windows]
+tags: [habitat, applications, windows]
 excerpt: "Today, I'll be reviewing some steps for troubleshooting [Habitat](https://www.habitat.sh) on Windows."
 ---
 ## Summary
@@ -58,7 +58,6 @@ At C:\src\plan.ps1:18 char:24
 # - With the breakpoint, you can single step through the commands  by using the `StepInto` option.
 # - Type `h` and press enter to get more help for using the debugger.
 ```
-
 
 ```PowerShell
 # If you forget the breakpoint id, we can find it
@@ -124,7 +123,7 @@ We reviewed the folder structure in a previous post, however, let's review:
 # Each supervised service will have a folder under svc\.
 └── svc
     └── <service-name>
-        # Output of the templatized config files from the \config\ directory in your hab package
+        # Output of the templated config files from the \config\ directory in your hab package
         ├── config
         # Stored data consumed by app, i.e. databases
         ├── data

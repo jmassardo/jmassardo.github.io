@@ -3,7 +3,7 @@ layout: post
 title:  "Habitat for Windows in Production"
 date:   2019-04-11 12:00:00 -0600
 category: Blog
-tags: [blog, habitat, applications, windows]
+tags: [habitat, applications, windows]
 excerpt: "Today, I'll be sharing some notes about running [Habitat](https://www.habitat.sh) for Windows in Production."
 ---
 ## Summary
@@ -172,7 +172,7 @@ Additional reading on peering [here](https://www.habitat.sh/docs/best-practices/
 
 Now that we have a basic ring, how do we secure it? There are several pieces, so let's dive right in.
 
-# What about rotating keys? how we do deliver new keys and restart supervisors without downtime
+## What about rotating keys? how we do deliver new keys and restart supervisors without downtime
 
 * We need encryption keys to protect our data on the wire so let's generate one:
 

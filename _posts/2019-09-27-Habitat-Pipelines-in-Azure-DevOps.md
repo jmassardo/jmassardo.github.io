@@ -3,7 +3,7 @@ layout: post
 title:  "Habitat pipelines in Azure DevOps"
 date:   2019-09-27 7:00:00 -0600
 category: Blog
-tags: [blog, habitat, applications, pipeline,ci/cd]
+tags: [habitat, applications, pipeline,ci/cd]
 excerpt: "I've been doing some work related to building and deploying [Habitat](https://www.habitat.sh) artifacts using [Azure DevOps](https://dev.azure.com) so I thought I'd blog the basic steps so future me can set it up again..."
 ---
 ## Summary

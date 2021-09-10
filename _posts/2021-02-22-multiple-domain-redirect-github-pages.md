@@ -3,7 +3,7 @@ layout: post
 title:  "HTTPS for Multiple domains using GitHub pages"
 date:   2021-02-22 15:00:00 -0600
 category: Blog
-tags: [blog, web, github, nginx]
+tags: [web, github, nginx]
 excerpt: "In today's modern Internet, nearly all browsers show a big warning when viewing an insecure/non-ssl site. If you own a single domain name and use [GitHub Pages](https://pages.github.com/) to host your site, this is a simple matter to resolve. So what happens if you own multiple domains that point to the same site?"
 ---
 ## Summary
@@ -14,13 +14,13 @@ In today's modern Internet, nearly all browsers show a big warning when viewing 
 
 So what happens if you own multiple domains that point to the same site? Now we have a bit of a mess to untangle.
 
-If this was a high volume or mission-critical site, I would use fit-for-purpose tooling with load balancers, CDNs, geo-redundant hosts, etc. But what about a simple page that doesn't get a lot of traffic? 
+If this was a high volume or mission-critical site, I would use fit-for-purpose tooling with load balancers, CDNs, geo-redundant hosts, etc. But what about a simple page that doesn't get a lot of traffic?
 
-How can we do it on the cheap? 
+How can we do it on the cheap?
 
 ## Problem
 
-Let's take a look at my needs: 
+Let's take a look at my needs:
 
 * My primary site, [dxrf.com](https://dxrf.com), is [Jekyll](https://jekyllrb.com/) based and is hosted as a [GitHub Pages](https://pages.github.com/) site.
 * I own 4 different domains that have served in various capacities over the years. As it stands right now, I want all 4 to redirect to my primary site.
@@ -43,6 +43,7 @@ Let's look at the high level steps needed. This assumes you have GitHub pages wo
 ***Don't use this refresh, use the url rewrite from the link above***
 
 Example `index.html`
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -67,10 +68,11 @@ There are a few caveats to this pattern a few things I still need to iron out.
 * Since this is a single VM exposed to the Internet, make sure it stays up to date to reduce the risk of someone hijacking your server and sending your traffic elsewhere (or worse, making your site serve malware).
 
 To-do List
+
 * Automate VM and cloud infra provisioning (e.g. terraform)
 * Automate Nginx config (e.g. chef/ansible)
 * Automate certbot auto-renewal
-* ~~Add Nginx config to redirect 404's to primary site (e.g. http://www.otherdomain.com/FileThatDoesntExist.html -> https://dxrf.com)~~ - DONE
+* ~~Add Nginx config to redirect 404's to primary site (e.g. `http://www.otherdomain.com/FileThatDoesntExist.html` -> `https://dxrf.com`)~~ - DONE
 
 ## Closing
 

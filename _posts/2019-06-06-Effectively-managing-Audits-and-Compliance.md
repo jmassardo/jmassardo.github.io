@@ -3,7 +3,7 @@ layout: post
 title:  "Effectively Managing Audits and Compliance"
 date:   2019-06-13 12:00:00 -0600
 category: Blog
-tags: [blog, compliance, audit, inspec]
+tags: [compliance, audit, inspec]
 excerpt: "Today, I'll be sharing some of my experiences working with audit and compliance. In a previous life, I was responsible for providing compliance data and responses for a portion of multiple internal audits and external examinations."
 ---
 ## Summary

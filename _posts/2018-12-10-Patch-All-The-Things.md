@@ -3,7 +3,7 @@ layout: post
 title:  "Patch all the things!"
 date:   2018-12-10 13:49:00 -0600
 category: Blog
-tags: [blog, chef, linux, mac, patching, updates, windows]
+tags: [chef, linux, mac, patching, updates, windows]
 excerpt: "I recently did a customer call/demo around using Chef to patch Windows systems and I thought this would make a great post. However, I'm going to change one thing, we're going review patching as a fundamental process and cover more than Windows."
 ---
 ## Summary
