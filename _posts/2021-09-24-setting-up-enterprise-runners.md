@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Setting up Shared Enterprise Actions"
-date:   2021-09-09 21:45:00 -0500
+date:   2021-09-28 10:25:00 -0500
 category: Blog
 tags: [github, actions, enterprise, runner]
 excerpt: "I recently had a customer that wanted to set up shared runners in their enterprise but the docs weren't super clear so I wrote up these steps to make it easier."
