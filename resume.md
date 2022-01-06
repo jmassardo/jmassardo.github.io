@@ -35,7 +35,7 @@ Highly motivated Technologist specializing in configuration management, systems 
 
 #### Automation
 
-Ansible, Chef Suite (Infra, InSpec, Habitat), Cloud (Azure, AWS, GCP, Kubernetes), CI/CD (Azure DevOps, GitLabCI, Jenkins, TravisCI), Terraform, Test Kitchen, Vagrant
+Ansible, Chef Suite (Infra, InSpec, Habitat), Cloud (Azure, AWS, GCP, Kubernetes), CI/CD (Azure DevOps, GitHub Actions, GitLabCI, Jenkins, TravisCI), Terraform, Test Kitchen, Vagrant
 
 #### Development
 
@@ -47,7 +47,7 @@ Active Directory, Azure, Certificate Services, Group Policy, IIS, Microsoft Depl
 
 #### Other
 
-Apple/Mac, AWS, Docker, Gainsight, Google Suite, Kanban Tool, Hubspot, Linux (CentOS/Ubuntu), Salesforce, Spacewalk, Trello, VMWare Fusion, Zapier
+Apple/Mac, Docker, Gainsight, Google Suite, Kanban Tool, Hubspot, Linux (CentOS/Ubuntu), Salesforce, Spacewalk, Trello, Totango, VMWare Fusion, Zapier
 
 ### MANAGEMENT
 
@@ -60,11 +60,15 @@ Apple/Mac, AWS, Docker, Gainsight, Google Suite, Kanban Tool, Hubspot, Linux (Ce
 
 ## Experience
 
-#### Sr. Customer Success Architect | Styra | 1/2021 - Present
+#### STAFF CUSTOMER SUCCESS ARCHITECT | GITHUB | 7/2021 - PRESENT
+
+* I work with some of the largest companies in the world to develop world class SDLC and DevOps best practices. I operate as a Trusted Technical Advisor to define processes and patterns for large scale git operations.
+
+#### SR. CUSTOMER SUCCESS ARCHITECT | STYRA | 1/2021 - 7/2021
 
 * My role as a Customer Success Architect is described as "All things proactive technical". I work with customers to design, develop, and implement best in class Authorization processes.
 
-#### Lead Customer Architect | Chef Software | 5/2018 - 1/2021
+#### LEAD CUSTOMER ARCHITECT | CHEF SOFTWARE | 5/2018 - 1/2021
 
 * As a Customer Architect, my primary role is to help customers get the most value from Chef's products as I can. This includes performing architecture reviews, conducting technical enablement sessions where I teach a new technique or skill, peer programming/reviews, and process coaching. I also develop sample code, demos, and examples along with writing process guides and blog posts about best practices.
 
@@ -107,6 +111,7 @@ Apple/Mac, AWS, Docker, Gainsight, Google Suite, Kanban Tool, Hubspot, Linux (Ce
 
 #### Certifications
 
+* GitHub: Actions - Working with GitHub Actions in the Enterprise
 * MTA: Cloud Fundamentals
 * MCTS: System Center Configuration Manager
 * ITIL Foundations v3.0
