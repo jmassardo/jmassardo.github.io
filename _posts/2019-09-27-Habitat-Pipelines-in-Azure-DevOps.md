@@ -82,4 +82,4 @@ We're almost there, the final steps set up the actual pipeline.
 
 ## Closing
 
-Hopefully, you've found a couple things that will help you be successful. If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+Hopefully, you've found a couple things that will help you be successful. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

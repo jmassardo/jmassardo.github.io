@@ -16,7 +16,7 @@ gem "jekyll-paginate"
 gem "minima", "~> 2.0"
 gem "ffi", ">= 1.9.24"
 gem "nokogiri"
-gem "activesupport", ">= 5.2.4.3"
+gem "activesupport", ">= 7.0.4.3"
 gem "kramdown", ">= 2.3.0"
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.

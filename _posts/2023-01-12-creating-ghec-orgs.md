@@ -53,4 +53,4 @@ You can read more about GitHub's GraphQL endpoint in the [documentation](https:/
 
 ## Closing
 
-If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

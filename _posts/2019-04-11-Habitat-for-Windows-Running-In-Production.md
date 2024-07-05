@@ -226,4 +226,4 @@ As you can see, there are a number of things to consider; however, most all of t
 
 Special thanks to Josh Hudson and Andrew Defour for letting me use info from their ChefConf 2019 session. I highly recommend checkout out their [presentation](https://chefconf.chef.io/conf-resources/lessons-field-chef-habitat-enterprise-scale/).
 
-As always, if you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+As always, if you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

@@ -190,4 +190,4 @@ test_block_priv_mode {
 
 Hopefully this post has been helpful getting started. The Open Policy Agent documentation has a lot more info on [policy testing](https://www.openpolicyagent.org/docs/latest/policy-testing/)
 
-If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

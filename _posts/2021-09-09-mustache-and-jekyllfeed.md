@@ -176,4 +176,4 @@ jobs:
 
 ## Closing
 
-Again, feel free to browse my [repo](https://github.com/jmassardo/jmassardo) with the functional source code. If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+Again, feel free to browse my [repo](https://github.com/jmassardo/jmassardo) with the functional source code. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

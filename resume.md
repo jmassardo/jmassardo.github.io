@@ -3,7 +3,7 @@ layout: page
 title: Resume
 ---
 
-# James Massardo
+# Jenna Massardo
 
 <p>
     {% for contact in site.author.contact %}
@@ -29,7 +29,7 @@ Highly motivated Technologist specializing in configuration management, systems 
 
 ### LANGUAGES
 
-.Net/C#, BASH, CSS, HTML, Java, PowerShell, Python, Ruby (Chef DSC and RAILS), Swift
+.Net/C#, BASH, CSS, HTML, Java, Javascript, PowerShell, Python, Ruby (Chef DSC and RAILS), Swift
 
 ### TECHNOLOGIES
 

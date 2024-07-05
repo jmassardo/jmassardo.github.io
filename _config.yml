@@ -1,6 +1,6 @@
 # Site Info
-title: James Massardo - DXRF
-tagline: 'James Massardo - Geek of all things Technology'
+title: Jenna Massardo - DXRF
+tagline: 'Jenna Massardo - Geek of all things Technology'
 description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
 #baseurl: "/"
 #url: http://www.dxrf.com
@@ -27,17 +27,17 @@ exclude: [vendor]
 
 # About/contact
 author:
-  name: James Massardo
+  name: Jenna Massardo
   description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
   gravatar: e1c60f4afa864fc91dbb12048dbac6b5 # md5 hash of your email address
   contact:
-    linkedin:  https://www.linkedin.com/in/james-massardo/
+    linkedin:  https://www.linkedin.com/in/jenna-massardo/
     github:    https://github.com/jmassardo
-    facebook:  https://www.facebook.com/james.massardo
-    twitter:   https://twitter.com/jamesmassardo
-    instagram: https://www.instagram.com/jamesmassardo/
+    facebook:  https://www.facebook.com/jennamassardo
+    threads:   https://www.threads.net/@jennamassardo
+    instagram: https://www.instagram.com/jennamassardo/
     #weibo:     http://weibo.com/41173780
-    email:     mailto:james@dxrf.com
+    email:     mailto:jenna@dxrf.com
 
 # Navigation (2nd level links supported)
 nav:

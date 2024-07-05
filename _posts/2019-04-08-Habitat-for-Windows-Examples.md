@@ -109,7 +109,7 @@ Our app team is diligent about storing their code in a git repo, so let's go str
 $pkg_name="moonsweeper-py"
 $pkg_origin="jmassardo"
 $pkg_version="0.1.0"
-$pkg_maintainer="James Massardo <james@dxrf.com>"
+$pkg_maintainer="Jenna Massardo <jenna@dxrf.com>"
 $pkg_license=@("Apache-2.0")
 $pkg_deps=@('jmassardo/python')
 $pkg_build_deps=@('core/git')
@@ -295,4 +295,4 @@ I'd like to take credit for writing all these plans but, alas, I can't. Fortunat
 
 If you run across another significant pattern that isn't here, please let me know so I can update this page!
 
-If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

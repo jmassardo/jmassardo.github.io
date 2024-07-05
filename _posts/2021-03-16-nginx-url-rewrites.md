@@ -27,4 +27,4 @@ server {
 
 ## Closing
 
-While these aren't step-by-step directions, hopefully it's enough for someone else to solve the same problem I had. If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+While these aren't step-by-step directions, hopefully it's enough for someone else to solve the same problem I had. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

@@ -120,7 +120,7 @@ $pkg_origin="jmassardo"
 $pkg_version="647819"
 
 # The person or group maintaining the package
-$pkg_maintainer="James Massardo <james@dxrf.com>"
+$pkg_maintainer="Jenna Massardo <jenna@dxrf.com>"
 
 # This needs to be a valid license type. I'm sure there are other references but this is the one I use: https://help.github.com/en/articles/licensing-a-repository
 $pkg_license=@("Apache-2.0")
@@ -260,4 +260,4 @@ Let's look at the structure of the `\hab\` directory and make note of what each 
 
 Congrats on making it through all of that info! Hopefully this post has clarified a few points and was helpful. If you're like me, documentation is invaluable, but it's nice to detail out some of the basics so the documentation actually makes sense!
 
-If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

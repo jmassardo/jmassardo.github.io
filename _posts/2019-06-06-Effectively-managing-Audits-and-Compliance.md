@@ -72,4 +72,4 @@ end
 
 ## Closing
 
-In closing, be prepared, be confident, and be thorough and you'll do fine. If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+In closing, be prepared, be confident, and be thorough and you'll do fine. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)

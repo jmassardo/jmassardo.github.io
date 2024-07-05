@@ -159,4 +159,4 @@ uploadProfile()
 
 That's it. Easy peasy, right? I know it feels like a lot of information and a lot of moving pieces and to a certain degree, it is. However, taking the time to set up this type of pipelining greatly improves operational efficiency and drastically reduces the likelihood of a simple mistake breaking production.
 
-Thank you for taking the time to read all of this information. The Automation Utilities and the Shared Library are both open source so feel free to contribute. If you do make enhancements or have questions, please drop me a email, hit me on [Twitter](https://twitter.com/jamesmassardo), open an issue, or submit a PR on GitHub.
+Thank you for taking the time to read all of this information. The Automation Utilities and the Shared Library are both open source so feel free to contribute. If you do make enhancements or have questions, please drop me a email, hit me on [Twitter](https://www.threads.net/@jennamassardo), open an issue, or submit a PR on GitHub.

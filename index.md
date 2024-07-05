@@ -3,7 +3,7 @@ layout: page
 title: Welcome
 ---
 
-Welcome. My name is James. This site is my place to make notes about things I do, reminders for how to do cool stuff, and a place to show off some of my projects.
+Welcome. My name is Jenna. This site is my place to make notes about things I do, reminders for how to do cool stuff, and a place to show off some of my projects.
 
 I'm completely retooling my site and content so it's pretty plain right now. I plan to write more about the various projects, hobbies, and groups that I'm involved in.
 

@@ -242,7 +242,7 @@ Now the real question: "Did everything get patched?" How do we answer this quest
 
 ## Closing
 
-Congratulations! If you are reading this, then you made it through a ton of information. Hopefully you found at least a couple nuggets that will help you. If you have any questions or feedback, please feel free to contact me: [@jamesmassardo](https://twitter.com/jamesmassardo)
+Congratulations! If you are reading this, then you made it through a ton of information. Hopefully you found at least a couple nuggets that will help you. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
 
 Thanks to [@ncerny](https://twitter.com/ndcerny) and [@trevorghess](https://twitter.com/trevorghess) for their input and code samples.
 
