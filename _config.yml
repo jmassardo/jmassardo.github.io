@@ -29,7 +29,7 @@ exclude: [vendor]
 author:
   name: Jenna Massardo
   description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
-  gravatar: e1c60f4afa864fc91dbb12048dbac6b5 # md5 hash of your email address
+  gravatar: 69ea17ec24451281f083ff214479fb07 # md5 hash of your email address
   contact:
     linkedin:  https://www.linkedin.com/in/jenna-massardo/
     github:    https://github.com/jmassardo
