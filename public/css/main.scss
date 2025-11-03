@@ -1,6 +1,32 @@
 ---
 ---
 
+@import "config";
+
+@import "bourbon/bourbon";
+
+/* Fix for excessive h3 spacing */
+h3 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  line-height: 1.3;
+}
+
+/* Post content h3 specific adjustments */
+.post-content h3,
+.post h3,
+article h3 {
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Reduce spacing after h3 when followed by certain elements */
+h3 + p,
+h3 + ul,
+h3 + ol {
+  margin-top: 0.5rem !important;
+}
+
 @import 'config';
 
 @import 'bourbon/bourbon';

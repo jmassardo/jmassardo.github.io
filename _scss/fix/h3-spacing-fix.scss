@@ -1,0 +1,22 @@
+/* Fix for excessive h3 spacing */
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+/* Post content h3 specific adjustments */
+.post-content h3,
+.post h3,
+article h3 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Reduce spacing after h3 when followed by certain elements */
+h3 + p,
+h3 + ul,
+h3 + ol {
+  margin-top: 0.5rem;
+}

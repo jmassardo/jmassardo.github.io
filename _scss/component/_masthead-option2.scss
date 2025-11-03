@@ -1,0 +1,56 @@
+/*
+ * Masthead - Option 2: Bold Hero Style
+ */
+
+.masthead {
+  padding: 3rem 0;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, $theme-color 0%, $theme-color-dark 100%);
+  color: white;
+  text-align: center;
+  @media (min-width: 30rem) {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
+  .masthead-title {
+    margin: 0;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    a {
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      &:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
+      }
+    }
+    small {
+      font-size: 0.6rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 1px;
+      text-transform: none;
+      display: block;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+    @media (max-width: 48em) {
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      small {
+        display: none;
+      }
+    }
+  }
+  .masthead-logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    margin-bottom: 1rem;
+  }
+}

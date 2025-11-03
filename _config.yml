@@ -1,6 +1,6 @@
 # Site Info
-title: Jenna Massardo - DXRF
-tagline: 'Jenna Massardo - Geek of all things Technology'
+title: "Welcome to the randoms..."
+tagline: 'Systems engineer. Robotics geek. Maker of shiny things. Part race car, part glitter.</br> Powered by caffeine and curiosity.'
 description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
 #baseurl: "/"
 #url: http://www.dxrf.com
@@ -11,7 +11,7 @@ plugins:
   - jekyll-paginate
   - jekyll-feed
 markdown: kramdown
-highligher: rouge
+highlighter: rouge
 kramdown:
   input: GFM
 excerpt_separator: "<!-- more -->"
@@ -28,7 +28,7 @@ exclude: [vendor]
 # About/contact
 author:
   name: Jenna Massardo
-  description: Ramblings and musings of a Robotics enthusiast, electronics tinkerer, ham radio operator, pilot, wannabe programmer, and Technology fanatic
+  description: Systems engineer. Robotics geek. Maker of shiny things. Part race car, part glitter. Powered by caffeine and curiosity.
   gravatar: 69ea17ec24451281f083ff214479fb07 # md5 hash of your email address
   contact:
     linkedin:  https://www.linkedin.com/in/jenna-massardo/
@@ -61,7 +61,7 @@ hero:
   imageurl: https://xkcd.com/730/
   caption: Welcome to my world! <br><small> Thanks <a href="https://xkcd.com/">XKCD</a> for another awesome comic</small>
 
-# Puglins
+# Plugins
 mathjax: true # whether support mathjax
 google_analytics_token: 'G-R8J4XTV6XW' # leave blank if you don't want google analytics
 #disqus_short_name: '' # leave blank if you don't want disqus

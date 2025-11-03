@@ -3,7 +3,7 @@
  */
 
 .masthead {
-  padding: 1rem 0;
+  padding: 2rem 0;
   margin-bottom: 3rem;
   background: #f8f9fa;
   border-bottom: 3px solid transparent;
@@ -25,46 +25,50 @@
   @media (min-width: 30rem) {
     position: fixed;
     width: 100%;
-    z-index: 100;
+    z-index: 1000;
   }
   .masthead-title {
     margin: 0;
-    color: $theme-color;
-    font-size: 1.25rem;
-    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1.6rem;
+    font-weight: 500;
     text-align: center;
     position: relative;
     z-index: 2;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 1.25;
-    text-rendering: optimizeLegibility;
     a {
-      color: $theme-color;
+      color: #2c3e50;
       text-decoration: none;
       transition: all 0.3s ease;
       display: inline-block;
       &:hover {
-        color: $theme-color-dark;
+        color: $theme-color;
         transform: scale(1.02);
+      }
+      &::before {
+        content: '⚡';
+        margin-right: 0.5rem;
+        color: $theme-color;
+        font-size: 0.8em;
+        opacity: 0.8;
       }
     }
     small {
-      font-size: 0.75rem;
+      font-size: 0.68rem;
       font-weight: 400;
-      color: #515151;
-      letter-spacing: 0;
+      color: #7f8c8d;
+      letter-spacing: 0.3px;
       display: block;
-      margin-top: 0.5rem;
-      line-height: 1.5;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin-top: 0.75rem;
+      line-height: 1.6;
+      font-family: 'Monaco', 'Menlo', monospace;
       &::before {
-        content: '';
+        content: '# ';
         color: $theme-color;
         font-weight: bold;
       }
     }
     @media (max-width: 48em) {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       small {
         display: none;
       }
