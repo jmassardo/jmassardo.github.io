@@ -1,32 +1,84 @@
-/* Colors 
- * Based on colors from Base16: http://chriskempson.github.io/base16/#default.
+/* Modern Color System
+ * Vibrant, engaging colors with proper contrast ratios (WCAG AA compliant)
  */
-$red:      #ac4142;
-$orange:   #d28445;
-$yellow:   #f4bf75;
-$green:    #90a959;
-$cyan:     #75b5aa;
-$blue:     #6a9fb5;
-$magenta:  #aa759f;
-$brown:    #8f5536;
-$default:  #505050;
 
-$white:      #fff;
-$lightgrey:  #eee;
-$black:      #000;
+// Brand Colors
+$primary:      #7c3aed;  // Rich purple - main brand color
+$primary-dark: #6d28d9;  // Darker purple for hover states
+$primary-light: #8b5cf6; // Lighter purple for accents
 
-$theme-color: $red;
-$theme-color-dark: darken($theme-color, 10%);
+$accent:       #ec4899;  // Vibrant pink - call-to-action
+$accent-dark:  #db2777;  // Darker pink for hover
+$accent-light: #f472b6;  // Lighter pink for backgrounds
 
-$post-date-color: #9a9a9a;
-$title-color: #313131;
-$masthead-title-small-color: #c0c0c0;
+// Neutral Colors
+$gray-50:  #fafafa;
+$gray-100: #f5f5f5;
+$gray-200: #e5e5e5;
+$gray-300: #d4d4d4;
+$gray-400: #a3a3a3;
+$gray-500: #737373;
+$gray-600: #525252;
+$gray-700: #404040;
+$gray-800: #262626;
+$gray-900: #171717;
+
+// Semantic Colors
+$success: #16a34a;
+$warning: #f59e0b;
+$error:   #dc2626;
+$info:    #0284c7;
+
+// Base Colors
+$white: #ffffff;
+$black: #000000;
+
+// Legacy mappings (for backwards compatibility)
+$red:      $accent;
+$orange:   $accent-light;
+$yellow:   $warning;
+$green:    $success;
+$cyan:     $primary-light;
+$blue:     $info;
+$magenta:  #a855f7;
+$brown:    #92400e;
+$default:  $gray-600;
+$lightgrey: $gray-100;
+
+// Theme Colors
+$theme-color: $primary;
+$theme-color-dark: $primary-dark;
+
+// Text Colors
+$text-primary:   $gray-900;
+$text-secondary: $gray-600;
+$text-muted:     $gray-500;
+$post-date-color: $gray-500;
+$title-color: $gray-900;
+$masthead-title-small-color: $gray-600;
 
 /* Layout */
 $reverse-layout: false;
 $overlay-sidebar: false;
 
-/* Font stack */
-$font-serif: "PT Serif", Georgia, "Times New Roman", serif;
-$font-sans: "PT Sans", Helvetica, Arial, sans-serif;
+/* Modern Font Stack */
+// System font stack for optimal performance and native feel
+$font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Serif for article content - improved readability
+$font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+
+// Monospace for code
+$font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
 $font-font-awesome: FontAwesome;
+
+/* Typography Scale - Fluid sizing */
+$text-xs:   0.75rem;   // 12px
+$text-sm:   0.875rem;  // 14px
+$text-base: 1rem;      // 16px
+$text-lg:   1.125rem;  // 18px
+$text-xl:   1.25rem;   // 20px
+$text-2xl:  1.5rem;    // 24px
+$text-3xl:  1.875rem;  // 30px
+$text-4xl:  2.25rem;   // 36px

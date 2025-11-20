@@ -1,5 +1,5 @@
 # Site Info
-title: "Welcome to the randoms..."
+title: "Caffeine, Code & Chaos"
 tagline: 'Systems engineer. Robotics geek. Maker of shiny things. Part race car, part glitter.</br> Powered by caffeine and curiosity.'
 description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
 #baseurl: "/"
@@ -10,6 +10,13 @@ logo: '/public/logo.png'
 plugins:
   - jekyll-paginate
   - jekyll-feed
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
 markdown: kramdown
 highlighter: rouge
 kramdown:

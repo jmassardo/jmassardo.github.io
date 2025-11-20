@@ -1,50 +1,75 @@
 /*
  * Pagination
  *
- * Super lightweight (HTML-wise) blog pagination. `span`s are provide for when
- * there are no more previous or next posts to show.
+ * Modern card-based pagination with purple theme
  */
 
 .pagination {
-  overflow: hidden; /* clearfix */
-  margin-left: -1rem;
-  margin-right: -1rem;
-  font-family: "PT Sans", Helvetica, Arial, sans-serif;
-  color: #ccc;
-  text-align: center;
+  overflow: hidden;
+  margin: 3rem 0;
+  font-family: $font-sans;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-/* Pagination items can be `span`s or `a`s */
+/* Pagination items */
 .pagination-item {
-  display: block;
-  padding: 1rem;
-  border: 1px solid $lightgrey;
-}
-.pagination-item:first-child {
-  margin-bottom: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.5rem;
+  background: $white;
+  border: 2px solid rgba($primary, 0.2);
+  border-radius: 8px;
+  font-weight: 600;
+  color: $primary;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  
+  &:first-child::before {
+    content: '← ';
+    margin-right: 0.5rem;
+  }
+  
+  &:last-child::after {
+    content: ' →';
+    margin-left: 0.5rem;
+  }
 }
 
-/* Only provide a hover state for linked pagination items */
+/* Disabled state for spans */
+span.pagination-item {
+  color: $gray-400;
+  border-color: $gray-200;
+  background: $gray-50;
+  cursor: not-allowed;
+}
+
+/* Hover state for linked pagination items */
 a.pagination-item:hover {
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: $white;
+  border-color: $primary;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba($primary, 0.3);
+  border-bottom: 2px solid rgba($primary, 0.2);
 }
 
-@media (min-width: 30em) {
+a.pagination-item:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 30em) {
   .pagination {
-    margin: 3rem 0;
+    flex-direction: column;
   }
+  
   .pagination-item {
-    float: left;
-    width: 50%;
-  }
-  .pagination-item:first-child {
-    margin-bottom: 0;
-    border-top-left-radius:    4px;
-    border-bottom-left-radius: 4px;
-  }
-  .pagination-item:last-child {
-    margin-left: -1px;
-    border-top-right-radius:    4px;
-    border-bottom-right-radius: 4px;
+    min-width: 100%;
   }
 }

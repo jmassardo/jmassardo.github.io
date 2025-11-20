@@ -18,31 +18,28 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 14rem;
+  width: 16rem;
   visibility: hidden;
   overflow-y: auto;
-  font-family: "PT Sans", Helvetica, Arial, sans-serif;
-  font-size: .875rem; /* 15px */
-  color: rgba(255,255,255,.6);
+  font-family: $font-sans;
+  font-size: $text-sm;
+  color: rgba(255,255,255,.95);
+  background: linear-gradient(180deg, $gray-900 0%, darken($gray-900, 3%) 100%);
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
   @include transition(all .3s ease-in-out);
 
   @if $reverse-layout {
     left: auto;
-    right: -14rem;
+    right: -16rem;
   } @else {
-    left: -14rem;
+    left: -16rem;
     right: auto;
   }
-
-  @if $theme-color != $default {
-    background-color: $theme-color;
-  } @else {
-    background-color: darken($theme-color-dark, 10%);
-  }
 }
+
 @media (min-width: 30em) {
   .sidebar {
-    font-size: .75rem; /* 14px */
+    font-size: $text-sm;
   }
 }
 
@@ -60,12 +57,19 @@
 
 /* Sidebar nav */
 .sidebar-nav {
-  border-bottom: 1px solid rgba(255,255,255,.1);
+  border-bottom: 1px solid rgba(255,255,255,.15);
 }
 .sidebar-nav-item {
   display: block;
-  padding: .5rem 1rem;
-  border-top: 1px solid rgba(255,255,255,.1);
+  padding: .75rem 1rem;
+  border-top: 1px solid rgba(255,255,255,.15);
+  transition: all 0.2s ease;
+  border-bottom: none;
+  position: relative;
+  
+  &:hover {
+    border-bottom: none;
+  }
 }
 .sidebar-nav-item-sub {
   &:before {
@@ -75,12 +79,22 @@
   font-size: 85%;
   line-height: 85%;
 }
-.sidebar-nav-item.active,
+.sidebar-nav-item.active {
+  text-decoration: none;
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.3) 0%, rgba(124, 58, 237, 0.15) 100%);
+  border-left: 3px solid $primary-light;
+  padding-left: calc(1rem - 3px);
+  color: $white;
+  font-weight: 600;
+}
+
 a.sidebar-nav-item:hover,
 a.sidebar-nav-item:focus {
   text-decoration: none;
-  background-color: rgba(255,255,255,.1);
+  background: linear-gradient(90deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.1) 100%);
   border-color: transparent;
+  color: $white;
+  padding-left: 1.25rem;
 }
 
 @media (min-width: 48em) {
@@ -113,11 +127,13 @@ a.sidebar-nav-item:focus {
   }
   display: block;
   padding: .25rem .75rem;
-  color: $theme-color;
+  color: $primary;
   background-color: $white;
   border-radius: .25rem;
   cursor: pointer;
   z-index: 200;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
 .sidebar-toggle:before {
@@ -125,20 +141,20 @@ a.sidebar-nav-item:focus {
   width: 1rem;
   height: .75rem;
   content: "";
-  @include background-image(linear-gradient(to bottom, $theme-color-dark, $theme-color-dark 20%, $white 20%, $white 40%, $theme-color-dark 40%, $theme-color-dark 60%, $white 60%, $white 80%, $theme-color-dark 80%, $theme-color-dark 100%));
+  @include background-image(linear-gradient(to bottom, $primary-dark, $primary-dark 20%, $white 20%, $white 40%, $primary-dark 40%, $primary-dark 60%, $white 60%, $white 80%, $primary-dark 80%, $primary-dark 100%));
 }
 
 .sidebar-toggle:active,
 #sidebar-checkbox:focus ~ .sidebar-toggle,
 #sidebar-checkbox:checked ~ .sidebar-toggle {
   color: $white;
-  background-color: $theme-color;
+  background-color: $primary;
 }
 
 .sidebar-toggle:active:before,
 #sidebar-checkbox:focus ~ .sidebar-toggle:before,
 #sidebar-checkbox:checked ~ .sidebar-toggle:before {
-  @include background-image(linear-gradient(to bottom, $white, $white 20%, $theme-color-dark 20%, $theme-color-dark 40%, $white 40%, $white 60%, $theme-color-dark 60%, $theme-color-dark 80%, $white 80%, $white 100%));
+  @include background-image(linear-gradient(to bottom, $white, $white 20%, $primary-dark 20%, $primary-dark 40%, $white 40%, $white 60%, $primary-dark 60%, $primary-dark 80%, $white 80%, $white 100%));
 }
 
 @media (min-width: 30.1em) {
@@ -182,11 +198,11 @@ a.sidebar-nav-item:focus {
 }
 
 #sidebar-checkbox:checked ~ .wrap {
-  @include transform(translateX(if($overlay-sidebar,0,if($reverse-layout, -14rem, 14rem))));
+  @include transform(translateX(if($overlay-sidebar,0,if($reverse-layout, -16rem, 16rem))));
 }
 
 #sidebar-checkbox:checked ~ .sidebar {
-  @include transform(translateX(if($reverse-layout, -14rem, 14rem)));
+  @include transform(translateX(if($reverse-layout, -16rem, 16rem)));
   @if $overlay-sidebar {
     box-shadow: .25rem 0 .5rem rgba(0,0,0,.1);
     @if $reverse-layout { box-shadow: -.25rem 0 .5rem rgba(0,0,0,.2); }
@@ -194,7 +210,7 @@ a.sidebar-nav-item:focus {
 }
 
 #sidebar-checkbox:checked ~ .sidebar-toggle {
-  @include transform(translateX(if($reverse-layout, -14rem, 14rem)));
+  @include transform(translateX(if($reverse-layout, -16rem, 16rem)));
   @if $overlay-sidebar {
     box-shadow: 0 0 0 .25rem $white;
   }
