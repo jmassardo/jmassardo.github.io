@@ -70,18 +70,19 @@
     margin-bottom: 0.5rem;
     font-size: $text-xs;
     font-weight: 600;
-    color: $white;
+    color: $white !important;
     background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
     border-radius: 4px;
     transition: all 0.2s ease;
-    border-bottom: none;
+    border-bottom: none !important;
     box-shadow: 0 2px 4px rgba($primary, 0.2);
     
     &:hover {
+      color: $white !important;
       background: linear-gradient(135deg, $primary-dark 0%, $primary 100%);
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba($primary, 0.3);
-      border-bottom: none;
+      border-bottom: none !important;
     }
   }
 
@@ -114,18 +115,19 @@
       gap: 0.5rem;
       padding: 0.5rem 1.25rem;
       background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-      color: $white;
+      color: $white !important;
       font-weight: 600;
       border-radius: 6px;
       transition: all 0.2s ease;
-      border-bottom: none;
+      border-bottom: none !important;
       box-shadow: 0 2px 4px rgba($primary, 0.2);
       
       &:hover {
+        color: $white !important;
         background: linear-gradient(135deg, $primary-dark 0%, $primary 100%);
         transform: translateX(4px);
         box-shadow: 0 4px 8px rgba($primary, 0.3);
-        border-bottom: none;
+        border-bottom: none !important;
       }
       
       .fa {

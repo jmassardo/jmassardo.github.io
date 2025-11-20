@@ -79,8 +79,9 @@ h4, h5, h6 {
   margin-bottom: 0.5rem;
 }
 
-/* Improved link styles */
-a {
+/* Improved link styles - scoped to content areas */
+.content a:not(.post-tag):not(.post-more):not(.header-anchor):not(.copy-button),
+.footer a {
   color: $primary;
   text-decoration: none;
   transition: all 0.2s ease;

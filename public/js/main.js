@@ -1,3 +1,26 @@
+// Mobile Navigation Toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const navToggle = document.getElementById('nav-toggle');
+  const mainNav = document.getElementById('main-nav');
+  
+  if (navToggle && mainNav) {
+    navToggle.addEventListener('click', function() {
+      const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', !isExpanded);
+      mainNav.classList.toggle('active');
+    });
+    
+    // Close mobile nav when clicking outside
+    document.addEventListener('click', function(event) {
+      const isClickInside = navToggle.contains(event.target) || mainNav.contains(event.target);
+      if (!isClickInside && mainNav.classList.contains('active')) {
+        navToggle.setAttribute('aria-expanded', 'false');
+        mainNav.classList.remove('active');
+      }
+    });
+  }
+});
+
 // Header Anchors
 document.addEventListener('DOMContentLoaded', function() {
   // Add anchor links to all headings in post content

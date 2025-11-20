@@ -7,26 +7,95 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    {% include sidebar.html %}
-
-    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
-         content to avoid any CSS collisions with our real content. -->
-    <div class="wrap">
-      <div class="masthead">
-        <div class="container">
-          <h3 class="masthead-title">
-            <a href="{{ site.baseurl }}/" title="Home">{{ site.title }}</a>
-
-          </h3>
+    <header class="masthead">
+      <div class="container">
+        <div class="masthead-inner">
+          <div class="masthead-brand">
+            <h3 class="masthead-title">
+              <a href="{{ site.baseurl }}/" title="Home">{{ site.title }}</a>
+            </h3>
+            <p class="masthead-tagline">{{ site.author.description }}</p>
+          </div>
+          
+          <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          
+          <nav class="main-nav" id="main-nav">
+            {% for nav in site.nav %}
+              {% assign is_relative = nav[1][0] | slice: 0 %}
+              {% assign url = nav[1][0] %}
+              {% if is_relative == '/' %}
+                {% assign url = nav[1][0] | prepend: site.baseurl %}
+              {% endif %}
+              
+              {% assign sub_len = nav[1] | size | minus: 1 %}
+              
+              {% if sub_len > 0 %}
+                <div class="nav-item has-dropdown">
+                  <a href="{{ url }}" class="nav-link {% if page.url == nav[1][0] %}active{% endif %}">
+                    {{ nav[0] }}
+                  </a>
+                  <div class="nav-dropdown">
+                    {% for i in (1..sub_len) %}
+                      {% for sub_nav in nav[1][i] %}
+                        {% assign sub_is_relative = sub_nav[1] | slice: 0 %}
+                        {% assign sub_url = sub_nav[1] %}
+                        {% if sub_is_relative == '/' %}
+                          {% assign sub_url = sub_nav[1] | prepend: site.baseurl %}
+                        {% endif %}
+                        <a href="{{ sub_url }}" class="nav-dropdown-link {% if page.url == sub_nav[1] %}active{% endif %}">
+                          {{ sub_nav[0] }}
+                        </a>
+                      {% endfor %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% else %}
+                <a href="{{ url }}" class="nav-link {% if page.url == nav[1][0] %}active{% endif %}">
+                  {{ nav[0] }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </nav>
         </div>
       </div>
+    </header>
 
-      <div class="container content" id="main-content">
-        {{ content }}
-      </div>
+    <div class="container content" id="main-content">
+      {{ content }}
     </div>
 
-    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <p>{{ site.author.description }}</p>
+          </div>
+          {% if site.author.contact %}
+          <div class="footer-section">
+            <p class="footer-connect">Connect:
+            {% for contact in site.author.contact %}
+              {% assign iconname = "fa-brands fa-" | append: contact[0] %}
+              {% if contact[0] == 'email' %}
+                {% assign iconname = 'fa fa-envelope' %}
+              {% endif %}
+              <a href="{{ contact[1] }}" aria-label="{{ contact[0] }}">
+                <i class="{{ iconname }}" aria-hidden="true"></i>
+              </a>
+            {% endfor %}
+            </p>
+          </div>
+          {% endif %}
+          <div class="footer-section">
+            <p>&copy; {{ site.time | date: '%Y' }} {{ site.author.name }}. Licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>.</p>
+            <p class="footer-powered">Powered by <a href="http://jekyllrb.com">Jekyll</a></p>
+          </div>
+        </div>
+      </div>
+    </footer>
 
     <script>
       (function(document) {

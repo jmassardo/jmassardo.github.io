@@ -78,8 +78,10 @@ a strong {
   color: inherit;
 }
 /* `:focus` is linked to `:hover` for basic accessibility */
-a:hover,
-a:focus {
+.content a:hover,
+.content a:focus,
+.footer a:hover,
+.footer a:focus {
   color: $primary-dark;
   border-bottom: 1px solid $primary-dark;
 }

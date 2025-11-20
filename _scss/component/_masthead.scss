@@ -1,70 +1,265 @@
 /*
- * Masthead - Modern, clean design
+ * Masthead - Header navigation
  */
 
 .masthead {
-  padding: 1rem 0;
-  margin-bottom: 2rem;
+  padding: 0;
   background: linear-gradient(135deg, $primary 0%, darken($primary, 8%) 100%);
-  border-bottom: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  position: relative;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  top: 0;
+  left: 0;
   
-  @media (min-width: 30rem) {
-    position: fixed;
-    width: 100%;
-    z-index: 100;
-    top: 0;
-    padding: 1.25rem 0;
-    margin-bottom: 3rem;
+  .masthead-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    position: relative;
+    gap: 2rem;
+    
+    @media (min-width: 48em) {
+      padding: 1rem 0;
+    }
+  }
+  
+  .masthead-brand {
+    flex-shrink: 0;
+    min-width: 0;
   }
   
   .masthead-title {
     margin: 0;
     color: $white;
-    font-size: $text-xl;
+    font-size: $text-base;
     font-weight: 700;
-    text-align: center;
     font-family: $font-sans;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     
-    @media (min-width: 30rem) {
+    @media (min-width: 48em) {
+      font-size: $text-xl;
+    }
+    
+    @media (min-width: 62em) {
       font-size: $text-2xl;
     }
     
     a {
       color: $white;
       text-decoration: none;
-      transition: all 0.2s ease;
-      display: inline-block;
       border-bottom: none;
+      transition: opacity 0.2s ease;
       
       &:hover {
-        color: rgba(255, 255, 255, 0.9);
-        transform: translateY(-1px);
+        opacity: 0.9;
         border-bottom: none;
       }
     }
+  }
+  
+  .masthead-tagline {
+    margin: 0.125rem 0 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.3;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    display: none;
     
-    small {
+    @media (min-width: 56em) {
+      display: block;
+      font-size: $text-xs;
+    }
+    
+    @media (min-width: 75em) {
       font-size: $text-sm;
-      font-weight: 400;
-      color: rgba(255, 255, 255, 0.9);
-      letter-spacing: 0;
-      display: none;
-      margin-top: 0.25rem;
-      line-height: 1.5;
-      font-family: $font-sans;
-      
-      @media (min-width: 48em) {
-        display: block;
+      max-width: 450px;
+    }
+  }
+}
+
+/* Navigation toggle button (mobile hamburger) */
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+  
+  @media (min-width: 48em) {
+    display: none;
+  }
+  
+  span {
+    width: 2rem;
+    height: 0.2rem;
+    background: $white;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    transform-origin: 1px;
+  }
+  
+  &[aria-expanded="true"] span:nth-child(1) {
+    transform: rotate(45deg);
+  }
+  
+  &[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  
+  &[aria-expanded="true"] span:nth-child(3) {
+    transform: rotate(-45deg);
+  }
+}
+
+/* Main navigation */
+.main-nav {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, darken($primary, 8%) 0%, darken($primary, 12%) 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  
+  @media (min-width: 48em) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: static;
+    background: none;
+    box-shadow: none;
+  }
+  
+  &.active {
+    display: block;
+  }
+}
+
+.nav-link {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: $white;
+  text-decoration: none;
+  border-bottom: none;
+  font-weight: 600;
+  font-size: $text-base;
+  transition: all 0.2s ease;
+  background: transparent;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  
+  @media (min-width: 48em) {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-bottom: none;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  
+  &.active {
+    background: rgba(255, 255, 255, 0.25);
+    border-bottom: none;
+    box-shadow: inset 0 -3px 0 $white;
+  }
+}
+
+.nav-item {
+  position: relative;
+  
+  &.has-dropdown {
+    @media (max-width: 47.99em) {
+      .nav-link {
+        padding-bottom: 0.5rem;
       }
     }
     
-    @media (max-width: 48em) {
-      font-size: $text-xl;
+    @media (min-width: 48em) {
+      &:hover .nav-dropdown,
+      .nav-dropdown:hover {
+        display: block;
+      }
+      
+      // Extend hover area to prevent gap
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 0.5rem;
+      }
     }
+  }
+}
+
+.nav-dropdown {
+  @media (max-width: 47.99em) {
+    display: block;
+    padding-left: 1rem;
+  }
+  
+  @media (min-width: 48em) {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    min-width: 180px;
+    background: darken($primary, 8%);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 0;
+  }
+}
+
+.nav-dropdown-link {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: $white;
+  text-decoration: none;
+  border-bottom: none;
+  font-size: $text-sm;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  background: transparent;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  
+  @media (min-width: 48em) {
+    padding: 0.625rem 1.25rem;
+    
+    &:first-child {
+      border-radius: 6px 6px 0 0;
+    }
+    
+    &:last-child {
+      border-radius: 0 0 6px 6px;
+    }
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-bottom: none;
+  }
+  
+  &.active {
+    background: rgba(255, 255, 255, 0.25);
+    font-weight: 700;
   }
 }
