@@ -81,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const textArea = document.createElement('textarea');
             textArea.value = text;
             textArea.style.position = 'absolute';
-            textArea.style.left = '-9999px';
-            textArea.style.top = '0';
             textArea.style.opacity = '0';
             textArea.style.pointerEvents = 'none';
             textArea.setAttribute('readonly', '');
@@ -92,13 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
               const successful = document.execCommand('copy');
-              textArea.remove();
               if (!successful) {
                 throw new Error('Copy command was unsuccessful');
               }
-            } catch (execErr) {
+            } finally {
               textArea.remove();
-              throw execErr;
             }
           }
           
