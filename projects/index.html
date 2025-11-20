@@ -1,0 +1,40 @@
+---
+layout: page
+title: Projects
+permalink: /projects/
+---
+
+<div class="projects-intro">
+  <p>Here are some of the things I'm working on, experimenting with, or have completed. Each project may have related blog posts that dive deeper into specific aspects.</p>
+</div>
+
+{% assign sorted_projects = site.projects | sort: "order" %}
+{% for project in sorted_projects %}
+  <div class="post">
+    <h1 class="post-title">
+      <a href="{{ project.url | relative_url }}">
+        {{ project.title }}
+      </a>
+    </h1>
+    <span class="post-date">{{ project.date | date: "%d %b %Y" }}</span>
+    {% if project.category %}
+      <span class="post-tag">{{ project.category }}</span>
+    {% endif %}
+    {% if project.status %}
+      <span class="post-tag">{{ project.status }}</span>
+    {% endif %}
+    {% if project.github %}
+      <a href="{{ project.github }}" class="post-tag" target="_blank" rel="noopener">
+        <i class="fa-brands fa-github" aria-hidden="true"></i> GitHub
+      </a>
+    {% endif %}
+    <article>
+      {{ project.excerpt | markdownify }}
+    <article>
+    <div class="post-more">
+      <a href="{{ project.url | relative_url }}">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> Read more
+      </a>
+    </div>
+  </div>
+{% endfor %}

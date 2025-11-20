@@ -97,25 +97,6 @@
       </div>
     </footer>
 
-    <script>
-      (function(document) {
-        var toggle = document.querySelector('.sidebar-toggle');
-        var sidebar = document.querySelector('#sidebar');
-        var checkbox = document.querySelector('#sidebar-checkbox');
-
-        document.addEventListener('click', function(e) {
-          var target = e.target;
-
-          if (target === toggle) {
-            checkbox.checked = !checkbox.checked;
-            e.preventDefault();
-          } else if (checkbox.checked && !sidebar.contains(target)) {
-            /* click outside the sidebar when sidebar is open */
-            checkbox.checked = false;
-          }
-        }, false);
-      })(document);
-    </script>
     <script src="https://kit.fontawesome.com/9e6c15bea8.js" crossorigin="anonymous"></script>
     <script src="{{ site.baseurl }}/public/js/main.js"></script>
     {% if site.google_analytics_token %}

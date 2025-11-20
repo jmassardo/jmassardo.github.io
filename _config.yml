@@ -10,6 +10,13 @@ logo: '/public/logo.png'
 plugins:
   - jekyll-paginate
   - jekyll-feed
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
 markdown: kramdown
 highlighter: rouge
 kramdown:
