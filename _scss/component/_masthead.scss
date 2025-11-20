@@ -1,73 +1,70 @@
 /*
- * Masthead - Option 4: Tech-Focused with Icon Accent
+ * Masthead - Modern, clean design
  */
 
 .masthead {
   padding: 1rem 0;
-  margin-bottom: 3rem;
-  background: #f8f9fa;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, $theme-color, $blue, $cyan) 1;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 8%) 100%);
+  border-bottom: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   position: relative;
-  overflow: hidden;
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(172, 65, 66, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(117, 181, 170, 0.05) 0%, transparent 50%);
-    z-index: 1;
-  }
+  
   @media (min-width: 30rem) {
     position: fixed;
     width: 100%;
     z-index: 100;
+    top: 0;
+    padding: 1.25rem 0;
+    margin-bottom: 3rem;
   }
+  
   .masthead-title {
     margin: 0;
-    color: $theme-color;
-    font-size: 1.25rem;
-    font-weight: bold;
+    color: $white;
+    font-size: $text-xl;
+    font-weight: 700;
     text-align: center;
-    position: relative;
-    z-index: 2;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 1.25;
-    text-rendering: optimizeLegibility;
+    font-family: $font-sans;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    
+    @media (min-width: 30rem) {
+      font-size: $text-2xl;
+    }
+    
     a {
-      color: $theme-color;
+      color: $white;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       display: inline-block;
+      border-bottom: none;
+      
       &:hover {
-        color: $theme-color-dark;
-        transform: scale(1.02);
+        color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
+        border-bottom: none;
       }
     }
+    
     small {
-      font-size: 0.75rem;
+      font-size: $text-sm;
       font-weight: 400;
-      color: #515151;
+      color: rgba(255, 255, 255, 0.9);
       letter-spacing: 0;
-      display: block;
-      margin-top: 0.5rem;
+      display: none;
+      margin-top: 0.25rem;
       line-height: 1.5;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      &::before {
-        content: '';
-        color: $theme-color;
-        font-weight: bold;
+      font-family: $font-sans;
+      
+      @media (min-width: 48em) {
+        display: block;
       }
     }
+    
     @media (max-width: 48em) {
-      font-size: 1.1rem;
-      small {
-        display: none;
-      }
+      font-size: $text-xl;
     }
   }
 }

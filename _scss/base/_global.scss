@@ -1,5 +1,5 @@
 @include selection {
-  background: $theme-color;
+  background: $primary;
   color: $white;
 }
 
@@ -9,22 +9,153 @@ body {
 }
 
 html {
-  font-family: $font-serif;
+  font-family: $font-sans;
+  font-size: 15px;
+  line-height: 1.7;
   text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust:100%;
-  -ms-text-size-adjust:100%;
-  text-rendering:optimizelegibility;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  
+  @media (min-width: 38em) {
+    font-size: 16px;
+  }
+  
+  @media (min-width: 56em) {
+    font-size: 17px;
+  }
 }
 
+body {
+  color: $text-primary;
+  background-color: $white;
+}
+
+/* Headings with improved hierarchy */
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-sans;
-  font-weight: 400;
+  font-weight: 700;
   color: $title-color;
-  letter-spacing: -.025rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
 
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  
+  @media (min-width: 38em) {
+    font-size: $text-4xl;
+  }
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($primary, 0.2);
+  
+  @media (min-width: 38em) {
+    font-size: $text-2xl;
+  }
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  color: $primary;
+  
+  @media (min-width: 38em) {
+    font-size: $text-xl;
+  }
+}
+
+h4, h5, h6 {
+  font-size: $text-lg;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Improved link styles */
+a {
+  color: $primary;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  
+  &:hover, &:focus {
+    color: $primary-dark;
+    border-bottom-color: $primary-light;
+  }
+  
+  &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* Focus styles for all interactive elements */
+button, input, select, textarea {
+  &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+/* Better code styling */
 code {
-  color: #666;
+  font-family: $font-mono;
+  font-size: 0.9em;
+  color: $accent-dark;
+  background: linear-gradient(to bottom, $gray-100 0%, darken($gray-100, 2%) 100%);
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  border: 1px solid $gray-200;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Improved paragraph spacing */
+p {
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+}
+
+/* Better list styling */
+ul, ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  
+  li {
+    margin-bottom: 0.5rem;
+  }
 }

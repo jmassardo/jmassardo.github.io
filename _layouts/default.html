@@ -5,6 +5,8 @@
 
   <body>
 
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     {% include sidebar.html %}
 
     <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
@@ -19,7 +21,7 @@
         </div>
       </div>
 
-      <div class="container content">
+      <div class="container content" id="main-content">
         {{ content }}
       </div>
     </div>
@@ -46,6 +48,7 @@
       })(document);
     </script>
     <script src="https://kit.fontawesome.com/9e6c15bea8.js" crossorigin="anonymous"></script>
+    <script src="{{ site.baseurl }}/public/js/main.js"></script>
     {% if site.google_analytics_token %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics_token }}"></script>
     <script>

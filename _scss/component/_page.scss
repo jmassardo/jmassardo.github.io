@@ -1,9 +1,24 @@
 .page {
-  margin-bottom: 4em;
+  margin-bottom: 3rem;
+  background: $white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  
+  @media (min-width: 38em) {
+    padding: 2.5rem;
+  }
+  
   .page-title {
-    color: $theme-color;
     margin-top: 0;
-    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 

@@ -59,15 +59,19 @@ html {
 }
 
 body {
-  color: #515151;
-  background-color: #fff;
+  color: $text-primary;
+  background-color: $gray-100;
+  background-image: 
+    radial-gradient(at 40% 20%, rgba(124, 58, 237, 0.03) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(236, 72, 153, 0.03) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(124, 58, 237, 0.03) 0px, transparent 50%);
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
 }
 
 /* No `:visited` state is required by default (browsers will use `a`) */
 a {
-  color: #268bd2;
+  color: $primary;
   text-decoration: none;
 }
 a strong {
@@ -76,7 +80,8 @@ a strong {
 /* `:focus` is linked to `:hover` for basic accessibility */
 a:hover,
 a:focus {
-  text-decoration: underline;
+  color: $primary-dark;
+  border-bottom: 1px solid $primary-dark;
 }
 
 /* Headings */
@@ -130,10 +135,11 @@ dd {
 /* Misc */
 hr {
   position: relative;
-  margin: 1.5rem 0;
+  margin: 2.5rem 0;
   border: 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #fff;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, $primary 50%, transparent 100%);
+  border-radius: 2px;
 }
 
 abbr {
@@ -150,41 +156,47 @@ abbr[title] {
 /* Code */
 code,
 pre {
-  font-family: Menlo, Monaco, "Courier New", monospace;
+  font-family: $font-mono;
 }
 code {
-  padding: .25em .5em;
-  font-size: 85%;
-  color: #bf616a;
-  background-color: #f9f9f9;
-  border-radius: 3px;
+  padding: .2em .4em;
+  font-size: 0.9em;
+  color: $accent-dark;
+  background-color: $gray-100;
+  border-radius: 4px;
+  border: 1px solid $gray-200;
 }
 pre {
   display: block;
   overflow-x: auto;
   max-width: 100%;
   margin-top: 0;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  font-size: .8rem;
-  line-height: 1.4;
-  white-space: pre;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
   white-space: pre;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: #f9f9f9;
+  background: linear-gradient(to bottom, $gray-50 0%, #fafafa 100%);
+  border: 1px solid $gray-200;
+  border-left: 4px solid $primary;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 pre code {
   padding: 0;
   font-size: 100%;
   color: inherit;
   background-color: transparent;
+  border: none;
 }
 
 /* Pygments via Jekyll */
 .highlight {
-  margin-bottom: 1rem;
-  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .highlight pre {
   margin-bottom: 0;
@@ -214,18 +226,21 @@ pre code {
 
 /* Quotes */
 blockquote {
-  padding: .5rem 1rem;
-  margin: .8rem 0;
-  color: #7a7a7a;
-  border-left: .25rem solid #e5e5e5;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  color: $text-secondary;
+  background: linear-gradient(to right, rgba($primary, 0.05) 0%, transparent 100%);
+  border-left: 4px solid $primary;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
 }
 blockquote p:last-child {
   margin-bottom: 0;
 }
 @media (min-width: 30em) {
   blockquote {
-    padding-right: 5rem;
-    padding-left: 1.25rem;
+    padding-right: 2rem;
+    padding-left: 1.5rem;
   }
 }
 
@@ -237,20 +252,40 @@ img {
 }
 
 /* Tables */
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  -webkit-overflow-scrolling: touch;
+}
+
 table {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   width: 100%;
-  border: 1px solid #e5e5e5;
+  border: 1px solid $gray-200;
   border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-width: 600px;
 }
 td,
 th {
-  padding: .25rem .5rem;
-  border: 1px solid #e5e5e5;
+  padding: .75rem 1rem;
+  border: 1px solid $gray-200;
+}
+th {
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: $white;
+  font-weight: 600;
+  text-align: left;
 }
 tbody tr:nth-child(odd) td,
 tbody tr:nth-child(odd) th {
-  background-color: #f9f9f9;
+  background-color: rgba($primary, 0.03);
+}
+tbody tr:hover td {
+  background-color: rgba($primary, 0.08);
+  transition: background-color 0.2s ease;
 }
 
 
@@ -282,18 +317,8 @@ tbody tr:nth-child(odd) th {
 
 
 /*
- * Container
- *
- * Center the page content.
+ * Container - moved to _layout.scss
  */
-
-.container {
-  max-width: 38rem;
-  padding-left:  1rem;
-  padding-right: 1rem;
-  margin-left:  auto;
-  margin-right: auto;
-}
 
 
 /*
