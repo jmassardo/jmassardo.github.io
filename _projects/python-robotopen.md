@@ -20,7 +20,7 @@ We settled on [RobotOpen](http://www.team221.com/robotopen/gs.html) since it's b
 
 ## Current Progress
 
-The first thing is we want to run [Raspberry Pi's](https://www.raspberrypi.org/). This presents a problem since the RobotOpen libraries are for Arduino so we started porting them to Python.
+The first thing is we want to run [Raspberry Pis](https://www.raspberrypi.org/). This presents a problem since the RobotOpen libraries are for Arduino so we started porting them to Python.
 
 ### Key Features
 - Python-based implementation

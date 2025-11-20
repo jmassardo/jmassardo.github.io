@@ -18,12 +18,12 @@
           </div>
           
           <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
           </button>
           
-          <nav class="main-nav" id="main-nav">
+          <nav class="main-nav" id="main-nav" aria-label="Main navigation">
             {% for nav in site.nav %}
               {% assign is_relative = nav[1][0] | slice: 0 %}
               {% assign url = nav[1][0] %}

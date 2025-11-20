@@ -3,7 +3,7 @@ layout: page
 title: "Arduino Projects"
 date: 2018-06-20
 category: electronics
-order: 1
+order: 2
 excerpt: "Various Arduino-based projects and experiments."
 status: ongoing
 related_tags: [arduino]
