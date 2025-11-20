@@ -80,16 +80,22 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fallback for older browsers or non-HTTPS contexts
             const textArea = document.createElement('textarea');
             textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
+            textArea.style.position = 'absolute';
+            textArea.style.left = '-9999px';
+            textArea.style.top = '0';
+            textArea.style.opacity = '0';
+            textArea.style.pointerEvents = 'none';
+            textArea.setAttribute('readonly', '');
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
             
             try {
-              document.execCommand('copy');
+              const successful = document.execCommand('copy');
               textArea.remove();
+              if (!successful) {
+                throw new Error('Copy command was unsuccessful');
+              }
             } catch (execErr) {
               textArea.remove();
               throw execErr;
