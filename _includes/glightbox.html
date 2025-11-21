@@ -1,0 +1,47 @@
+<!-- GLightbox - Lightweight Lightbox for Images -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/js/glightbox.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select all images in post/page content (excluding hero, sidebar, etc.)
+    const contentImages = document.querySelectorAll('.post article img, .page img:not(.hero img)');
+    
+    // Wrap each image in a link for lightbox functionality
+    contentImages.forEach(function(img) {
+      // Skip if already wrapped or has no src
+      if (img.parentElement.tagName === 'A' || !img.src) return;
+      
+      // Create wrapper link
+      const link = document.createElement('a');
+      link.href = img.src;
+      link.classList.add('glightbox');
+      link.setAttribute('data-gallery', 'content-gallery');
+      
+      // Use alt text as description if available
+      if (img.alt) {
+        link.setAttribute('data-glightbox', 'description: ' + img.alt);
+      }
+      
+      // Wrap the image
+      img.parentNode.insertBefore(link, img);
+      link.appendChild(img);
+      
+      // Add thumbnail class for styling
+      img.classList.add('modal-thumbnail');
+    });
+    
+    // Initialize GLightbox
+    const lightbox = GLightbox({
+      touchNavigation: true,
+      loop: true,
+      autoplayVideos: true,
+      closeButton: true,
+      keyboardNavigation: true,
+      skin: 'modern',
+      // Custom styling to match your theme
+      cssEfects: {
+        fade: { in: 'fadeIn', out: 'fadeOut' },
+        zoom: { in: 'zoomIn', out: 'zoomOut' }
+      }
+    });
+  });
+</script>

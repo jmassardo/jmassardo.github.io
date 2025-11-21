@@ -1,0 +1,121 @@
+// Image Modal Styling - GLightbox customization to match theme
+
+// Thumbnail styling for clickable images
+.post article img, .page img {
+  &.modal-thumbnail {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    
+    &:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba($primary, 0.3);
+      border-color: rgba($primary, 0.3);
+    }
+  }
+}
+
+// Ensure images in links don't have default link styling
+a.glightbox {
+  border-bottom: none !important;
+  display: inline-block;
+  line-height: 0;
+  
+  &:hover {
+    border-bottom: none !important;
+  }
+}
+
+// GLightbox custom theme overrides
+.gslide-description {
+  background: linear-gradient(135deg, rgba($primary, 0.95) 0%, rgba($accent, 0.95) 100%);
+  color: $white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  backdrop-filter: blur(10px);
+}
+
+.glightbox-clean {
+  .gclose,
+  .gprev,
+  .gnext {
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    color: $white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    
+    &:hover {
+      background: linear-gradient(135deg, $primary-dark 0%, $accent-dark 100%);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba($primary, 0.5);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .gclose {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+// Overlay background
+.glightbox-container {
+  .goverlay {
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(4px);
+  }
+}
+
+// Loading animation matching theme
+.gloader {
+  border: 3px solid rgba($white, 0.2);
+  border-top-color: $primary;
+  border-radius: 50%;
+}
+
+// Counter styling (1 of 5, etc.)
+.gslide-inline,
+.gslide-image {
+  .gslide-media {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  .gslide-description {
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .glightbox-clean {
+    .gclose,
+    .gprev,
+    .gnext {
+      width: 35px;
+      height: 35px;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// Ensure images maintain aspect ratio in modal
+.gslide-image img {
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
