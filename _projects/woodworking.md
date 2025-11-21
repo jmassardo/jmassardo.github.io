@@ -1,21 +1,28 @@
 ---
 layout: page
 title: "Woodworking Projects"
-date: 2016-05-12
+date: 2025-11-13
 category: woodworking
-order: 6
-excerpt: "A little old school work with wood and hand tools."
-status: hobby
-related_tags: [woodworking, maker]
+status: active
+excerpt: "Custom woodworking projects - part custom, part IKEA. All booklover heaven."
+related_tags: [woodworking, maker, furniture]
 ---
 
 ## Overview
 
-A little old school work - combining traditional woodworking with modern maker tools.
+Combining traditional woodworking with modern solutions. Creating custom furniture and storage solutions for book lovers.
 
 ## Current Projects
 
-*Coming soon - add your woodworking project details here*
+### Custom Bookshelf System
+Part custom woodwork, part IKEA integration. Building the ultimate book storage solution - a booklover's heaven.
+
+## Approach
+
+- Custom joinery and design
+- Integration with IKEA components
+- Space-optimized solutions
+- Focus on aesthetics and function
 
 ## Related Posts
 
