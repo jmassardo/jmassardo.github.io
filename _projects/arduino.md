@@ -1,21 +1,23 @@
 ---
 layout: page
-title: "Arduino Projects"
-date: 2018-06-20
+title: "Electronics Projects"
+date: 2025-11-11
 category: electronics
-order: 2
-excerpt: "Various Arduino-based projects and experiments."
-status: ongoing
-related_tags: [arduino]
+status: active
+excerpt: "Various electronics projects including Arduino, ESP32, and custom PCB designs."
+related_tags: [electronics, arduino, esp32]
 ---
 
 ## Overview
 
-Arduino projects focusing on embedded systems, sensors, and automation.
+Electronics projects spanning embedded systems, microcontrollers, and custom circuit design.
 
-## Current Projects
+## Focus Areas
 
-*Coming soon - add your Arduino project details here*
+- Arduino and ESP32 development
+- Custom PCB design and fabrication
+- Sensor integration and IoT devices
+- Embedded firmware development
 
 ## Related Posts
 

@@ -8,8 +8,13 @@ permalink: /projects/
   <p>Here are some of the things I'm working on, experimenting with, or have completed. Each project may have related blog posts that dive deeper into specific aspects.</p>
 </div>
 
-{% assign sorted_projects = site.projects | sort: "order" %}
-{% for project in sorted_projects %}
+{% assign projects_by_status = site.projects | group_by: "status" | sort: "name" %}
+{% for status_group in projects_by_status %}
+  {% assign sorted_projects = status_group.items | sort: "title" %}
+  
+  <h2 class="status-heading">{{ status_group.name | capitalize }}</h2>
+  
+  {% for project in sorted_projects %}
   <div class="post">
     <h1 class="post-title">
       <a href="{{ project.url | relative_url }}">
@@ -37,4 +42,6 @@ permalink: /projects/
       </a>
     </div>
   </div>
+  {% endfor %}
 {% endfor %}
+

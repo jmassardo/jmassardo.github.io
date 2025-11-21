@@ -58,6 +58,8 @@ nav:
     - '/resume/'
   Projects:
     - '/projects/'
+  Reading List:
+    - '/reading-list/'
 
 # Where are tags and categories displayed
 tag_page: '/blog/tags/'

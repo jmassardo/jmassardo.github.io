@@ -1,7 +1,7 @@
 ---
 name: personal-blog-editor
 description: 'Your personal blog editor for your Jekyll-based blog.'
-tools: ['edit']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'github/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runSubagent']
 ---
 
 # Personal Blog Editor
