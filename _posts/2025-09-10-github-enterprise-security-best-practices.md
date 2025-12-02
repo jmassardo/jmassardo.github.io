@@ -80,7 +80,7 @@ GitHub's default roles are like off-the-rack suits – they'll work, but custom 
 
 ### Repository Rulesets: Your First Line of Defense
 
-Rulesets are like having a bouncer who actually checks IDs at the door. They enforce your policies automatically so you don't have to rely on developers remembering to do the right thing.
+Rulesets are like having a bouncer who actually checks IDs at the door. They enforce your policies automatically so you don't have to rely on developers remembering to do the right thing. Learn more about [managing repositories at scale](https://wellarchitected.github.com/library/governance/recommendations/managing-repositories-at-scale/) in the GitHub Well-Architected framework.
 
 **Essential ruleset configurations**:
 
@@ -118,7 +118,7 @@ rules:
 
 ### Security Configurations: Defense in Depth
 
-Security configurations let you set organization-wide defaults that actually stick. Think of them as your security policy enforcement mechanism.
+Security configurations let you set organization-wide defaults that actually stick. Think of them as your security policy enforcement mechanism. For comprehensive security controls, refer to the [GitHub Well-Architected Application Security pillar](https://wellarchitected.github.com/library/application-security/).
 
 **Key configurations to implement**:
 
@@ -187,17 +187,17 @@ graph LR
     subgraph "Your Identity Provider"
         A[IDP Group:<br/>platform-engineering]
     end
-    
+
     subgraph "GitHub"
         B[GitHub Team:<br/>Platform Engineering]
         C[Repository:<br/>platform-api]
         D[Repository:<br/>infrastructure]
     end
-    
+
     A -->|Syncs to| B
     B -->|"Write" role| C
     B -->|"Admin" role| D
-    
+
     style A fill:#e1f5fe
     style B fill:#e8f5e8
     style C fill:#fff3e0
@@ -212,7 +212,7 @@ graph LR
 
 When Sarah joins the platform engineering team:
 - HR adds her to the `platform-engineering` AD group
-- She automatically becomes a member of the GitHub `Platform Engineering` team  
+- She automatically becomes a member of the GitHub `Platform Engineering` team
 - She immediately gets `Write` access to `platform-api` and `Admin` access to `infrastructure`
 - No manual GitHub administration required
 
@@ -396,6 +396,7 @@ Let's make this the definitive guide to GitHub Enterprise security that actually
 ---
 
 **Additional Resources:**
+- [GitHub Well-Architected Framework](https://wellarchitected.github.com/) - Comprehensive guidance on security, governance, and operational excellence
 - [GitHub Enterprise Security Best Practices](https://docs.github.com/en/enterprise-cloud@latest/admin/overview/best-practices-for-enterprises)
 - [Enterprise Managed Users Documentation](https://docs.github.com/en/enterprise-cloud@latest/admin/identity-and-access-management/using-enterprise-managed-users-for-iam/about-enterprise-managed-users)
 - [Repository Rulesets Documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
