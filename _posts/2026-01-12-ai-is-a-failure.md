@@ -77,4 +77,4 @@ If your AI rollout is struggling, the problem probably isn't the AI. It's everyt
 
 ---
 
-*Have you seen AI implementations succeed or fail in your organization? What made the difference? I'd love to hear your war stories. Hit me up on [LinkedIn](https://www.linkedin.com/in/jennamassardo) or [GitHub](https://github.com/jmassardo).*
+*Have you seen AI implementations succeed or fail in your organization? What made the difference? I'd love to hear your war stories. Hit me up on [LinkedIn](https://www.linkedin.com/in/jenna-massardo) or [GitHub](https://github.com/jmassardo).*
