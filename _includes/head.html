@@ -31,4 +31,41 @@
 MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], processEscapes: true } });
   </script>
   {% endif %}
+
+  <!-- Mermaid diagram support -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true
+        }
+      });
+      
+      // Convert fenced code blocks with language-mermaid to mermaid diagrams
+      document.querySelectorAll('pre code.language-mermaid').forEach(function(codeBlock) {
+        var pre = codeBlock.parentElement;
+        var div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = codeBlock.textContent;
+        pre.parentElement.replaceChild(div, pre);
+      });
+      
+      // Also handle cases where Rouge highlights it differently
+      document.querySelectorAll('div.language-mermaid pre code, div.highlighter-rouge.language-mermaid pre code').forEach(function(codeBlock) {
+        var wrapper = codeBlock.closest('.language-mermaid') || codeBlock.closest('.highlighter-rouge');
+        var div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = codeBlock.textContent;
+        wrapper.parentElement.replaceChild(div, wrapper);
+      });
+      
+      // Run mermaid after converting
+      mermaid.run();
+    });
+  </script>
 </head>
