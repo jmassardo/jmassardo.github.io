@@ -30,14 +30,62 @@ You can also find me on [Goodreads](https://www.goodreads.com/user/show/18953099
 
 ## Recently Completed
 
+### 2026
+
+- **Brimstone** by Callie Hart (Fae & Alchemy #2) ⭐ 4.09
+
 ### 2025
 
-*Add your 2025 reads here with brief thoughts*
+**Fantasy & Romantasy**
+- **Graceling** by Kristin Cashore (Graceling Realm #1) ⭐ 4.08
+- **Rebel Witch** by Kristen Ciccarelli (The Crimson Moth #2) ⭐ 4.26
+- **Heartless Hunter** by Kristen Ciccarelli (Crimson Moth #1) ⭐ 4.28
+- **Lady of The Lake** by C.N. Crawford (Fey Academy for Spies #3) ⭐ 4.24
+- **Vale of Dreams** by C.N. Crawford (Fey Academy for Spies #2) ⭐ 4.32
+- **Avalon Tower** by C.N. Crawford (Fey Academy for Spies #1) ⭐ 4.12
+- **Shield of Sparrows** by Devney Perry (Shield of Sparrows #1) ⭐ 4.53
+- **Her Soul for Revenge** by Harley Laroux (Souls Trilogy #2) ⭐ 4.25
+- **Soul of a Witch** by Harley Laroux (Souls Trilogy #3) ⭐ 4.31
+- **Her Soul to Take** by Harley Laroux (Souls Trilogy #1) ⭐ 4.03
+- **Queen of Shadows** by Sarah J. Maas (Throne of Glass #4) ⭐ 4.69
+- **Quicksilver** by Callie Hart (Fae & Alchemy #1) ⭐ 4.49
+- **Iron Flame** by Rebecca Yarros (The Empyrean #2) ⭐ 4.33
+- **Onyx Storm** by Rebecca Yarros (The Empyrean #3) ⭐ 4.16
+- **Phantasma** by Kaylie Smith (Wicked Games #1) ⭐ 4.12
+- **Fourth Wing** by Rebecca Yarros (The Empyrean #1) ⭐ 4.55
+- **Kingdom of Ash** by Sarah J. Maas (Throne of Glass #7) ⭐ 4.74
+- **The Assassin's Blade** by Sarah J. Maas (Throne of Glass #0.1-0.5) ⭐ 4.28
+- **From Blood and Ash** by Jennifer L. Armentrout (Blood and Ash #1) ⭐ 4.18
+- **Curse of Shadows and Thorns** by L.J. Andrews (The Broken Kingdoms #1) ⭐ 3.85
+- **Empire of Storms** by Sarah J. Maas (Throne of Glass #5) ⭐ 4.71
+- **Tower of Dawn** by Sarah J. Maas (Throne of Glass #6) ⭐ 4.45
+
+**Sapphic Romance**
+- **Learning Curves** by Rachel Lacey ⭐ 4.00
+- **Love Next Door** by Rachael Sommers ⭐ 4.25
+- **No Rings Attached** by Rachel Lacey (Ms. Right #2) ⭐ 3.80
+- **Stars Collide** by Rachel Lacey ⭐ 4.00
+- **Read Between the Lines** by Rachel Lacey (Ms. Right #1) ⭐ 3.65
+- **Mistakes Were Made** by Meryl Wilsner ⭐ 3.89
+- **Down to a Science** by Haley Cass ⭐ 4.13
+- **On the Same Page** by Haley Cass ⭐ 4.34
+
+**Non-Fiction**
+- **Queer, 2nd Edition: The Ultimate LGBTQ Guide for Teens** by Kathy Belge ⭐ 3.90
 
 ### 2024
 
-*Add your 2024 reads here*
-
+- **Heir of Fire** by Sarah J. Maas (Throne of Glass #3) ⭐ 4.51
+- **Crown of Midnight** by Sarah J. Maas (Throne of Glass #2) ⭐ 4.51
+- **Throne of Glass** by Sarah J. Maas (Throne of Glass #1) ⭐ 4.26
+- **A Court of Thorns and Roses** by Sarah J. Maas (ACOTAR #1) ⭐ 4.35
+- **A Court of Mist and Fury** by Sarah J. Maas (ACOTAR #2) ⭐ 4.72
+- **A Court of Wings and Ruin** by Sarah J. Maas (ACOTAR #3) ⭐ 4.60
+- **A Court of Frost and Starlight** by Sarah J. Maas (ACOTAR #3.5) ⭐ 3.97
+- **A Court of Silver Flames** by Sarah J. Maas (ACOTAR #4) ⭐ 4.60
+- **House of Earth and Blood** by Sarah J. Maas (Crescent City #1) ⭐ 4.58
+- **House of Sky and Breath** by Sarah J. Maas (Crescent City #2) ⭐ 4.56
+- **House of Flame and Shadow** by Sarah J. Maas (Crescent City #3) ⭐ 4.41
 ---
 
 ## Want to Read
@@ -65,7 +113,6 @@ You can also find me on [Goodreads](https://www.goodreads.com/user/show/18953099
 - **The Song of Achilles** by Madeline Miller ⭐ 4.29
 - **Court of Shadows** (Institute of the Shadow Fae #1) by C.N. Crawford ⭐ 3.88
 - **Spark of the Everflame** (Kindred's Curse #1) by Penn Cole ⭐ 4.18
-- **Brimstone** (Fae & Alchemy #2) by Callie Hart ⭐ 4.55
 - **House of Crimson Hearts** (Kingdom of Immortal Lovers #1) by Ruby Roe ⭐ 4.02
 - **A Game of Hearts and Heists** (Girl Games #1) by Ruby Roe ⭐ 3.90
 - **The Awakening** (Zodiac Academy #1) by Caroline Peckham ⭐ 3.79
@@ -121,20 +168,14 @@ You can also find me on [Goodreads](https://www.goodreads.com/user/show/18953099
 
 ---
 
-## Book Notes & Reviews
-
-Detailed notes and thoughts on books that made an impact.
-
-*Coming soon*
-
----
-
 ## Reading Stats
 
-- **Books read in 2025:** TBD
-- **Favorite genre:** TBD
-- **Current reading goal:** TBD books/year
+- **Books read in 2025:** 31 books
+- **Books read in 2024:** 11 books
+- **Books read in 2026:** 1 (so far!)
+- **Favorite genre:** Fantasy Romance & Fae
+- **Current reading goal:** 35 books/year
 
 ---
 
-*Last updated: November 21, 2025*
+*Last updated: January 14, 2026*
