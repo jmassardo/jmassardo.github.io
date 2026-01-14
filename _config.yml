@@ -73,3 +73,16 @@ hero:
 mathjax: true # whether support mathjax
 google_analytics_token: 'G-R8J4XTV6XW' # leave blank if you don't want google analytics
 #disqus_short_name: '' # leave blank if you don't want disqus
+
+# Giscus Comments (https://giscus.app)
+giscus:
+  enabled: true
+  repo: "jmassardo/jmassardo.github.io"
+  repo_id: "MDEwOlJlcG9zaXRvcnkxNTcxMzE0OTQ="           # Get from https://giscus.app
+  category: "Comments"  # Create this category in Discussions
+  category_id: "DIC_kwDOCV2i5s4C09dy"       # Get from https://giscus.app
+  mapping: "pathname"   # Maps posts to discussions by URL path
+  reactions: "1"        # Enable reactions
+  input_position: "top" # Comment box at top
+  theme: "noborder_light"
+  lang: "en"

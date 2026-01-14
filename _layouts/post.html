@@ -30,3 +30,7 @@ layout: default
     {% endfor %}
   </ul>
 </div>
+
+{% unless page.comments == false %}
+  {% include comments.html %}
+{% endunless %}

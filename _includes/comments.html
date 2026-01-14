@@ -1,0 +1,21 @@
+{% if site.giscus.enabled %}
+<div class="comments">
+  <h2>Comments</h2>
+  <script src="https://giscus.app/client.js"
+          data-repo="{{ site.giscus.repo }}"
+          data-repo-id="{{ site.giscus.repo_id }}"
+          data-category="{{ site.giscus.category }}"
+          data-category-id="{{ site.giscus.category_id }}"
+          data-mapping="{{ site.giscus.mapping | default: 'pathname' }}"
+          data-strict="0"
+          data-reactions-enabled="{{ site.giscus.reactions | default: '1' }}"
+          data-emit-metadata="0"
+          data-input-position="{{ site.giscus.input_position | default: 'top' }}"
+          data-theme="{{ site.giscus.theme | default: 'preferred_color_scheme' }}"
+          data-lang="{{ site.giscus.lang | default: 'en' }}"
+          data-loading="lazy"
+          crossorigin="anonymous"
+          async>
+  </script>
+</div>
+{% endif %}
