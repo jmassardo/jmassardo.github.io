@@ -75,6 +75,7 @@ jobs:
           import re
           import os
           import sys
+          import uuid
 
           post_file = os.environ.get('POST_FILE')
           
@@ -110,7 +111,8 @@ jobs:
           # Generate hashtags (limit to 5)
           hashtags = []
           for tag in tags[:5]:
-              # Clean tag for social media, keeping hyphens and underscores
+              # Clean tag for social media (keeps alphanumeric, hyphens, and underscores)
+              # Note: \w already includes underscores, so this pattern preserves them
               clean_tag = re.sub(r'[^\w-]', '', str(tag))
               if clean_tag:
                   hashtags.append(f"#{clean_tag}")
@@ -127,7 +129,6 @@ jobs:
                   full_image_url = f"https://dxrf.com/{image_path}"
 
           # Output to GitHub Actions (using delimiter for multiline values)
-          import uuid
           delimiter = uuid.uuid4().hex
           
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
@@ -182,8 +183,22 @@ jobs:
           if hashtags:
               post_text += f"\n\n{hashtags}"
 
-          # Trim if too long
+          # Trim if too long (Bluesky has 300 char limit)
           if len(post_text) > 300:
+              # Helper function to safely truncate at char boundaries
+              def safe_truncate(text, max_len):
+                  if len(text) <= max_len:
+                      return text
+                  # Truncate and ensure we don't break in middle of multi-byte char
+                  truncated = text[:max_len]
+                  try:
+                      # Try to encode/decode to verify valid UTF-8
+                      truncated.encode('utf-8')
+                      return truncated
+                  except UnicodeDecodeError:
+                      # If broken, remove last char and try again
+                      return safe_truncate(text[:max_len-1], max_len-1)
+              
               # Calculate available space for excerpt
               prefix = f"📝 New blog post: {title}\n\n"
               suffix = f"\n\n🔗 {post_url}"
@@ -192,14 +207,14 @@ jobs:
               
               available_space = 300 - len(prefix) - len(suffix) - 3  # 3 for "..."
               if available_space > 0:
-                  trimmed_excerpt = excerpt[:available_space] + "..."
+                  trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
                   post_text = f"{prefix}{trimmed_excerpt}{suffix}"
               else:
                   # If still too long, remove hashtags and try again
                   suffix = f"\n\n🔗 {post_url}"
                   available_space = 300 - len(prefix) - len(suffix) - 3
                   if available_space > 0:
-                      trimmed_excerpt = excerpt[:available_space] + "..."
+                      trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
                       post_text = f"{prefix}{trimmed_excerpt}{suffix}"
                   else:
                       # Last resort: just title and link
@@ -221,7 +236,6 @@ jobs:
                   # Link not found in text, just post as plain text
                   client.send_post(post_text)
                   print(f"✅ Posted to Bluesky successfully (plain text)!")
-                  import sys
                   sys.exit(0)
               
               # Add the link
@@ -279,6 +293,20 @@ jobs:
 
           # LinkedIn has a 3000 character limit for post text
           if len(commentary) > 3000:
+              # Helper function to safely truncate at char boundaries
+              def safe_truncate(text, max_len):
+                  if len(text) <= max_len:
+                      return text
+                  # Truncate and ensure we don't break in middle of multi-byte char
+                  truncated = text[:max_len]
+                  try:
+                      # Try to encode/decode to verify valid UTF-8
+                      truncated.encode('utf-8')
+                      return truncated
+                  except UnicodeDecodeError:
+                      # If broken, remove last char and try again
+                      return safe_truncate(text[:max_len-1], max_len-1)
+              
               # Trim excerpt to fit
               prefix = f"📝 New blog post: {title}\n\n"
               suffix = f"\n\nRead more: {post_url}"
@@ -287,14 +315,14 @@ jobs:
               
               available_space = 3000 - len(prefix) - len(suffix) - 3  # 3 for "..."
               if available_space > 0:
-                  trimmed_excerpt = excerpt[:available_space] + "..."
+                  trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
                   commentary = f"{prefix}{trimmed_excerpt}{suffix}"
               else:
                   # If still too long, remove hashtags
                   suffix = f"\n\nRead more: {post_url}"
                   available_space = 3000 - len(prefix) - len(suffix) - 3
                   if available_space > 0:
-                      trimmed_excerpt = excerpt[:available_space] + "..."
+                      trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
                       commentary = f"{prefix}{trimmed_excerpt}{suffix}"
                   else:
                       # Last resort: just title and link
