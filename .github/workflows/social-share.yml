@@ -65,6 +65,8 @@ jobs:
       - name: Extract post data
         id: extract
         if: steps.detect.outputs.post_file != ''
+        env:
+          POST_FILE: ${{ steps.detect.outputs.post_file }}
         run: |
           python3 << 'EOF'
           import yaml
@@ -73,7 +75,7 @@ jobs:
           import sys
           from urllib.parse import quote
 
-          post_file = "${{ steps.detect.outputs.post_file }}"
+          post_file = os.environ.get('POST_FILE')
           
           if not os.path.exists(post_file):
               print(f"Error: Post file not found: {post_file}")
@@ -123,10 +125,13 @@ jobs:
                   image_path = image.lstrip('/')
                   full_image_url = f"https://dxrf.com/{image_path}"
 
-          # Output to GitHub Actions
+          # Output to GitHub Actions (using delimiter for multiline values)
+          import uuid
+          delimiter = uuid.uuid4().hex
+          
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-              f.write(f"title={title}\n")
-              f.write(f"excerpt={excerpt}\n")
+              f.write(f"title<<{delimiter}\n{title}\n{delimiter}\n")
+              f.write(f"excerpt<<{delimiter}\n{excerpt}\n{delimiter}\n")
               f.write(f"post_url={post_url}\n")
               f.write(f"hashtags={hashtags_str}\n")
               f.write(f"image_url={full_image_url}\n")
@@ -143,6 +148,11 @@ jobs:
         env:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          POST_TITLE: ${{ steps.extract.outputs.title }}
+          POST_EXCERPT: ${{ steps.extract.outputs.excerpt }}
+          POST_URL: ${{ steps.extract.outputs.post_url }}
+          POST_HASHTAGS: ${{ steps.extract.outputs.hashtags }}
+          POST_IMAGE_URL: ${{ steps.extract.outputs.image_url }}
         run: |
           python3 << 'EOF'
           import os
@@ -157,12 +167,12 @@ jobs:
               print("Error: Bluesky credentials not configured")
               sys.exit(1)
 
-          # Get post data
-          title = """${{ steps.extract.outputs.title }}"""
-          excerpt = """${{ steps.extract.outputs.excerpt }}"""
-          post_url = "${{ steps.extract.outputs.post_url }}"
-          hashtags = "${{ steps.extract.outputs.hashtags }}"
-          image_url = "${{ steps.extract.outputs.image_url }}"
+          # Get post data from environment variables
+          title = os.environ.get('POST_TITLE', '')
+          excerpt = os.environ.get('POST_EXCERPT', '')
+          post_url = os.environ.get('POST_URL', '')
+          hashtags = os.environ.get('POST_HASHTAGS', '')
+          image_url = os.environ.get('POST_IMAGE_URL', '')
 
           # Create post text (max 300 chars for Bluesky)
           post_text = f"📝 New blog post: {title}\n\n{excerpt}\n\n🔗 {post_url}"
@@ -202,7 +212,7 @@ jobs:
               
               # Add text before the link
               link_start_pos = post_text.find(post_url)
-              if link_start_pos > 0:
+              if link_start_pos >= 0 and link_start_pos > 0:
                   post_builder.text(post_text[:link_start_pos])
               
               # Add the link
@@ -228,6 +238,10 @@ jobs:
         env:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          POST_TITLE: ${{ steps.extract.outputs.title }}
+          POST_EXCERPT: ${{ steps.extract.outputs.excerpt }}
+          POST_URL: ${{ steps.extract.outputs.post_url }}
+          POST_HASHTAGS: ${{ steps.extract.outputs.hashtags }}
         run: |
           python3 << 'EOF'
           import os
@@ -243,11 +257,11 @@ jobs:
               print("Error: LinkedIn credentials not configured")
               sys.exit(1)
 
-          # Get post data
-          title = """${{ steps.extract.outputs.title }}"""
-          excerpt = """${{ steps.extract.outputs.excerpt }}"""
-          post_url = "${{ steps.extract.outputs.post_url }}"
-          hashtags = "${{ steps.extract.outputs.hashtags }}"
+          # Get post data from environment variables
+          title = os.environ.get('POST_TITLE', '')
+          excerpt = os.environ.get('POST_EXCERPT', '')
+          post_url = os.environ.get('POST_URL', '')
+          hashtags = os.environ.get('POST_HASHTAGS', '')
 
           # Create commentary text
           commentary = f"📝 New blog post: {title}\n\n{excerpt}\n\nRead more: {post_url}"
