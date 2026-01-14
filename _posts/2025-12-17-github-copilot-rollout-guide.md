@@ -231,3 +231,7 @@ Run surveys at:
 - [GitHub Copilot user management and provisioning](https://resources.github.com/learn/pathways/copilot/essentials/github-copilot-user-management-and-provisioning/)
 - [Understanding billing for GitHub Copilot](https://resources.github.com/learn/pathways/copilot/essentials/understanding-billing-for-github-copilot/)
 - [SPACE framework (ACM)](https://queue.acm.org/detail.cfm?id=3454124) - Foundational reading on developer productivity metrics
+
+---
+
+*Rolling out Copilot at your organization? Have questions or war stories? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

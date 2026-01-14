@@ -41,3 +41,7 @@ Next is to create a post.
 ```
 
 From there, add your header and start writing. [Post Docs](https://jekyllrb.com/docs/posts/)
+
+---
+
+*Have questions about Jekyll or want to share your own static site setup? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

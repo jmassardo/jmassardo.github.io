@@ -8,3 +8,7 @@ excerpt: "Let the continuous integration begin! It took a little tinkering (most
 ---
 
 Let the continuous integration begin! It took a little tinkering (mostly around getting the FTP upload to work), but I have [TravisCI](https://travis-ci.org) working with [GitHub](https://github.com/). I'm planning to detail out the process in a future post.
+
+---
+
+*Interested in CI/CD setups? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

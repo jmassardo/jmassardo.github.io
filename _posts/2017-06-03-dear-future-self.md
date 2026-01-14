@@ -10,3 +10,7 @@ excerpt: "I met a lot of really awesome people at ChefConf. One guy, named Danie
 I met a lot of really awesome people at ChefConf. One guy, named Daniel, and I were joking about blogging stuff and we said we should start a blog named Dear Future Self. Technologists come in contact with so much information, there's no way anyone can remember it all. A lot of the stuff on this blog is literally so I don't have to remember everything.
 
 So Dear Future self, please enjoy all this stuff :)
+
+---
+
+*Got questions or want to share your own "Dear Future Self" moments? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

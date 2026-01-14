@@ -163,4 +163,6 @@ Promoting/Demoting - So we've got our package built and running in production. A
 
 As always, I hope you've found some valuable tidbits here. Check back as this post will undoubtedly receive updates as I find new things in Habitat.
 
-If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+---
+
+*Found a troubleshooting tip I missed? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

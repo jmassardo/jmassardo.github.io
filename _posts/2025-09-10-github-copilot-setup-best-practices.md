@@ -541,3 +541,7 @@ Now go forth and configure! Your future self (and your teammates) will thank you
 - [Awesome Copilot Repository](https://github.com/github/awesome-copilot)
 - [MCP Protocol Specification](https://docs.github.com/en/copilot/using-github-copilot/using-extensions-to-integrate-external-tools-with-copilot-chat)
 - [Copilot Best Practices Guide](https://docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot)
+
+---
+
+*Questions about Copilot configuration? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

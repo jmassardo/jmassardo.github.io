@@ -76,4 +76,8 @@ To-do List
 
 ## Closing
 
-While these aren't step-by-step directions, hopefully it's enough for someone else to solve the same problem I had. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+While these aren't step-by-step directions, hopefully it's enough for someone else to solve the same problem I had.
+
+---
+
+*Have questions about domain redirects or GitHub Pages? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

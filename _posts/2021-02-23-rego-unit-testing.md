@@ -190,4 +190,6 @@ test_block_priv_mode {
 
 Hopefully this post has been helpful getting started. The Open Policy Agent documentation has a lot more info on [policy testing](https://www.openpolicyagent.org/docs/latest/policy-testing/)
 
-If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+---
+
+*Have questions about Rego or OPA? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

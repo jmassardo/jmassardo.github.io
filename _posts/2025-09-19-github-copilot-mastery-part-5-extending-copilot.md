@@ -1018,4 +1018,4 @@ Start with simple extensions and gradually build more complex integrations. The 
 
 ---
 
-*This post is part 5 of the GitHub Copilot Mastery series. Next up: Real-world use cases that showcase the full potential of AI-assisted development.*
+*This post is part 5 of the GitHub Copilot Mastery series. Next up: Real-world use cases that showcase the full potential of AI-assisted development. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

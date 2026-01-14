@@ -134,3 +134,7 @@ The next era of product development means teams can build faster without comprom
 Stop me if you've heard this one: "AI will change everything." The difference now? We can actually see the roadmap. The question is whether you'll be ready when Phase 3 and 4 arrive - or whether you'll still be figuring out Phase 1.
 
 Together, governance, agents, and human creativity will define the next generation of software development. The winners will be the teams that embrace this shift while building the guardrails to make it sustainable.
+
+---
+
+*Have thoughts on AI governance or agent orchestration? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

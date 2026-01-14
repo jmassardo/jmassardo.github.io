@@ -82,4 +82,8 @@ We're almost there, the final steps set up the actual pipeline.
 
 ## Closing
 
-Hopefully, you've found a couple things that will help you be successful. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+Hopefully, you've found a couple things that will help you be successful.
+
+---
+
+*Have questions about Habitat and Azure DevOps? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

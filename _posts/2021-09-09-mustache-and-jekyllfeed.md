@@ -176,4 +176,8 @@ jobs:
 
 ## Closing
 
-Again, feel free to browse my [repo](https://github.com/jmassardo/jmassardo) with the functional source code. If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+Again, feel free to browse my [repo](https://github.com/jmassardo/jmassardo) with the functional source code.
+
+---
+
+*Have questions about Jekyll feeds or Mustache templating? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

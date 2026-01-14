@@ -710,4 +710,4 @@ Start implementing these advanced techniques gradually. Each one builds on the o
 
 ---
 
-*This post is part 4 of the GitHub Copilot Mastery series. Coming up: Building extensions and custom tools that leverage Copilot's capabilities.*
+*This post is part 4 of the GitHub Copilot Mastery series. Coming up: Building extensions and custom tools that leverage Copilot's capabilities. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

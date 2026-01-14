@@ -381,4 +381,4 @@ Consider experimenting with different IDEs using the same project to see how Cop
 
 ---
 
-*This post is part 3 of the GitHub Copilot Mastery series. Coming up: Advanced usage techniques that will make you a Copilot power user.*
+*This post is part 3 of the GitHub Copilot Mastery series. Coming up: Advanced usage techniques that will make you a Copilot power user. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

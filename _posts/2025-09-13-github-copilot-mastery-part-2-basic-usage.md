@@ -341,4 +341,4 @@ Start practicing these basic usage patterns in your daily coding. The more you u
 
 ---
 
-*This post is part 2 of the GitHub Copilot Mastery series. Coming up: IDE differences and how to optimize Copilot for your preferred development environment.*
+*This post is part 2 of the GitHub Copilot Mastery series. Coming up: IDE differences and how to optimize Copilot for your preferred development environment. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

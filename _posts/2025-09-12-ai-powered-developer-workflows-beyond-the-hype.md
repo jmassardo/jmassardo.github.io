@@ -112,3 +112,7 @@ The AI development tools landscape is evolving rapidly. The key is to experiment
 Start with one or two of these workflows in your daily routine. See what works for your team and codebase. And remember - the goal isn't to eliminate human creativity from development, but to eliminate human drudgery so you can focus on what actually matters.
 
 The future of development isn't about AI replacing developers - it's about developers with AI outpacing developers without it. Time to level up your workflow.
+
+---
+
+*Have questions about AI-powered workflows? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

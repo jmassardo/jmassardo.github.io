@@ -295,4 +295,6 @@ I'd like to take credit for writing all these plans but, alas, I can't. Fortunat
 
 If you run across another significant pattern that isn't here, please let me know so I can update this page!
 
-If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+---
+
+*Have questions about Habitat plans or want to share your own examples? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

@@ -53,4 +53,4 @@ You can read more about GitHub's GraphQL endpoint in the [documentation](https:/
 
 ## Closing
 
-If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+*Have questions about GitHub Enterprise Cloud organization management? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

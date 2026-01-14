@@ -260,4 +260,6 @@ Let's look at the structure of the `\hab\` directory and make note of what each 
 
 Congrats on making it through all of that info! Hopefully this post has clarified a few points and was helpful. If you're like me, documentation is invaluable, but it's nice to detail out some of the basics so the documentation actually makes sense!
 
-If you have any questions or feedback, please feel free to contact me: [@jennamassardo](https://www.threads.net/@jennamassardo)
+---
+
+*Have questions about Habitat on Windows? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

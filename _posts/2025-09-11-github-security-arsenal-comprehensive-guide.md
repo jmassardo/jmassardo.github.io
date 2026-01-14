@@ -594,4 +594,4 @@ Start with understanding one vulnerability deeply, apply the fix carefully, and 
 
 ---
 
-*Have you used Copilot autofix for security vulnerabilities? How did it work for your use case? I'm always interested in hearing about real-world security remediation experiences drop me a line if you've got war stories to share.*
+*Have you used Copilot autofix for security vulnerabilities? How did it work for your use case? I'm always interested in hearing about real-world security remediation experiences - find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

@@ -307,3 +307,7 @@ The future of development isn't about humans versus AI – it's about humans wit
 - [AI-Assisted Code Review Guidelines](https://github.blog/2023-08-25-how-to-use-github-copilot-in-your-ide-tips-tricks-and-best-practices/)
 - [Security Considerations for AI-Generated Code](https://owasp.org/www-project-ai-security-and-privacy-guide/)
 - [Testing Strategies for AI-Augmented Development](https://martinfowler.com/articles/2023-chatgpt-xu-hao.html)
+
+---
+
+*Want to chat about AI-assisted development workflows? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

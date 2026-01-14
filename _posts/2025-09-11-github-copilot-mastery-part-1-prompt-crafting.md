@@ -245,4 +245,4 @@ Until then, start experimenting with these prompt crafting techniques in your da
 
 ---
 
-*This post is part 1 of the GitHub Copilot Mastery series. Follow along as we explore everything from basic usage to advanced customization techniques.*
+*This post is part 1 of the GitHub Copilot Mastery series. Follow along as we explore everything from basic usage to advanced customization techniques. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

@@ -76,3 +76,7 @@ AI is a power tool. Like any power tool, it can help you build amazing things fa
 The people who get the most value from AI aren't the ones who trust it blindly or avoid it entirely. They're the ones who've learned when to trust, when to verify, and when to override.
 
 That's not cynicism. That's just good engineering.
+
+---
+
+*Have thoughts on AI trust and verification? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*

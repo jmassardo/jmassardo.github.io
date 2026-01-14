@@ -973,4 +973,4 @@ The key to mastery is practice. Start with one use case that addresses your bigg
 
 ---
 
-*This concludes the GitHub Copilot Mastery series. Thank you for following along on this journey from beginner to expert. Now go forth and build amazing things with your AI coding companion!*
+*This concludes the GitHub Copilot Mastery series. Thank you for following along on this journey from beginner to expert. Now go forth and build amazing things with your AI coding companion! Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
