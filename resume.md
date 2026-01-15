@@ -21,98 +21,94 @@ title: Resume
 
 ## Summary
 
-Highly motivated Technologist specializing in configuration management, systems management, DevOps practices, infrastructure automation technologies, and service design/delivery. Aiming to use my proven skills in implementing technology, service design, and process management in a career where I can help organizations use technology to transform operations.
+Technical executive and strategic advisor specializing in developer experience, platform engineering, and enterprise DevOps transformation. I partner with Fortune 500 engineering leaders to modernize software delivery, implement secure development practices, and drive measurable business outcomes. With deep expertise spanning infrastructure automation, policy-as-code, and AI-assisted development, I help organizations scale their engineering capabilities while maintaining security and compliance. Speaker, technical writer, and thought leader with a track record of enabling engineering teams to ship faster, safer, and smarter.
 
 ---
 
-## Skills & Abilities
+## Areas of Expertise
 
-### LANGUAGES
+### PLATFORM ENGINEERING & DEVELOPER EXPERIENCE
 
-.Net/C#, BASH, CSS, HTML, Java, Javascript, PowerShell, Python, Ruby (Chef DSC and RAILS), Swift
+Enterprise DevOps strategy, CI/CD architecture, GitHub Actions & workflows at scale, innersource program design, developer productivity optimization, engineering metrics & DORA adoption
 
-### TECHNOLOGIES
+### SECURITY & COMPLIANCE
 
-#### Automation
+DevSecOps implementation, policy-as-code (Open Policy Agent/Rego), software supply chain security, SBOM strategies, compliance automation, secrets management, security-first architecture
 
-Ansible, Chef Suite (Infra, InSpec, Habitat), Cloud (Azure, AWS, GCP, Kubernetes), CI/CD (Azure DevOps, GitHub Actions, GitLabCI, Jenkins, TravisCI), Terraform, Test Kitchen, Vagrant
+### AI-ASSISTED DEVELOPMENT
 
-#### Development
+GitHub Copilot enterprise deployment, AI-augmented workflows, responsible AI adoption strategies, developer enablement for AI tooling
 
-Eclipse, Git, GitHub, Visual Studio, VS Code
+### CLOUD & INFRASTRUCTURE
 
-#### Microsoft
+Multi-cloud architecture (Azure, AWS, GCP), Kubernetes & container orchestration, infrastructure as code (Terraform), configuration management at scale
 
-Active Directory, Azure, Certificate Services, Group Policy, IIS, Microsoft Deployment Toolkit, Office 365, SQL Server, System Center (Configuration Manager/InTune, Operations Manager, Orchestrator), Windows Client, Windows Server
+### TECHNICAL LEADERSHIP
 
-#### Other
-
-Apple/Mac, Docker, Gainsight, Google Suite, Kanban Tool, Hubspot, Linux (CentOS/Ubuntu), Salesforce, Spacewalk, Trello, Totango, VMWare Fusion, Zapier
-
-### MANAGEMENT
-
-* ~4 yrs. Experience in IT Leadership as a working Supervisor/Manager.
-* Successfully developed 3 independent teams and transitioned to other managers or newly promoted supervisors.
-* Assist in managing ~$10M in budget.
-* Lead a distributed team including remote employees.
+Strategic technology advisory, enterprise architecture review, technical enablement & training, cross-functional stakeholder alignment, engineering team scaling
 
 ---
 
 ## Experience
 
-#### STAFF CUSTOMER SUCCESS ARCHITECT | GITHUB | 7/2021 - PRESENT
+#### STAFF CUSTOMER SUCCESS ARCHITECT | GITHUB | 2021 - PRESENT
 
-* I work with some of the largest companies in the world to develop world class SDLC and DevOps best practices. I operate as a Trusted Technical Advisor to define processes and patterns for large scale git operations.
+Strategic technical advisor to GitHub's largest enterprise customers, driving adoption of modern software development practices across organizations with tens of thousands of developers.
 
-#### SR. CUSTOMER SUCCESS ARCHITECT | STYRA | 1/2021 - 7/2021
+* Serve as trusted technical advisor to Fortune 500 engineering leadership, providing strategic guidance on DevOps transformation, platform engineering, and secure software delivery
+* Design and architect enterprise-scale GitHub deployments including Actions CI/CD pipelines, advanced security configurations, and Copilot rollout strategies
+* Lead technical enablement programs that accelerate customer adoption of GitHub's platform capabilities, resulting in measurable improvements to developer velocity and security posture
+* Develop and deliver executive-level presentations on emerging practices including AI-assisted development, software supply chain security, and engineering effectiveness metrics
+* Author technical content and best practices documentation; contribute to GitHub's body of knowledge on enterprise DevOps patterns
+* Collaborate cross-functionally with product, engineering, and sales teams to translate customer needs into platform improvements
 
-* My role as a Customer Success Architect is described as "All things proactive technical". I work with customers to design, develop, and implement best in class Authorization processes.
+#### SR. CUSTOMER SUCCESS ARCHITECT | STYRA | 2021
 
-#### LEAD CUSTOMER ARCHITECT | CHEF SOFTWARE | 5/2018 - 1/2021
+Technical lead for enterprise customers implementing policy-as-code and authorization frameworks using Open Policy Agent (OPA).
 
-* As a Customer Architect, my primary role is to help customers get the most value from Chef's products as I can. This includes performing architecture reviews, conducting technical enablement sessions where I teach a new technique or skill, peer programming/reviews, and process coaching. I also develop sample code, demos, and examples along with writing process guides and blog posts about best practices.
+* Designed and implemented authorization architectures for customers adopting cloud-native security patterns
+* Developed Rego policies and testing frameworks for complex authorization requirements
+* Delivered technical enablement on policy-as-code principles and OPA ecosystem best practices
 
-#### SYSTEMS ENGINEER, ADVANCED | JACK HENRY & ASSOCIATES | 12/2017 - 5/2018
+#### LEAD CUSTOMER ARCHITECT | CHEF SOFTWARE (PROGRESS) | 2018 - 2021
 
-* As a Systems Engineer, I act as an Automation Evangelist. My goal is to assist other groups in improving their operations through automation. This assistance takes many forms including training, consultation, peer programming, code reviews, and providing architecture/ engineering support. I develop samples and starters for groups that want to eventually own their own automation. I also develop complete automation solutions and custom applications to meet customer requirements.
-* Duties included developing custom applications for internal customers, working with business units to identify operational deficiencies and develop custom automated workflows, presenting on automation and DevOps topics.
-* Custom development
-  * Notification system for Datacenter Operations Center (Ruby/RAILS)
-  * Server Tagging Web service: automates identification of registry tattoo
+Senior technical advisor responsible for driving customer success and product adoption across Chef's infrastructure automation portfolio.
 
-#### SYSTEMS ADMINISTRATION MANAGER | JACK HENRY & ASSOCIATES | 1/2016 - 12/2017
+* Partnered with enterprise customers to design compliance-as-code strategies using InSpec, enabling automated audit and security validation across hybrid infrastructure
+* Led architecture reviews and provided strategic guidance on infrastructure automation at scale
+* Developed reference architectures, sample code, and technical documentation; authored blog content on DevOps best practices
+* Conducted technical enablement sessions and peer programming engagements to upskill customer engineering teams
 
-* Duties included managing a dynamic, mostly remote team, assisting with department budget planning, leading peer meetings, mentoring peers, strategic planning for service design, transition, and operations, assisting customers with process automation, developing custom scripts/automated workflows/custom applications in PowerShell, .Net, Chef (Ruby). Lead successful effort to deploy Chef to 11K+ production datacenter servers for compliance management.
-* Responsible for writing business proposals for new technology. Also, responsible for delivering regularly scheduled presentations to technical and business personnel on upcoming activities and new technologies being implemented.
-* Participated in SCRUM team with internal development group. Worked with Product Owner to document requirements and user stories. Participated in daily standups. Worked with developers to facilitate software deployments into test, dev, and prod.
-* Our team delivered systems management and infrastructure automation technologies to internal customers (over 22K systems) using technologies such as Chef, System Center Configuration Manager, Spacewalk, System Center Orchestrator.
+#### ENGINEERING MANAGER & AUTOMATION ARCHITECT | JACK HENRY & ASSOCIATES | 2014 - 2018
 
-#### SYSTEMS ADMINISTRATION SUPERVISOR | JACK HENRY & ASSOCIATES | 1/2014 – 1/2016
+Progressive leadership roles driving infrastructure automation strategy and engineering team development for a Fortune 1000 financial technology company.
 
-* Duties included supervising a team of 7 people including remote employees; assisting with budget planning; performing performance appraisals; coordinating training; managing project resources.
-* Successfully built 3 teams as a Supervisor: a Systems Management Team, an Operations Monitoring Team, and a Certificate Services Team.
-* Implemented ConfigMgr upgrades with the Systems Management Team. Deployed an enterprise wide monitoring solution using System Center Operations Manager. Designed and deployed an enterprise-class PKI Infrastructure.
+* Led successful enterprise-wide deployment of configuration management to 11,000+ production servers, establishing compliance automation capabilities
+* Built and mentored multiple high-performing teams including Systems Management, Operations Monitoring, and Security Infrastructure
+* Managed distributed engineering teams and contributed to $10M+ technology budget planning
+* Championed DevOps practices and automation adoption across business units through training, consultation, and internal evangelism
+* Developed custom automation solutions and internal tooling to improve operational efficiency
 
-#### SR. SYSTEMS ADMINISTRATOR | JACK HENRY & ASSOCIATES | 1/2003 – 1/2014
+---
 
-* Duties included deploying and maintaining a multi-site SCCM hierarchy; deploying software; deploying software updates; monitoring update and configuration compliance; providing reports for asset tracking, software license tracking, and assisting network security engineers with compliance reporting for unauthorized software; supporting Pc Technicians and Hardware Server Administrators with Operating System Deployment, including building boot images, building OS images, and task sequences. Other duties include administering Active Directory and Group Policy. Act as Subject Matter Expert for Systems Management technologies and processes.
+## Thought Leadership
+
+* **Technical Blog:** [dxrf.com/blog](https://www.dxrf.com/blog) — Writing on DevOps, platform engineering, and engineering leadership
+* **Speaking:** Internal and customer-facing presentations on enterprise DevOps, GitHub best practices, and AI-assisted development
+* **Open Source:** Contributor to documentation and community resources
 
 ---
 
 ## Education
 
-#### ASSOCIATE OF APPLIED SCIENCE | 2003 | NORTH ARKANSAS COLLEGE
+#### NORTH ARKANSAS COLLEGE
 
-* Major: Electronics Technology
+* Associate of Applied Science, Computer Information Technology
+* Associate of Applied Science, Electronics Technology
 
-#### ASSOCIATE OF APPLIED SCIENCE | 2002 | NORTH ARKANSAS COLLEGE
+---
 
-* Major: Computer Information Technology
+## Certifications
 
-#### Certifications
-
-* GitHub: Actions - Working with GitHub Actions in the Enterprise
-* MTA: Cloud Fundamentals
-* MCTS: System Center Configuration Manager
-* ITIL Foundations v3.0
-* ITIL Intermediate – Service Strategy
+* GitHub Actions - Working with GitHub Actions in the Enterprise
+* ITIL Foundations & Service Strategy
