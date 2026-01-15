@@ -1,0 +1,52 @@
+name: Post to Bluesky
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '_posts/**'
+
+jobs:
+  post-to-bluesky:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to detect new files
+
+      - name: Get new posts
+        id: new-posts
+        run: |
+          # Get list of added files in _posts directory
+          NEW_POSTS=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- '_posts/*.md' || true)
+          
+          if [ -z "$NEW_POSTS" ]; then
+            echo "No new posts found"
+            echo "has_new_posts=false" >> $GITHUB_OUTPUT
+          else
+            echo "New posts found:"
+            echo "$NEW_POSTS"
+            echo "has_new_posts=true" >> $GITHUB_OUTPUT
+            # Save to file for the next step
+            echo "$NEW_POSTS" > new_posts.txt
+          fi
+
+      - name: Set up Python
+        if: steps.new-posts.outputs.has_new_posts == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        if: steps.new-posts.outputs.has_new_posts == 'true'
+        run: pip install atproto
+
+      - name: Post to Bluesky
+        if: steps.new-posts.outputs.has_new_posts == 'true'
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: python scripts/post_new_to_bluesky.py
