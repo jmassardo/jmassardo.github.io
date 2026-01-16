@@ -43,7 +43,7 @@ excerpt: "This is a short summary of my awesome blog post."
 - Ensure links are formatted correctly in Markdown.
 - Also ensure that links are valid and not broken.
 - Always provide examples where applicable.
-- All posts should end with a signoff that lists things like ways to contact the author or provide feedback
+- All posts should end with a signoff that lists ways to contact the author or provide feedback. Use the social links from `_config.yml` under `author.contact` for this signoff.
 
 ## Core Capabilities
 
