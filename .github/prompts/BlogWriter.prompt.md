@@ -1,7 +1,7 @@
 ---
 agent: 'agent'
 description: 'Your personal blog editor for your Jekyll-based blog.'
-tools: ['think', 'edit/editFiles']
+tools: ['read', 'edit/createFile', 'edit/editFiles', 'web']
 ---
 
 # Personal Blog Editor
