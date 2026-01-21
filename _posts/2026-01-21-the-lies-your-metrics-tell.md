@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Lies Your Metrics Tell"
-date: 2026-01-21 10:00:00 -0500
+date: 2026-01-21 08:00:00 -0500
 category: Blog
 tags: [engineering, metrics, leadership, devops, measurement, dora, space]
 excerpt: "A detailed autopsy of common engineering metrics: what they claim to measure, what they actually measure, and how to use them without being misled."
@@ -227,6 +227,6 @@ These are leading indicators of sustainability and burnout risk.
 
 ---
 
-*This is Part 2 of a three-part series on engineering metrics. Previously: [You're Measuring It Wrong]({% post_url 2026-01-19-youre-measuring-it-wrong %}). Coming next: [Metrics That Actually Matter]({% post_url 2026-01-23-metrics-that-actually-matter %}) where we build a framework for choosing measurements that inform without misleading.*
+*This is Part 2 of a three-part series on engineering metrics. Previously: [You're Measuring It Wrong]({% post_url 2026-01-19-youre-measuring-it-wrong %}). Coming next: Metrics That Actually Matter, where we build a framework for choosing measurements that inform without misleading.*
 
 *Got examples of metrics gone wrong (or right)? I'm always collecting war stories. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*
