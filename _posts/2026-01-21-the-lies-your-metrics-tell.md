@@ -227,6 +227,6 @@ These are leading indicators of sustainability and burnout risk.
 
 ---
 
-*This is Part 2 of a three-part series on engineering metrics. Previously: [You're Measuring It Wrong]({% post_url 2026-01-19-youre-measuring-it-wrong %}). Coming next: Metrics That Actually Matter, where we build a framework for choosing measurements that inform without misleading.*
+*This is Part 2 of a three-part series on engineering metrics. Previously: [You're Measuring It Wrong]({% post_url 2026-01-19-youre-measuring-it-wrong %}). Next: [Metrics That Actually Matter]({% post_url 2026-01-23-metrics-that-actually-matter %}) where we build a framework for choosing measurements that inform without misleading.*
 
 *Got examples of metrics gone wrong (or right)? I'm always collecting war stories. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

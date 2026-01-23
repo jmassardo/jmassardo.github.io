@@ -160,7 +160,7 @@ Look, I know I just spent 1,500 words telling you everything is broken. Here's s
 
 ---
 
-*This is Part 1 of a three-part series on engineering metrics. Next up: [The Lies Your Metrics Tell]({% post_url 2026-01-21-the-lies-your-metrics-tell %}) where we dissect exactly how common metrics fail and what signals might actually be useful. Part 3, Metrics That Actually Matter, is coming soon.*
+*This is Part 1 of a three-part series on engineering metrics. Next up: [The Lies Your Metrics Tell]({% post_url 2026-01-21-the-lies-your-metrics-tell %}) where we dissect exactly how common metrics fail and what signals might actually be useful. Then: [Metrics That Actually Matter]({% post_url 2026-01-23-metrics-that-actually-matter %}) where we build a framework for measurements that inform without misleading.*
 
 *Did this post make you uncomfortable? Good. That means it's working. Have thoughts, counterarguments, or your own horror stories about metrics gone wrong? I'd love to hear them. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo). And if you're a vendor selling a developer productivity platform, my DMs are open, but bring data, not just demos.*
 

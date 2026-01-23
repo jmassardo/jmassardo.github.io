@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Metrics That Actually Matter"
-date: 2026-01-23 10:00:00 -0500
+date: 2026-01-23 7:00:00 -0500
 category: Blog
 tags: [engineering, metrics, observability, devops, leadership, dora, space]
 excerpt: "After tearing down bad metrics, it's time to build something better. A practical framework for measurements that reflect flow, resilience, learning, and team health."
@@ -172,6 +172,14 @@ Here's the most important part: metrics should inform judgment, not replace it.
 ## Building Your Metrics Practice
 
 So how do you put this into practice? Here's a framework:
+
+```mermaid
+flowchart LR
+    Q["🔍 Questions<br/><i>What do we need<br/>to understand?</i>"] --> M["📊 Metrics<br/><i>Choose signals that<br/>help answer them</i>"]
+    M --> C["💬 Conversations<br/><i>What's behind<br/>this number?</i>"]
+    C --> I["🚀 Improvements<br/><i>Take action and<br/>track results</i>"]
+    I -.->|"Continuous improvement cycle"| Q
+```
 
 ### Start with Questions, Not Dashboards
 
