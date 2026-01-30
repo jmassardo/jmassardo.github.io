@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Building a Center of Excellence: Your Guide to Scaling Knowledge Without Building Bureaucracy"
-date: 2026-01-16 10:00:00 -0500
+date: 2026-01-30 10:00:00 -0500
 category: Blog
 tags: [devops, leadership, organizational-design, developer-experience, champions, enablement]
 excerpt: "Centers of Excellence get a bad rap, but done right, they're the secret sauce for scaling expertise across your organization. Here's how to build one that enables teams instead of gatekeeping them."
