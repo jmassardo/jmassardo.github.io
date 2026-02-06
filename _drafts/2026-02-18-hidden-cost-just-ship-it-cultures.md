@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Hidden Cost of 'Just Ship It' Cultures"
-date: 2026-01-15 10:00:00 -0500
+date: 2026-02-18 10:00:00 -0500
 category: Blog
 tags: [engineering, culture, leadership, sustainability, devops]
 excerpt: "Speed is the ultimate virtue in many engineering orgs. But relentless urgency quietly accumulates risk, erodes trust, and degrades quality. The costs are real, just deferred."

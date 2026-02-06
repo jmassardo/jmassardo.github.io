@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Complex Systems Fail Quietly Before They Fail Loudly"
-date: 2026-01-31 10:00:00 -0500
+date: 2026-03-06 10:00:00 -0500
 category: Blog
 tags: [engineering, reliability, incidents, systems-thinking, devops]
 excerpt: "Major incidents rarely come out of nowhere. They're preceded by subtle warning signs that get normalized or ignored. Organizations that learn to notice weak signals can prevent catastrophe."

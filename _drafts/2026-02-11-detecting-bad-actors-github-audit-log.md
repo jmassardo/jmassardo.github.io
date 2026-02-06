@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Detecting Bad Actors: Key GitHub Audit Log Events Security Teams Should Monitor"
-date: 2026-01-26 10:00:00 -0500
+date: 2026-02-11 10:00:00 -0500
 category: Blog
 tags: [github, security, audit-log, siem, threat-detection, enterprise, emu]
 excerpt: "Your GitHub audit log stream is a goldmine for detecting malicious activity. Learn which events are the strongest indicators of compromise and how to build effective detection rules around them."

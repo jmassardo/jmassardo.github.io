@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Why Engineers Burn Out in 'High-Performance' Organizations"
-date: 2026-01-29 10:00:00 -0500
+date: 2026-03-04 10:00:00 -0500
 category: Blog
 tags: [engineering, burnout, leadership, culture, wellness]
 excerpt: "Burnout is often misdiagnosed as a personal resilience issue. It's actually a systemic failure driven by chronic overload, ambiguity, and lack of recovery. Sustainable performance requires designing for human limits."

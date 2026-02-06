@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Engineering Is a Socio-Technical System (and We Keep Pretending It Isn't)"
-date: 2026-01-13 10:00:00 -0500
+date: 2026-02-13 10:00:00 -0500
 category: Blog
 tags: [engineering, leadership, culture, systems-thinking, devops]
 excerpt: "Modern engineering failures rarely stem from code alone. They emerge from the messy intersection of people, incentives, tooling, and organizational structure. It's time we stopped pretending otherwise."

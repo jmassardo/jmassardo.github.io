@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Future of Engineering Systems in an AI-Augmented World"
-date: 2026-02-12 10:00:00 -0500
+date: 2026-03-18 10:00:00 -0500
 category: Blog
 tags: [ai, engineering, future, devops, leadership]
 excerpt: "AI will reshape workflows, decision-making, and organizational structure over the coming years. The focus isn't on tools themselves but on second-order effects. Complexity will increase, not disappear."

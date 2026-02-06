@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GitHub Actions Runner Scaling Patterns: GitHub-Hosted vs ARC"
-date: 2026-01-29 10:00:00 -0500
+date: 2026-02-16 10:00:00 -0500
 category: Blog
 tags: [github, actions, runners, kubernetes, arc, scaling, devops]
 excerpt: "Scaling GitHub Actions runners requires different architectural patterns depending on whether you're using GitHub-hosted runners or Actions Runner Controller. Here's why the approaches are essentially opposite—and how to get each one right."

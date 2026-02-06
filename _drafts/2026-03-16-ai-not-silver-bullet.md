@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AI Is Not a Silver Bullet (And That's Actually Good News)"
-date: 2026-02-10 10:00:00 -0500
+date: 2026-03-16 10:00:00 -0500
 category: Blog
 tags: [ai, engineering, devops, automation, critical-thinking]
 excerpt: "AI is often positioned as a cure-all for engineering complexity. But AI reflects the quality of the systems it operates within. Better systems make better use of intelligence, human or otherwise."
