@@ -158,4 +158,4 @@ Most organizations should aim for level 4. Level 5 is only appropriate for well-
 
 ---
 
-*Have automation horror stories? Or examples of automation done right? I'm collecting both. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have automation horror stories? Or examples of automation done right? I'm collecting both. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

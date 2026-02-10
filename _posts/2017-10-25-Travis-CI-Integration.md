@@ -11,4 +11,4 @@ Let the continuous integration begin! It took a little tinkering (mostly around 
 
 ---
 
-*Interested in CI/CD setups? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Interested in CI/CD setups? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

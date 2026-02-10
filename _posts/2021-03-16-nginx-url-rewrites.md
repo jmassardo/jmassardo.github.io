@@ -31,4 +31,4 @@ While these aren't step-by-step directions, hopefully it's enough for someone el
 
 ---
 
-*Have questions about Nginx configurations? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have questions about Nginx configurations? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

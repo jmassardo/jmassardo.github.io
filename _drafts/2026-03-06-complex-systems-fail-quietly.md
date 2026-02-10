@@ -141,4 +141,4 @@ The signs are there. The question is whether you're looking.
 
 ---
 
-*Have a story about warning signs you noticed (or missed)? Found good practices for surfacing weak signals? I'd love to hear about it. Connect on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have a story about warning signs you noticed (or missed)? Found good practices for surfacing weak signals? I'd love to hear about it. Connect on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

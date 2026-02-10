@@ -93,4 +93,4 @@ But you can:
 
 ---
 
-*Been in a "just ship it" culture? Found ways to push back effectively? Escaped to somewhere healthier? I'd love to hear your war stories. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Been in a "just ship it" culture? Found ways to push back effectively? Escaped to somewhere healthier? I'd love to hear your war stories. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

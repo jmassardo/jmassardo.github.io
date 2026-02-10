@@ -190,4 +190,4 @@ If the playbook is used to assign blame after incidents ("you didn't follow step
 
 ---
 
-*Built a playbook that actually gets used? Run effective incident drills? I'm always collecting examples of what works. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Built a playbook that actually gets used? Run effective incident drills? I'm always collecting examples of what works. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

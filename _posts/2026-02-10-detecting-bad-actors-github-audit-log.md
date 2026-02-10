@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Detecting Bad Actors: Key GitHub Audit Log Events Security Teams Should Monitor"
-date: 2026-02-11 10:00:00 -0500
+date: 2026-02-10 10:00:00 -0500
 category: Blog
 tags: [github, security, audit-log, siem, threat-detection, enterprise, emu]
 excerpt: "Your GitHub audit log stream is a goldmine for detecting malicious activity. Learn which events are the strongest indicators of compromise and how to build effective detection rules around them."
@@ -34,7 +34,7 @@ This is the big one. If someone's planning to steal your code, they need to clon
 
 **What to monitor:**
 
-- **Volume anomalies**: Calculate the average number of unique repositories cloned per user per day/week. If a user typically clones 2-3 repos per week and suddenly clones 50, that's a problem. I've seen compromised service accounts clone every repo in an organization within hours.
+- **Volume anomalies**: Calculate the average number of unique repositories cloned per user per day/week. If a user typically clones 2-3 repos per week and suddenly clones 50, that's a problem. A compromised service accounts can clone every repo in an organization within hours.
 - **First-time access**: User clones a repository they've never accessed before, especially if it's a sensitive repo.
 - **Bulk cloning patterns**: Multiple clone events in rapid succession from the same actor.
 
@@ -105,6 +105,23 @@ SSH key additions are high-value targets.
 - Multiple keys added in a short timeframe
 - Keys added for users who typically use HTTPS authentication
 
+### `deploy_key.create` - Repository Deploy Keys
+
+Deploy keys are often overlooked because they're scoped to individual repositories rather than user accounts. That's exactly what makes them attractive for persistence.
+
+**Key events:**
+- `deploy_key.create` - New deploy key added
+- `deploy_key.delete` - Deploy key removed
+
+**What to monitor:**
+
+- Deploy keys created with write access (read-only is safer)
+- Keys added to repositories the actor doesn't normally maintain
+- Keys created just before a user's departure date
+- Deploy keys that persist after associated automation is decommissioned
+
+**Why this matters:** Deploy keys survive user deprovisioning. If an attacker (or departing employee) adds a deploy key to a sensitive repo, that access persists even after their account is removed. Unlike SSH keys, deploy keys are easy to miss during offboarding because they're attached to repos, not users.
+
 ### `personal_access_token` Events
 
 PAT creation and usage patterns can reveal compromise.
@@ -118,6 +135,22 @@ PAT creation and usage patterns can reveal compromise.
 - Tokens created with broad scopes (especially `repo`, `admin:org`)
 - Token creation followed immediately by API activity (might indicate scripted attacks)
 - Tokens authorized by users who don't typically use programmatic access
+
+### Fine-Grained Personal Access Tokens
+
+Fine-grained PATs have their own event types and require slightly different detection logic.
+
+**Key events:**
+- `fine_grained_personal_access_token.access_granted` - New fine-grained token authorized
+- `fine_grained_personal_access_token.access_revoked` - Token revoked
+
+**What to monitor:**
+
+- Tokens granted access to repositories outside the user's normal scope
+- Tokens with `contents: write` or `administration` permissions
+- Fine-grained tokens that bypass your classic PAT detection rules due to narrower scopes
+
+**Detection consideration:** Fine-grained PATs can have very specific scopes that might fly under the radar if you're only alerting on broad classic PAT permissions. An attacker might create multiple narrow-scoped tokens instead of one broad one.
 
 ## Security Control Tampering
 
@@ -135,6 +168,22 @@ When attackers gain elevated access, they often try to weaken security controls.
 - Changes made outside of change management windows
 - Removal of required reviews or status checks
 
+### Repository Ruleset Events
+
+Rulesets are the newer, more powerful successor to branch protection. They deserve their own monitoring.
+
+- `repository_ruleset.create` - New ruleset created
+- `repository_ruleset.update` - Ruleset modified
+- `repository_ruleset.destroy` - Ruleset deleted
+- `repo.bypass_rules_actor_update` - Bypass actors modified
+
+**What to monitor:**
+
+- Rulesets deleted on repositories with compliance requirements
+- Bypass actors added, especially service accounts or specific users
+- Required status checks removed from rulesets
+- Ruleset changes outside of change management windows
+
 ### Security Feature Disabling
 
 These events are almost always bad news:
@@ -147,6 +196,25 @@ These events are almost always bad news:
 
 **Detection rule:**
 > Any of these events should generate an immediate alert with context about who made the change and from where.
+
+### Secret Scanning Alert Events
+
+Secret scanning alerts aren't just about finding secrets—the response patterns are equally revealing.
+
+**Key events:**
+- `secret_scanning_alert.create` - A secret was detected in a commit
+- `secret_scanning_alert.resolve` - Alert marked as resolved
+- `secret_scanning_alert_location.create` - Additional location of existing secret found
+- `secret_scanning.disable` - Secret scanning turned off
+
+**What to monitor:**
+
+- High volume of `secret_scanning_alert.create` from a single user (they're committing secrets repeatedly)
+- Alerts resolved as "false_positive" or "won't_fix" without corresponding secret rotation
+- Alerts resolved immediately after creation (possible attempt to hide evidence)
+- Users dismissing alerts on repositories they don't normally work on
+
+**Detection approach:** Create a dashboard tracking alert resolution reasons. A high ratio of "false_positive" dismissals might indicate someone bypassing rather than fixing.
 
 ### IP Allow List Modifications
 
@@ -181,6 +249,23 @@ Track what your admins are doing. Most organizations have too many org admins, a
 
 Making internal repos public (accidentally or intentionally) is a common data exposure vector.
 
+### Repository Transfers
+
+- `repo.transfer` - Repository moved to different owner
+- `repo.transfer_start` - Transfer initiated
+
+This is the nuclear option for data exfiltration—move the entire repository somewhere else.
+
+**What to monitor:**
+
+- Any `repo.transfer` event to a destination outside your enterprise
+- Transfers by users approaching their termination date
+- Transfers of repositories containing sensitive custom properties (if you've classified them)
+- Bulk transfers from a single actor
+
+**Detection rule:**
+> Any `repo.transfer` where the destination is outside your enterprise should trigger an immediate alert and possibly an automated block (if you have the capability).
+
 ## Integration and Webhook Events
 
 Third-party integrations can be backdoors into your organization.
@@ -212,7 +297,19 @@ Webhooks can exfiltrate data or trigger external systems.
 
 ## Actions and Workflow Manipulation
 
-GitHub Actions has become a prime target for supply chain attacks.
+GitHub Actions has become a prime target for supply chain attacks. The attack surface here is broad—from disabling security checks to injecting malicious code via workflow modifications.
+
+### Workflow File Changes
+
+Watch for suspicious modifications to workflow files via `git.push` events targeting `.github/workflows/`.
+
+**What to monitor:**
+
+- Commits to workflow files by users who don't normally touch CI/CD
+- Workflow changes that remove security scanning steps
+- Addition of `workflow_run` triggers (can be used for [pwn requests](https://securitylab.github.com/research/github-actions-preventing-pwn-requests/))
+- Workflows that use `pull_request_target` with explicit checkout of PR code (dangerous pattern)
+- Changes to `CODEOWNERS` that remove protection for `.github/workflows/`
 
 ### `workflows.disable_workflow`
 
@@ -235,6 +332,35 @@ Watch for legitimate security workflows being disabled (SAST scans, security che
 - `repo.register_self_hosted_runner` - Repo-level runner
 
 Self-hosted runners can be used to pivot into your network. Monitor for unexpected registrations.
+
+### Actions Cache Events
+
+- `actions_cache.deleted` - Cache entry removed
+
+**What to monitor:**
+
+- Cache deletions followed by workflow runs (possible cache poisoning setup)
+- Unusual patterns of cache manipulation by users who don't normally interact with CI
+
+## Codespaces Events
+
+Codespaces create persistent cloud development environments that have access to repository contents and developer secrets.
+
+### Key Events
+
+- `codespaces.create` - New codespace created
+- `codespaces.delete` - Codespace removed
+- `codespaces.publish` - Codespace published to a repository
+- `codespaces.access_settings_updated` - Access settings changed
+
+**What to monitor:**
+
+- Codespaces created on sensitive repositories by users who don't normally work on them
+- Long-running codespaces that haven't been used (potential persistent access)
+- Codespace port forwarding to external addresses (data exfiltration path)
+- Bulk codespace creation (resource abuse or exfiltration preparation)
+
+**Detection consideration:** Codespaces have access to repository secrets configured in the repository settings. A compromised codespace is essentially a compromised developer workstation with repository access.
 
 ## Enterprise Managed Users: What's Different?
 
@@ -395,13 +521,18 @@ If you can only monitor a handful of events, focus on these:
 | Critical | `git.clone` (volume anomalies) | Primary data exfiltration method |
 | Critical | `protected_branch.destroy` | Security control removal |
 | Critical | `org.disable_two_factor_requirement` | Authentication weakening |
+| Critical | `repo.transfer` | Entire repository exfiltration |
 | High | `public_key.create` | Persistent access establishment |
+| High | `deploy_key.create` | Persistent repo-level access |
 | High | `personal_access_token.access_granted` | Programmatic access creation |
 | High | `integration_installation.create` | Third-party access |
 | High | `repo.access` (visibility changes) | Accidental/intentional exposure |
+| High | `repository_ruleset.destroy` | Security control removal |
 | Medium | `org.add_member` / `team.add_member` | Access grants |
 | Medium | `hook.create` | Data exfiltration paths |
 | Medium | `workflows.disable_workflow` | CI/CD security bypass |
+| Medium | `secret_scanning_alert.create` | Credential exposure indicator |
+| Medium | `codespaces.create` (anomalies) | Persistent cloud access |
 
 ## Wrapping Up
 
@@ -413,4 +544,4 @@ Your code is one of your most valuable assets. Treat its access controls like yo
 
 ---
 
-Have questions about GitHub security monitoring? Want to share your own detection rules? Hit me up on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or drop me a line at [jenna@dxrf.com](mailto:jenna@dxrf.com).
+*Have questions about GitHub security monitoring? Want to share your own detection rules? Hit me up on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

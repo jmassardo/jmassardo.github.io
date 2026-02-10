@@ -262,4 +262,4 @@ Congrats on making it through all of that info! Hopefully this post has clarifie
 
 ---
 
-*Have questions about Habitat on Windows? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have questions about Habitat on Windows? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

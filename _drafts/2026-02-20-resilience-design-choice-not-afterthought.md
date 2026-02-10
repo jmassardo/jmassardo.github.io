@@ -151,4 +151,4 @@ It's less glamorous than shipping features. It doesn't make good demo material. 
 
 ---
 
-*Building something resilient? Learned hard lessons about fragility? I'd love to hear about it. Connect with me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Building something resilient? Learned hard lessons about fragility? I'd love to hear about it. Connect with me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

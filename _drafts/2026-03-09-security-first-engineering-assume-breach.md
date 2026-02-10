@@ -157,4 +157,4 @@ Each small step makes the system more resilient. Compound them over time.
 
 ---
 
-*Building security into your architecture? Found good ways to make threat modeling practical? I'm always interested in how teams operationalize security. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Building security into your architecture? Found good ways to make threat modeling practical? I'm always interested in how teams operationalize security. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

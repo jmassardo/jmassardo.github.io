@@ -151,4 +151,4 @@ AI makes that work potentially more effective. But it doesn't replace it.
 
 ---
 
-*Using AI effectively in engineering? Learned lessons about what works and what doesn't? I'm always interested in real-world experiences. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Using AI effectively in engineering? Learned lessons about what works and what doesn't? I'm always interested in real-world experiences. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

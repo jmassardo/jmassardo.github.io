@@ -149,4 +149,4 @@ This is hard. Reorgs are painful. But fighting against Conway's Law is even more
 
 ---
 
-*Scaled a team successfully? Have war stories about scaling gone wrong? I'm always interested in hearing how organizations navigate growth. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Scaled a team successfully? Have war stories about scaling gone wrong? I'm always interested in hearing how organizations navigate growth. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

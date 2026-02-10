@@ -155,6 +155,152 @@ security_and_analysis:
     languages: ["javascript", "python", "java", "go"]
 ```
 
+### Automation Tools: Configuration as Code
+
+Manually clicking through the GitHub UI to configure hundreds of repositories is a recipe for inconsistency and burnout. Treat your GitHub configuration like any other infrastructure – as code that's version-controlled, reviewed, and automatically applied.
+
+#### github/safe-settings
+
+[Safe-settings](https://github.com/github/safe-settings) is an open source project that applies repository and organization settings from a central configuration repository. It's like having an automated security guard that constantly ensures your settings match your policy.
+
+**Key benefits**:
+- Declarative YAML configuration stored in a `.github` repository
+- Automatic remediation when settings drift from baseline
+- Supports rulesets, branch protection, collaborators, and security features
+- Audit trail through pull request history
+
+**Example safe-settings configuration**:
+
+```yaml
+# .github/repos/platform-api.yml
+repository:
+  name: platform-api
+  description: Platform API service
+  private: true
+  has_issues: true
+  has_wiki: false
+  default_branch: main
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  delete_branch_on_merge: true
+  security_and_analysis:
+    secret_scanning:
+      status: enabled
+    secret_scanning_push_protection:
+      status: enabled
+
+branches:
+  - name: main
+    protection:
+      required_pull_request_reviews:
+        required_approving_review_count: 2
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: true
+      required_status_checks:
+        strict: true
+        contexts:
+          - "ci/build"
+          - "security/scan"
+      enforce_admins: true
+      restrictions: null
+```
+
+#### Terraform with the GitHub Provider
+
+For organizations already invested in Terraform, the [GitHub Terraform provider](https://registry.terraform.io/providers/integrations/github/latest/docs) lets you manage GitHub resources alongside your other infrastructure.
+
+**When to choose Terraform over safe-settings**:
+- You're already using Terraform for infrastructure management
+- You need to coordinate GitHub configuration with other cloud resources
+- You want to leverage Terraform's state management and plan/apply workflow
+- You need more programmatic control (loops, conditionals, modules)
+
+**Example Terraform configuration**:
+
+```hcl
+# Define a secure repository with all security features enabled
+resource "github_repository" "platform_api" {
+  name        = "platform-api"
+  description = "Platform API service"
+  visibility  = "private"
+  
+  has_issues   = true
+  has_wiki     = false
+  has_projects = false
+  
+  allow_squash_merge = true
+  allow_merge_commit = false
+  allow_rebase_merge = false
+  delete_branch_on_merge = true
+  
+  security_and_analysis {
+    secret_scanning {
+      status = "enabled"
+    }
+    secret_scanning_push_protection {
+      status = "enabled"
+    }
+  }
+}
+
+resource "github_branch_protection" "main" {
+  repository_id = github_repository.platform_api.node_id
+  pattern       = "main"
+  
+  required_status_checks {
+    strict   = true
+    contexts = ["ci/build", "security/scan"]
+  }
+  
+  required_pull_request_reviews {
+    dismiss_stale_reviews           = true
+    required_approving_review_count = 2
+    require_code_owner_reviews      = true
+  }
+  
+  enforce_admins = true
+}
+
+# Apply consistent settings across multiple repositories
+locals {
+  secure_repos = ["platform-api", "auth-service", "data-pipeline"]
+}
+
+resource "github_repository_ruleset" "security_baseline" {
+  for_each = toset(local.secure_repos)
+  
+  name        = "security-baseline"
+  repository  = each.value
+  target      = "branch"
+  enforcement = "active"
+  
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+  
+  rules {
+    required_signatures = true
+    pull_request {
+      required_approving_review_count = 2
+      dismiss_stale_reviews_on_push   = true
+      require_code_owner_review       = true
+    }
+  }
+}
+```
+
+**Automation implementation checklist**:
+- [ ] Choose your automation approach (safe-settings, Terraform, or both)
+- [ ] Set up a dedicated configuration repository
+- [ ] Define baseline security templates for different repository classifications
+- [ ] Implement CI/CD pipeline for configuration changes
+- [ ] Configure drift detection and alerting
+- [ ] Establish review process for configuration changes
+
 ## Advanced Security Configurations
 
 ### Custom Properties: Metadata That Matters
@@ -405,4 +551,4 @@ Let's make this the definitive guide to GitHub Enterprise security that actually
 
 ---
 
-*Questions about GitHub Enterprise security? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Questions about GitHub Enterprise security? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

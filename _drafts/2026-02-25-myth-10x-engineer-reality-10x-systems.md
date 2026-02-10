@@ -116,4 +116,4 @@ And here's the kicker: your great engineers know this. The best people want to w
 
 ---
 
-*Built a 10x system? Escaped from a hero-dependent org? Have thoughts on what actually makes teams effective? I'd love to hear it. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Built a 10x system? Escaped from a hero-dependent org? Have thoughts on what actually makes teams effective? I'd love to hear it. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

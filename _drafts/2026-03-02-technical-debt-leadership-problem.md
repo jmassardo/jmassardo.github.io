@@ -136,4 +136,4 @@ But engineers often don't have the authority to prioritize their own work. They 
 
 ---
 
-*Dealt with technical debt as a leadership issue? Found ways to get leadership buy-in for paying it down? I'd love to hear what worked. Connect on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Dealt with technical debt as a leadership issue? Found ways to get leadership buy-in for paying it down? I'd love to hear what worked. Connect on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

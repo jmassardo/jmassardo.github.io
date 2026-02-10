@@ -122,4 +122,4 @@ If your culture treats deviation from process as insubordination, your process w
 
 ---
 
-*Have a process that actually helps? Or a bureaucratic nightmare you're trying to fix? I'm always interested in hearing how teams navigate this. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have a process that actually helps? Or a bureaucratic nightmare you're trying to fix? I'm always interested in hearing how teams navigate this. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

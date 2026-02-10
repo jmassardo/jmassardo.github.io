@@ -73,4 +73,4 @@ curl \
 
 ## Closing
 
-*Have questions about GitHub Enterprise runners? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have questions about GitHub Enterprise runners? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

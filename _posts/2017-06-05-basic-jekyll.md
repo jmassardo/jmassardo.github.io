@@ -44,4 +44,4 @@ From there, add your header and start writing. [Post Docs](https://jekyllrb.com/
 
 ---
 
-*Have questions about Jekyll or want to share your own static site setup? Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have questions about Jekyll or want to share your own static site setup? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

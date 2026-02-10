@@ -281,4 +281,4 @@ The AI assistant landscape is evolving fast. What I've described here will proba
 
 ---
 
-*Have questions about AI coding assistants or want to share your setup? Find me on [GitHub](https://github.com/jmassardo), [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or drop me an [email](mailto:jenna@dxrf.com).*
+*Have questions about AI coding assistants or want to share your setup? Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

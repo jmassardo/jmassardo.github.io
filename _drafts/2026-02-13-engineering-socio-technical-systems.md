@@ -80,4 +80,4 @@ None of this is rocket science. It's just uncomfortable because it requires ackn
 
 ---
 
-*Got thoughts on socio-technical systems? Found a great way to make your org acknowledge the "socio" part? I'd love to hear about it. Find me on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Got thoughts on socio-technical systems? Found a great way to make your org acknowledge the "socio" part? I'd love to hear about it. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

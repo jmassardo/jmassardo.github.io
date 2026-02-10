@@ -146,4 +146,4 @@ Your job isn't to push people until they break and then replace them. Your job i
 
 ---
 
-*Been through burnout? Found ways to create sustainable cultures? I'm always interested in what works. Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Been through burnout? Found ways to create sustainable cultures? I'm always interested in what works. Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

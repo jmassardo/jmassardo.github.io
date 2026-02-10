@@ -256,4 +256,4 @@ Here's what you need to remember from GitHub's Engineering System Success Playbo
 
 ---
 
-*Have you adopted systems thinking in your engineering org? What metrics do you track, and how do you prevent them from being weaponized? I'd love to hear your experiences—hit me up on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Have you adopted systems thinking in your engineering org? What metrics do you track, and how do you prevent them from being weaponized? I'd love to hear your experiences—hit me up on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

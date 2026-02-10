@@ -158,4 +158,4 @@ That's harder than buying software. It's also where the real competitive advanta
 
 ---
 
-*Have thoughts on AI adoption in your organization? I'd love to hear what's working (or not working) for you. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo). You can also reach me via [email](mailto:jenna@dxrf.com).*
+*Have thoughts on AI adoption in your organization? I'd love to hear what's working (or not working) for you. Find me on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*

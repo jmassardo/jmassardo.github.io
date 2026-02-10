@@ -174,4 +174,4 @@ We have interesting times ahead.
 
 ---
 
-*Thanks for reading this series. If you've made it this far, I'd love to hear your thoughts on the future of engineering. What are you seeing? What are you expecting? What are you worried about? Reach out on [GitHub](https://github.com/jmassardo) or [LinkedIn](https://www.linkedin.com/in/jenna-massardo/).*
+*Thanks for reading this series. If you've made it this far, I'd love to hear your thoughts on the future of engineering. What are you seeing? What are you expecting? What are you worried about? Reach out on [LinkedIn](https://www.linkedin.com/in/jenna-massardo/), [Bluesky](https://bsky.app/profile/jmassardo.bsky.social), or [GitHub](https://github.com/jmassardo).*
