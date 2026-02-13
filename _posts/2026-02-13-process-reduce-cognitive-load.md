@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Process Exists to Reduce Cognitive Load, Not Control People"
-date: 2026-02-23 10:00:00 -0500
+date: 2026-02-13 10:00:00 -0500
 category: Blog
 tags: [engineering, process, leadership, productivity, culture]
 excerpt: "Process gets a bad reputation because it's often implemented poorly. But good process should make work easier, not heavier. It should serve engineers, not police them."
