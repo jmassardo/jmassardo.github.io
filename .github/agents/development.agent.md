@@ -114,28 +114,28 @@ If you cannot complete a task fully:
 
 ### 5. Anti-Patterns to AVOID
 
-❌ "I'll add tests later" - Tests are written NOW, not later
-❌ "This works for the happy path" - Handle ALL paths
-❌ "TODO: handle edge case" - Handle it NOW
-❌ "Quick fix for now" - Do it right the first time
-❌ "Skipping lint to save time" - Lint is not optional
-❌ "The build warnings are fine" - Warnings become errors, fix them
-❌ "Tests are optional for this change" - Tests are NEVER optional
+- ❌ "I'll add tests later" - Tests are written NOW, not later
+- ❌ "This works for the happy path" - Handle ALL paths
+- ❌ "TODO: handle edge case" - Handle it NOW
+- ❌ "Quick fix for now" - Do it right the first time
+- ❌ "Skipping lint to save time" - Lint is not optional
+- ❌ "The build warnings are fine" - Warnings become errors, fix them
+- ❌ "Tests are optional for this change" - Tests are NEVER optional
 
 ### 6. NEVER Bypass Quality Checks
 
 **The following are STRICTLY FORBIDDEN:**
 
-❌ Adding rules to `.ruff.toml` ignore lists to hide lint errors
-❌ Adding `# noqa`, `# type: ignore`, `# pylint: disable` comments to bypass checks
-❌ Adding `// @ts-ignore`, `// @ts-expect-error`, `/* eslint-disable */` to bypass TypeScript/ESLint
-❌ Modifying `.eslintignore`, `.prettierignore` to exclude files with errors
-❌ Lowering coverage thresholds in config files
-❌ Disabling or skipping tests with `@pytest.mark.skip`, `.skip()`, `xit()`, `xdescribe()`
-❌ Modifying CI/CD pipelines to skip failing checks
-❌ Adding `--no-verify` flags to git commits
-❌ Changing `error` rules to `warn` or `off` in linter configs
-❌ Using `Any` type in TypeScript/Python to avoid type errors
+- ❌ Adding rules to `.ruff.toml` ignore lists to hide lint errors
+- ❌ Adding `# noqa`, `# type: ignore`, `# pylint: disable` comments to bypass checks
+- ❌ Adding `// @ts-ignore`, `// @ts-expect-error`, `/* eslint-disable */` to bypass TypeScript/ESLint
+- ❌ Modifying `.eslintignore`, `.prettierignore` to exclude files with errors
+- ❌ Lowering coverage thresholds in config files
+- ❌ Disabling or skipping tests with `@pytest.mark.skip`, `.skip()`, `xit()`, `xdescribe()`
+- ❌ Modifying CI/CD pipelines to skip failing checks
+- ❌ Adding `--no-verify` flags to git commits
+- ❌ Changing `error` rules to `warn` or `off` in linter configs
+- ❌ Using `Any` type in TypeScript/Python to avoid type errors
 
 **If a lint rule or type check fails, FIX THE CODE, not the rules.**
 
@@ -154,16 +154,16 @@ The ONLY acceptable exceptions:
 
 **FORBIDDEN without explicit user approval:**
 
-❌ Adding new npm packages when existing packages provide the functionality
-❌ Adding new Python dependencies when existing libraries suffice
-❌ Introducing new state management libraries (use what's already configured)
-❌ Adding new HTTP clients (use the existing API client patterns)
-❌ Introducing new testing frameworks (use pytest/Vitest/Playwright as established)
-❌ Adding new CSS frameworks or UI libraries (use TailwindCSS as configured)
-❌ Introducing new ORMs or database tools (use SQLAlchemy as established)
-❌ Adding new logging libraries (use the existing logging configuration)
-❌ Introducing new validation libraries (use Pydantic/Zod as established)
-❌ Adding alternative tools that duplicate existing functionality
+- ❌ Adding new npm packages when existing packages provide the functionality
+- ❌ Adding new Python dependencies when existing libraries suffice
+- ❌ Introducing new state management libraries (use what's already configured)
+- ❌ Adding new HTTP clients (use the existing API client patterns)
+- ❌ Introducing new testing frameworks (use pytest/Vitest/Playwright as established)
+- ❌ Adding new CSS frameworks or UI libraries (use TailwindCSS as configured)
+- ❌ Introducing new ORMs or database tools (use SQLAlchemy as established)
+- ❌ Adding new logging libraries (use the existing logging configuration)
+- ❌ Introducing new validation libraries (use Pydantic/Zod as established)
+- ❌ Adding alternative tools that duplicate existing functionality
 
 **When you encounter a need:**
 1. First, search the codebase for existing solutions

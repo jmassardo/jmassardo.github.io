@@ -103,13 +103,13 @@ If you cannot complete a task fully:
 
 **The following are STRICTLY FORBIDDEN:**
 
-❌ Adding rules to linter ignore lists to hide errors
-❌ Adding inline ignore comments (`# noqa`, `# type: ignore`, `// @ts-ignore`, etc.)
-❌ Modifying ignore files to exclude problematic files
-❌ Lowering security scanning thresholds
-❌ Disabling security checks in CI/CD pipelines
-❌ Weakening security policies to avoid compliance failures
-❌ Using permissive configurations to bypass validation
+- ❌ Adding rules to linter ignore lists to hide errors
+- ❌ Adding inline ignore comments (`# noqa`, `# type: ignore`, `// @ts-ignore`, etc.)
+- ❌ Modifying ignore files to exclude problematic files
+- ❌ Lowering security scanning thresholds
+- ❌ Disabling security checks in CI/CD pipelines
+- ❌ Weakening security policies to avoid compliance failures
+- ❌ Using permissive configurations to bypass validation
 
 **If a check fails, FIX THE ARCHITECTURE, not the rules.**
 
@@ -125,13 +125,13 @@ If you cannot complete a task fully:
 
 **FORBIDDEN without explicit user approval:**
 
-❌ Recommending Django/Flask when FastAPI is established
-❌ Suggesting MongoDB when PostgreSQL is the chosen database
-❌ Proposing RabbitMQ when Redis/Celery is the queue system
-❌ Recommending Vue/Angular/Svelte when React is established
-❌ Suggesting alternative CSS frameworks when TailwindCSS is configured
-❌ Proposing Prisma/TypeORM when SQLAlchemy is established
-❌ Recommending serverless when containerized architecture is established
+- ❌ Recommending Django/Flask when FastAPI is established
+- ❌ Suggesting MongoDB when PostgreSQL is the chosen database
+- ❌ Proposing RabbitMQ when Redis/Celery is the queue system
+- ❌ Recommending Vue/Angular/Svelte when React is established
+- ❌ Suggesting alternative CSS frameworks when TailwindCSS is configured
+- ❌ Proposing Prisma/TypeORM when SQLAlchemy is established
+- ❌ Recommending serverless when containerized architecture is established
 
 **When designing architecture:**
 1. Review existing ADRs in `docs/adrs/` for technology decisions

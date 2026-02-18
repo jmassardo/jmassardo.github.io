@@ -120,30 +120,30 @@ If you cannot complete testing fully:
 
 ### 5. Anti-Patterns to AVOID
 
-❌ "The happy path works" - Test ALL paths
-❌ "We'll add more tests later" - Add tests NOW
-❌ "This test is flaky, skip it" - Fix the flakiness
-❌ "Coverage is close enough" - Meet the threshold exactly
-❌ "Edge cases are unlikely" - Edge cases cause production bugs
-❌ "The code looks correct" - Prove it with tests
-❌ "Security testing takes too long" - Security testing is mandatory
-❌ "It passed on my machine" - Verify in CI environment
+- ❌ "The happy path works" - Test ALL paths
+- ❌ "We'll add more tests later" - Add tests NOW
+- ❌ "This test is flaky, skip it" - Fix the flakiness
+- ❌ "Coverage is close enough" - Meet the threshold exactly
+- ❌ "Edge cases are unlikely" - Edge cases cause production bugs
+- ❌ "The code looks correct" - Prove it with tests
+- ❌ "Security testing takes too long" - Security testing is mandatory
+- ❌ "It passed on my machine" - Verify in CI environment
 
 ### 6. NEVER Bypass Quality Checks
 
 **The following are STRICTLY FORBIDDEN:**
 
-❌ Adding rules to `.ruff.toml` ignore lists to hide lint errors
-❌ Adding `# noqa`, `# type: ignore`, `# pylint: disable` comments to bypass checks
-❌ Adding `// @ts-ignore`, `// @ts-expect-error`, `/* eslint-disable */` to bypass TypeScript/ESLint
-❌ Modifying `.eslintignore`, `.prettierignore` to exclude files with errors
-❌ Lowering coverage thresholds in config files
-❌ Disabling or skipping tests with `@pytest.mark.skip`, `.skip()`, `xit()`, `xdescribe()`
-❌ Modifying CI/CD pipelines to skip failing checks
-❌ Removing tests that fail instead of fixing the code
-❌ Changing `error` rules to `warn` or `off` in linter configs
-❌ Using `Any` type in TypeScript/Python to avoid type errors
-❌ Marking tests as "expected failures" instead of fixing them
+- ❌ Adding rules to `.ruff.toml` ignore lists to hide lint errors
+- ❌ Adding `# noqa`, `# type: ignore`, `# pylint: disable` comments to bypass checks
+- ❌ Adding `// @ts-ignore`, `// @ts-expect-error`, `/* eslint-disable */` to bypass TypeScript/ESLint
+- ❌ Modifying `.eslintignore`, `.prettierignore` to exclude files with errors
+- ❌ Lowering coverage thresholds in config files
+- ❌ Disabling or skipping tests with `@pytest.mark.skip`, `.skip()`, `xit()`, `xdescribe()`
+- ❌ Modifying CI/CD pipelines to skip failing checks
+- ❌ Removing tests that fail instead of fixing the code
+- ❌ Changing `error` rules to `warn` or `off` in linter configs
+- ❌ Using `Any` type in TypeScript/Python to avoid type errors
+- ❌ Marking tests as "expected failures" instead of fixing them
 
 **If a quality check fails, the code is NOT ready. Fix the code, not the checks.**
 
@@ -159,13 +159,13 @@ If you cannot complete testing fully:
 
 **FORBIDDEN without explicit user approval:**
 
-❌ Adding Jest when Vitest is the established test runner
-❌ Adding unittest or nose when pytest is established
-❌ Adding Cypress or Selenium when Playwright is established
-❌ Adding new assertion libraries when existing ones suffice
-❌ Adding new mocking libraries when existing patterns work
-❌ Introducing new coverage tools when pytest-cov/Vitest coverage is configured
-❌ Adding new performance testing tools without approval
+- ❌ Adding Jest when Vitest is the established test runner
+- ❌ Adding unittest or nose when pytest is established
+- ❌ Adding Cypress or Selenium when Playwright is established
+- ❌ Adding new assertion libraries when existing ones suffice
+- ❌ Adding new mocking libraries when existing patterns work
+- ❌ Introducing new coverage tools when pytest-cov/Vitest coverage is configured
+- ❌ Adding new performance testing tools without approval
 
 **Follow existing test patterns:**
 1. Look at existing tests in the same directory for patterns

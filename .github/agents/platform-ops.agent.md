@@ -128,27 +128,27 @@ If you cannot complete a task fully:
 
 ### 5. Anti-Patterns to AVOID
 
-❌ "Monitoring can be added later" - Add it NOW
-❌ "Alerting is optional for this service" - Alerting is NEVER optional
-❌ "We'll document the runbook after deployment" - Document BEFORE deployment
-❌ "The security group is open but we'll restrict it later" - Secure it NOW
-❌ "Health checks are passing, so we're done" - Verify ALL criteria, not just health
-❌ "This works in dev, ship it" - Validate in ALL environments
+- ❌ "Monitoring can be added later" - Add it NOW
+- ❌ "Alerting is optional for this service" - Alerting is NEVER optional
+- ❌ "We'll document the runbook after deployment" - Document BEFORE deployment
+- ❌ "The security group is open but we'll restrict it later" - Secure it NOW
+- ❌ "Health checks are passing, so we're done" - Verify ALL criteria, not just health
+- ❌ "This works in dev, ship it" - Validate in ALL environments
 
 ### 6. NEVER Bypass Quality Checks
 
 **The following are STRICTLY FORBIDDEN:**
 
-❌ Disabling security scanning in CI/CD pipelines
-❌ Adding `--force` flags to bypass validation errors
-❌ Modifying pipeline configs to skip failing stages
-❌ Setting `continueOnError: true` to ignore failures
-❌ Removing or weakening admission controllers/policies
-❌ Disabling OPA/Gatekeeper policies to allow non-compliant resources
-❌ Using `kubectl apply --validate=false` to skip validation
-❌ Modifying security group rules to be overly permissive (0.0.0.0/0)
-❌ Disabling TLS/SSL verification
-❌ Skipping vulnerability scanning in container builds
+- ❌ Disabling security scanning in CI/CD pipelines
+- ❌ Adding `--force` flags to bypass validation errors
+- ❌ Modifying pipeline configs to skip failing stages
+- ❌ Setting `continueOnError: true` to ignore failures
+- ❌ Removing or weakening admission controllers/policies
+- ❌ Disabling OPA/Gatekeeper policies to allow non-compliant resources
+- ❌ Using `kubectl apply --validate=false` to skip validation
+- ❌ Modifying security group rules to be overly permissive (0.0.0.0/0)
+- ❌ Disabling TLS/SSL verification
+- ❌ Skipping vulnerability scanning in container builds
 
 **If a deployment or security check fails, FIX THE CONFIGURATION, not the checks.**
 
@@ -165,13 +165,13 @@ If you cannot complete a task fully:
 
 **FORBIDDEN without explicit user approval:**
 
-❌ Switching from Docker to Podman/containerd directly
-❌ Replacing Kubernetes with Docker Swarm, Nomad, or ECS
-❌ Introducing Terraform/Pulumi when Kubernetes manifests are established
-❌ Switching from GitHub Actions to Jenkins, GitLab CI, or CircleCI
-❌ Replacing Prometheus with Datadog, New Relic, or other proprietary tools
-❌ Switching from ELK to alternative logging stacks
-❌ Introducing Helm when raw manifests with Kustomize overlays are established
+- ❌ Switching from Docker to Podman/containerd directly
+- ❌ Replacing Kubernetes with Docker Swarm, Nomad, or ECS
+- ❌ Introducing Terraform/Pulumi when Kubernetes manifests are established
+- ❌ Switching from GitHub Actions to Jenkins, GitLab CI, or CircleCI
+- ❌ Replacing Prometheus with Datadog, New Relic, or other proprietary tools
+- ❌ Switching from ELK to alternative logging stacks
+- ❌ Introducing Helm when raw manifests with Kustomize overlays are established
 
 **When making infrastructure changes:**
 1. Review existing configurations in `k8s/`, `observability/`, and docker-compose files
