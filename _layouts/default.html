@@ -59,6 +59,10 @@
                 </a>
               {% endif %}
             {% endfor %}
+
+            <button class="search-toggle" id="search-toggle" aria-label="Search" title="Search">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
           </nav>
         </div>
       </div>
@@ -100,8 +104,30 @@
       </div>
     </footer>
 
+    <!-- Search modal -->
+    <div class="search-overlay" id="search-overlay">
+      <div class="search-modal">
+        <div class="search-modal-header">
+          <div class="search-input-wrapper">
+            <i class="fa fa-search search-modal-icon" aria-hidden="true"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="Search posts..." autocomplete="off">
+            <button id="search-clear" class="search-clear" aria-label="Clear search" style="display: none;">&times;</button>
+          </div>
+          <button class="search-close" id="search-close" aria-label="Close search">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <p id="search-info" class="search-info"></p>
+        <div id="search-results" class="search-results"></div>
+        <div class="search-footer">
+          <span class="search-shortcut"><kbd>Esc</kbd> to close</span>
+        </div>
+      </div>
+    </div>
+
     <script src="https://kit.fontawesome.com/9e6c15bea8.js" crossorigin="anonymous"></script>
     <script src="{{ site.baseurl }}/public/js/main.js"></script>
+    <script src="{{ site.baseurl }}/public/js/search.js"></script>
     {% if site.google_analytics_token %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics_token }}"></script>
     <script>
