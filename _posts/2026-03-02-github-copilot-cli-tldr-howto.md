@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GitHub Copilot CLI: Senior Developer Reference"
-date: 2026-02-25 10:00:00 -0500
+date: 2026-03-02 10:00:00 -0500
 category: Blog
 tags: [github, copilot, cli, ai, agents, automation, governance]
 excerpt: "A reference-style guide for senior developers using Copilot CLI (GA). Focus on agent runtime architecture, composition patterns, autopilot mode, memory, programmatic automation, and team-scale governance."
