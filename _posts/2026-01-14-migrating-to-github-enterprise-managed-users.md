@@ -24,12 +24,12 @@ flowchart LR
     P5 --> P6["Phase 6\nValidation &\nAdoption"]
     P6 -->|"Repeat for\neach group"| P5
     
-    style P1 fill:#e1f5fe,stroke:#0288d1
-    style P2 fill:#fff3e0,stroke:#f57c00
-    style P3 fill:#e8f5e9,stroke:#388e3c
-    style P4 fill:#f3e5f5,stroke:#7b1fa2
-    style P5 fill:#fce4ec,stroke:#c2185b
-    style P6 fill:#e0f2f1,stroke:#00796b
+    style P1 fill:#e1f5fe,stroke:#0288d1,color:#333
+    style P2 fill:#fff3e0,stroke:#f57c00,color:#333
+    style P3 fill:#e8f5e9,stroke:#388e3c,color:#333
+    style P4 fill:#f3e5f5,stroke:#7b1fa2,color:#333
+    style P5 fill:#fce4ec,stroke:#c2185b,color:#333
+    style P6 fill:#e0f2f1,stroke:#00796b,color:#333
 ```
 
 | Phase | Focus | Key Activities | Timeline |
@@ -266,10 +266,21 @@ flowchart TB
         M1 -.->|"❌ Cannot contribute"| EPUB[("Public Repos<br/>OSS Projects")]
     end
     
-    style GHEC fill:#f0f7ff,stroke:#0366d6
-    style EMU fill:#f0fff4,stroke:#28a745
-    style PUB fill:#fff3cd,stroke:#856404
-    style EPUB fill:#f8d7da,stroke:#721c24
+    style GHEC fill:#f0f7ff,stroke:#0366d6,color:#333
+    style EMU fill:#f0fff4,stroke:#28a745,color:#333
+    style PUB fill:#fff3cd,stroke:#856404,color:#333
+    style EPUB fill:#f8d7da,stroke:#721c24,color:#333
+    style U1 fill:#bbdefb,stroke:#1565c0,color:#333
+    style U2 fill:#bbdefb,stroke:#1565c0,color:#333
+    style U3 fill:#bbdefb,stroke:#1565c0,color:#333
+    style ORG1 fill:#90caf9,stroke:#1565c0,color:#333
+    style ORG2 fill:#90caf9,stroke:#1565c0,color:#333
+    style IDP fill:#ffcc80,stroke:#ef6c00,color:#333
+    style M1 fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style M2 fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style M3 fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style EORG1 fill:#81c784,stroke:#2e7d32,color:#333
+    style EORG2 fill:#81c784,stroke:#2e7d32,color:#333
 ```
 
 ### Identity and Authentication Flow Comparison
@@ -665,6 +676,9 @@ stateDiagram-v2
     Suspended --> Reactivated: User re-assigned to app
     Suspended --> [*]: Account cleaned up
     Reactivated --> Active: Username restored
+
+    classDef stateStyle fill:#b3e5fc,stroke:#0288d1,color:#333
+    class Assigned,Provisioned,Active,Updated,Suspended,Reactivated stateStyle
 ```
 
 ### Team and Permission Synchronization
@@ -691,8 +705,14 @@ flowchart LR
     IG2 -->|"syncs to"| GT2
     IG3 -->|"syncs to"| GT3
     
-    style IdP fill:#e3f2fd,stroke:#1976d2
-    style GitHub fill:#e8f5e9,stroke:#388e3c
+    style IdP fill:#e3f2fd,stroke:#1976d2,color:#333
+    style GitHub fill:#e8f5e9,stroke:#388e3c,color:#333
+    style IG1 fill:#bbdefb,stroke:#1565c0,color:#333
+    style IG2 fill:#bbdefb,stroke:#1565c0,color:#333
+    style IG3 fill:#bbdefb,stroke:#1565c0,color:#333
+    style GT1 fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style GT2 fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style GT3 fill:#a5d6a7,stroke:#2e7d32,color:#333
 ```
 
 When you connect an IdP group to a GitHub team:
@@ -858,6 +878,15 @@ flowchart LR
     STREAM --> S3[AWS S3]
     STREAM --> GCS[Google Cloud Storage]
     STREAM --> BLOB[Azure Blob Storage]
+
+    style GH fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style STREAM fill:#b3e5fc,stroke:#0288d1,color:#333
+    style SPLUNK fill:#ffe0b2,stroke:#e65100,color:#333
+    style DATADOG fill:#ffe0b2,stroke:#e65100,color:#333
+    style SENTINEL fill:#ffe0b2,stroke:#e65100,color:#333
+    style S3 fill:#ffe0b2,stroke:#e65100,color:#333
+    style GCS fill:#ffe0b2,stroke:#e65100,color:#333
+    style BLOB fill:#ffe0b2,stroke:#e65100,color:#333
 ```
 
 See [Streaming the audit log for your enterprise](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise) for configuration details.
@@ -957,7 +986,14 @@ flowchart TB
     ER --> Org1
     ER --> Org2
     
-    style Enterprise fill:#f0fff4,stroke:#28a745
+    style Enterprise fill:#f0fff4,stroke:#28a745,color:#333
+    style Org1 fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style Org2 fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style R1 fill:#b3e5fc,stroke:#0288d1,color:#333
+    style SR1 fill:#ffe0b2,stroke:#e65100,color:#333
+    style R2 fill:#b3e5fc,stroke:#0288d1,color:#333
+    style SR2 fill:#ffe0b2,stroke:#e65100,color:#333
+    style ER fill:#ce93d8,stroke:#7b1fa2,color:#333
 ```
 
 **Self-hosted runner considerations:**
@@ -1050,8 +1086,17 @@ flowchart LR
     WH --> CI
     API <--> DOCK
     
-    style GitHub fill:#f0fff4,stroke:#28a745
-    style External fill:#f0f7ff,stroke:#0366d6
+    style GitHub fill:#f0fff4,stroke:#28a745,color:#333
+    style External fill:#f0f7ff,stroke:#0366d6,color:#333
+    style GHA fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style OA fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style WH fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style API fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style JIRA fill:#bbdefb,stroke:#1565c0,color:#333
+    style SLACK fill:#bbdefb,stroke:#1565c0,color:#333
+    style CI fill:#bbdefb,stroke:#1565c0,color:#333
+    style SEC fill:#bbdefb,stroke:#1565c0,color:#333
+    style DOCK fill:#bbdefb,stroke:#1565c0,color:#333
 ```
 
 ### GitHub Apps vs OAuth Apps
@@ -1153,10 +1198,17 @@ flowchart LR
     PAT1 -.->|"❌ Invalid"| X1["Broken"]
     PAT2 -.->|"❌ Invalid"| X2["Broken"]
     
-    style Before fill:#fff3e0,stroke:#f57c00
-    style After fill:#e8f5e9,stroke:#388e3c
-    style X1 fill:#ffebee,stroke:#c62828
-    style X2 fill:#ffebee,stroke:#c62828
+    style Before fill:#fff3e0,stroke:#f57c00,color:#333
+    style After fill:#e8f5e9,stroke:#388e3c,color:#333
+    style X1 fill:#ffebee,stroke:#c62828,color:#333
+    style X2 fill:#ffebee,stroke:#c62828,color:#333
+    style PA fill:#ffe0b2,stroke:#e65100,color:#333
+    style PAT1 fill:#ffe0b2,stroke:#e65100,color:#333
+    style PAT2 fill:#ffe0b2,stroke:#e65100,color:#333
+    style MA fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style NPAT fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style GA fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style API fill:#a5d6a7,stroke:#2e7d32,color:#333
 ```
 
 ### Step 1: Inventory Existing Tokens
@@ -1933,8 +1985,16 @@ flowchart TB
         DECISION -->|No| DONE["Migration complete"]
     end
     
-    style Loop fill:#f9f9f9,stroke:#333
-    style DONE fill:#c8e6c9,stroke:#388e3c
+    style Loop fill:#f9f9f9,stroke:#333,color:#333
+    style DONE fill:#c8e6c9,stroke:#388e3c,color:#333
+    style SELECT fill:#b3e5fc,stroke:#0288d1,color:#333
+    style MIGRATE fill:#b3e5fc,stroke:#0288d1,color:#333
+    style MANNEQUIN fill:#b3e5fc,stroke:#0288d1,color:#333
+    style VALIDATE fill:#b3e5fc,stroke:#0288d1,color:#333
+    style TRAIN fill:#b3e5fc,stroke:#0288d1,color:#333
+    style CUTOVER fill:#b3e5fc,stroke:#0288d1,color:#333
+    style MONITOR fill:#b3e5fc,stroke:#0288d1,color:#333
+    style DECISION fill:#fff9c4,stroke:#f9a825,color:#333
 ```
 
 ## GitHub Migration Tools
@@ -2167,9 +2227,15 @@ flowchart LR
     APP -->|"6. Push to fork"| FORK
     FORK -->|"7. PR upstream"| OSS
     
-    style EMU fill:#f0fff4,stroke:#28a745
-    style Public fill:#f0f7ff,stroke:#0366d6
-    style PMA fill:#fff3cd,stroke:#856404
+    style EMU fill:#f0fff4,stroke:#28a745,color:#333
+    style Public fill:#f0f7ff,stroke:#0366d6,color:#333
+    style PMA fill:#fff3cd,stroke:#856404,color:#333
+    style Upstream fill:#f5f5f5,stroke:#9e9e9e,color:#333
+    style OSS fill:#e0e0e0,stroke:#616161,color:#333
+    style FORK fill:#bbdefb,stroke:#1565c0,color:#333
+    style MIRROR fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style DEV fill:#a5d6a7,stroke:#2e7d32,color:#333
+    style APP fill:#fff9c4,stroke:#f9a825,color:#333
 ```
 
 **Key benefits of PMA:**
