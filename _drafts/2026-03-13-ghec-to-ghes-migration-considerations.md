@@ -60,7 +60,7 @@ GHES requires its own authentication configuration. The options are [SAML SSO](h
 
 ### Enterprise Managed Users (EMUs)
 
-GHES doesn't have EMUs - it uses its own IAM model. If you're currently using EMUs on GHEC, the approach to user lifecycle management will be different. Plan for this as a net-new configuration rather than a settings migration.
+GHES doesn't have EMUs - it uses its own IAM model. If you're currently using EMUs on GHEC, the approach to user lifecycle management will be on you to manage with the LDAP/SAML/SCIM configurations.
 
 ## Secrets, Packages, and Artifacts
 
