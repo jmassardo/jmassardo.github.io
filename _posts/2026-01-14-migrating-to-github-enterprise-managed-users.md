@@ -891,6 +891,37 @@ flowchart LR
 
 See [Streaming the audit log for your enterprise](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise) for configuration details.
 
+#### Enable API Request Event Streaming
+
+By default, audit log streams only include web (UI) events. For complete visibility, you should also enable **API request events**. These capture every REST and GraphQL API call made against your enterprise, which is critical for detecting automated access patterns, identifying misconfigured integrations, and satisfying compliance requirements.
+
+To enable API request event streaming:
+1. Navigate to your enterprise settings → Audit log → Log streaming
+2. Select your configured stream
+3. Check **Enable API Request Events**
+
+> **⚠️ Warning:** API request events generate significantly more data than web events — often 10-100x more volume depending on your automation footprint. Make sure your streaming destination can handle the increased throughput and that you've budgeted for the additional storage and ingestion costs. Start by enabling it in a test window to gauge volume before committing.
+
+See [Streaming the audit log for your enterprise - API request events](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise#enabling-audit-log-streaming-of-api-requests) for more details.
+
+#### Enable Source IP Disclosure
+
+By default, GitHub audit log events do not include the source IP address of the actor. For security monitoring, incident response, and compliance, you'll want to enable **IP source disclosure** so that every audit event includes the originating IP address.
+
+To enable source IP disclosure:
+1. Navigate to your enterprise settings → Settings → Authentication security
+2. Under **IP allow list**, enable **Display IP addresses in audit log**
+
+Once enabled, your audit log events will include the `actor_ip` field, which is invaluable for:
+- **Incident response**: Correlating suspicious activity with known IP ranges
+- **Geo-blocking validation**: Confirming access only comes from expected locations
+- **Conditional Access Policy enforcement**: Verifying that Entra ID CAP is working as intended
+- **Compliance evidence**: Demonstrating access control enforcement to auditors
+
+> **Note:** Enterprise owners should communicate this change to users, as IP logging may have privacy implications depending on your jurisdiction. Consult your legal and privacy teams before enabling.
+
+See [Displaying IP addresses in the audit log for your enterprise](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/displaying-ip-addresses-in-the-audit-log-for-your-enterprise) for configuration steps.
+
 ### Audit Log API
 
 For programmatic access, use the Audit Log API:
