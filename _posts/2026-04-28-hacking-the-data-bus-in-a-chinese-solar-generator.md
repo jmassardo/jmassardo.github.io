@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hacking the Data Bus in a Chinese Solar Generator"
-date:   2026-04-01 10:00:00 -0500
+date:   2026-04-28 10:00:00 -0500
 category: Blog
 tags: [devops, automation, hardware, reverse-engineering, solar, modbus, home-assistant]
 excerpt: "How we tapped the internal RS485 bus in a GRECELL H1200, decoded Modbus RTU traffic, and pulled real telemetry into Home Assistant."
@@ -9,7 +9,9 @@ excerpt: "How we tapped the internal RS485 bus in a GRECELL H1200, decoded Modbu
 
 I built an off-grid roadside camera relay for our neighborhood, and I needed one thing that the power station did not provide: data. The GRECELL H1200 had no app, no API, no Bluetooth, and no cloud integration. Just an LCD. Good enough for camping. Not good enough when you want proactive alerts before your cameras go dark.
 
-So I did what any reasonable engineer does after a coffee and a bad idea: opened it.
+So I did what any reasonable engineer does after a Monster and a bad idea: opened it.
+
+![Inside the GRECELL H1200](/public/img/grecell_unit.jpeg)
 
 This is the story of how that turned into a full reverse-engineering rabbit hole.
 
@@ -36,9 +38,11 @@ Once I opened the case, two headers immediately looked like the easy path:
 
 Both had RX, TX, 3.3V, GND. It looked like a one-hour UART job.
 
-It was not a one-hour UART job.
+> Narrator: It was not a one-hour UART job.
 
 ### PJ3: All Promise, No Payload
+
+![PJ3 header](/public/img/grecell_pj3.jpeg)
 
 I soldered in headers, connected USB-TTL, tested common baud rates, and tried both passive listening and active command probing.
 
@@ -47,6 +51,8 @@ Nothing.
 The pins were electrically alive, but the firmware looked like it was keeping the port dormant unless some missing companion module is detected at boot. So the most obvious data port was basically a decorative feature in this configuration.
 
 ### J2: A Great Clue, but Still a Dead End
+
+![J2 header](/public/img/grecell_j2.jpeg)
 
 `J2` was more interesting. At 9600 baud, it repeated frames like this:
 
@@ -62,7 +68,13 @@ So yes, this was progress. Also yes, still a dead end.
 
 At that point, I stopped assuming the labeled headers were my path and started following the real electrical path.
 
-Scope probes went on the board-to-board lines between the main controller and the BMS daughter board. What showed up was textbook differential behavior: one line rising while the other fell, clean mirrored waveforms, and timing that lined up around 9600 baud.
+Scope probes went on the board-to-board lines between the main controller and the BMS daughter board.
+
+![BMS board-to-board lines](/public/img/grecell_bms_lines.jpeg)
+
+What showed up was textbook differential behavior: one line rising while the other fell, clean mirrored waveforms, and timing that lined up around 9600 baud.
+
+![Differential signal capture](/public/img/grecell_diff_signal.jpeg)
 
 That was the moment the project clicked.
 
@@ -143,6 +155,8 @@ Software path:
 
 - ESPHome `modbus_controller`
 - Home Assistant entities and automations
+
+![Live telemetry in Home Assistant](/public/img/grecell_live_monitor.jpeg)
 
 Useful references:
 
