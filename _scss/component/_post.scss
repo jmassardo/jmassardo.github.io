@@ -161,6 +161,47 @@
   }
 }
 
+// Social share buttons
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid $gray-200;
+  border-bottom: 1px solid $gray-200;
+  font-size: $text-sm;
+
+  .share-label {
+    font-weight: 600;
+    color: $text-muted;
+    margin-right: 0.25rem;
+  }
+
+  .share-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    border: 1px solid currentColor;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.15s ease;
+    border-bottom: 1px solid currentColor !important;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  .share-bluesky  { color: #0085ff; }
+  .share-linkedin { color: #0a66c2; }
+  .share-mastodon { color: #6364ff; }
+  .share-copy     { color: $text-muted; }
+}
+
 .related-posts {
   padding-left: 0;
   list-style: none;

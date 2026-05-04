@@ -10,9 +10,11 @@ layout: default
     <a href="{{ site.baseurl }}{{ site.tag_page }}#{{ tag | slugify }}" class="post-tag">{{ tag }}</a>
   {% endfor %}
   {% endif %}
+  {% include share.html %}
   <article>
     {{ content }}
   </article>
+  {% include share.html %}
 </div>
 
 <div class="related">
@@ -34,3 +36,34 @@ layout: default
 {% unless page.comments == false %}
   {% include comments.html %}
 {% endunless %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ page.title | jsonify }},
+  "description": {{ page.excerpt | strip_html | strip_newlines | jsonify }},
+  "datePublished": "{{ page.date | date_to_xmlschema }}",
+  "dateModified": "{{ page.last_modified_at | default: page.date | date_to_xmlschema }}",
+  "author": {
+    "@type": "Person",
+    "name": {{ site.author.name | jsonify }},
+    "url": "{{ site.url }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ site.title | jsonify }},
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ site.url }}{{ site.logo }}"
+    }
+  },
+  "url": "{{ site.url }}{{ page.url }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ site.url }}{{ page.url }}"
+  }{% if page.image %},
+  "image": "{{ page.image | absolute_url }}"{% endif %}{% if page.tags %},
+  "keywords": {{ page.tags | join: ", " | jsonify }}{% endif %}
+}
+</script>

@@ -1,15 +1,20 @@
 # Site Info
 title: "Caffeine, Code, & Chaos"
 tagline: 'Systems engineer. Robotics geek. Maker of shiny things. Part race car, part glitter.</br> Powered by caffeine and curiosity.'
-description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
-#baseurl: "/"
-#url: http://www.dxrf.com
+description: "Systems engineer, robotics geek, and maker of shiny things. Notes on DevOps, hardware, and whatever else catches my attention."
+baseurl: ""
+url: https://dxrf.com
 logo: '/public/logo.png'
+
+twitter:
+  username: jmassardo
 
 # Site configurations
 plugins:
   - jekyll-paginate
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Collections
 collections:
@@ -31,6 +36,18 @@ permalink: pretty
 
 version: 2.0.0
 exclude: [vendor]
+
+# RSS feed
+feed:
+  posts_limit: 20
+
+# Default OG image for social sharing (per-post image: frontmatter overrides this)
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      image: /public/img/og-default.png
 
 # About/contact
 author:
