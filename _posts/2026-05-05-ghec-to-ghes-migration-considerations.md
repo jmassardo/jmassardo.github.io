@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GHEC to GHES Migration: A Practical Planning Guide"
-date: 2026-03-13 10:00:00 -0500
+date: 2026-05-05 10:00:00 -0500
 category: Blog
 tags: [github, ghes, ghec, migration, devops, infrastructure, security, best-practices]
 excerpt: "A comprehensive reference for planning a migration from GitHub Enterprise Cloud to GitHub Enterprise Server, covering feature parity, identity, Actions, infrastructure, and the items that are easy to overlook."
