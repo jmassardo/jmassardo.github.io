@@ -79,7 +79,7 @@ Senior technical advisor responsible for driving customer success and product ad
 * Developed reference architectures, sample code, and technical documentation; authored blog content on DevOps best practices
 * Conducted technical enablement sessions and peer programming engagements to upskill customer engineering teams
 
-#### ENGINEERING MANAGER & AUTOMATION ARCHITECT | JACK HENRY & ASSOCIATES | 2014 - 2018
+#### ENGINEERING MANAGER & AUTOMATION ARCHITECT | JACK HENRY & ASSOCIATES | 2003 - 2018
 
 Progressive leadership roles driving infrastructure automation strategy and engineering team development for a Fortune 1000 financial technology company.
 

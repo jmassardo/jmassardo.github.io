@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GitHub Actions Runner Scaling Patterns: GitHub-Hosted vs ARC"
-date: 2026-02-16 10:00:00 -0500
+date: 2026-04-29 10:00:00 -0500
 category: Blog
 tags: [github, actions, runners, kubernetes, arc, scaling, devops]
 excerpt: "Scaling GitHub Actions runners requires different architectural patterns depending on whether you're using GitHub-hosted runners or Actions Runner Controller. Here's why the approaches are essentially opposite—and how to get each one right."
@@ -25,13 +25,13 @@ The fundamental distinction comes down to where scaling happens and who controls
 
 ### GitHub-Hosted Runners
 
-GitHub manages the infrastructure. You define runner configurations, set concurrency limits, and organize runners into groups. GitHub handles provisioning, scaling, and cleanup. Your job is to direct workflows to the right resources.
+GitHub manages the infrastructure. You define runner configurations, set concurrency limits, and organize runners into groups. GitHub handles provisioning, scaling, and cleanup. Your job is to direct workflows to the right resources. See [Managing larger runners](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/manage-larger-runners) for the full configuration reference.
 
 **Scaling model**: GitHub scales runners based on demand within your configured limits. You control access and routing through runner groups.
 
 ### Actions Runner Controller (ARC)
 
-You manage the infrastructure. ARC runs on your Kubernetes clusters and provisions runner pods on demand. You control everything: cluster sizing, node pools, pod specs, and autoscaling behavior.
+You manage the infrastructure. ARC runs on your Kubernetes clusters and provisions runner pods on demand. You control everything: cluster sizing, node pools, pod specs, and autoscaling behavior. See the [ARC quickstart](https://docs.github.com/en/enterprise-cloud@latest/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller/quickstart-for-actions-runner-controller) to get up and running.
 
 **Scaling model**: You scale by deploying more clusters or increasing node capacity. ARC handles pod lifecycle within each cluster.
 
@@ -80,7 +80,7 @@ Why runner groups instead of runner names?
 
 ### Organizing Runner Groups
 
-Structure your groups around access patterns and capabilities:
+Structure your groups around access patterns and capabilities. See [Managing access to self-hosted runners using groups](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access) for setup instructions - the same runner group concepts apply to both GitHub-hosted larger runners and self-hosted runners.
 
 ```text
 Enterprise Runner Groups
@@ -96,7 +96,7 @@ Each group can contain multiple runners with the same or different configuration
 
 To scale capacity:
 
-1. **Increase concurrency limits** on existing runners
+1. **Increase concurrency limits** on existing runners - see [Configuring autoscaling for larger runners](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/manage-larger-runners#configuring-autoscaling-for-larger-runners)
 2. **Add more runners** to existing groups
 3. **Create new groups** for new access patterns or capabilities
 
@@ -131,13 +131,13 @@ When you hit a cluster's capacity, you can't just "add more runners" like you ca
 
 The solution: **same scale set name across clusters, different runner groups**.
 
-This is explicitly supported in the [official documentation](https://docs.github.com/en/enterprise-cloud@latest/actions/tutorials/use-actions-runner-controller/deploy-runner-scale-sets#high-availability-and-automatic-failover):
+This is explicitly supported in the [official documentation](https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets#high-availability-and-automatic-failover):
 
 > Runner scale set names are unique within the runner group they belong to. If you want to deploy multiple runner scale sets with the same name, they must belong to different runner groups.
 
 ### Best Practice: Consistent Names, Different Groups
 
-Using the official Helm chart configuration:
+Using the official Helm chart configuration (full options in [values.yaml](https://github.com/actions/actions-runner-controller/blob/master/charts/gha-runner-scale-set/values.yaml)):
 
 ```yaml
 # Cluster A - Region: East US (values-east.yaml)
@@ -245,9 +245,9 @@ jobs:
 
 To scale capacity:
 
-1. **Adjust `maxRunners`/`minRunners`** in your Helm values
+1. **Adjust `maxRunners`/`minRunners`** in your Helm values - see [Setting the maximum and minimum number of runners](https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets#setting-the-maximum-and-minimum-number-of-runners)
 2. **Scale Kubernetes nodes** in existing clusters
-3. **Deploy additional clusters** with the same scale set name (different runner group)
+3. **Deploy additional clusters** with the same scale set name (different runner group) - see [High availability and automatic failover](https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets#high-availability-and-automatic-failover)
 4. **Add runner groups to the same parent group** for unified workflow targeting
 
 The scaling lever is on the infrastructure side (clusters), not the workflow side.
@@ -351,7 +351,7 @@ Use GitHub-hosted for general compute and ARC for specialized workloads requirin
 - Specific compliance requirements
 - Cost optimization at scale
 
-As a best practice from the [ARC documentation](https://docs.github.com/en/enterprise-cloud@latest/actions/tutorials/use-actions-runner-controller/deploy-runner-scale-sets#using-arc-across-organizations): create a unique namespace for each organization, or even each runner scale set, to maximize isolation and security.
+As a best practice from the [ARC documentation](https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets#using-arc-across-organizations): create a unique namespace for each organization, or even each runner scale set, to maximize isolation and security.
 
 ---
 
