@@ -7,7 +7,7 @@ tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Raw data is useless if nobody looks at it. Here's how to build a static GitHub Pages dashboard that turns your metrics into actionable trends."
 ---
 
-In **[Part 1]({% post_url 2026-03-10-measuring-genai-effectiveness-data-collection %})**, we built Python scripts that collect Copilot usage, PR health, and issue lifecycle metrics from the GitHub API. Now we have daily JSON files piling up in a `data/` directory.
+In **[Part 1](/blog/2026/03/10/measuring-genai-effectiveness-data-collection/)**, we built Python scripts that collect Copilot usage, PR health, and issue lifecycle metrics from the GitHub API. Now we have daily JSON files piling up in a `data/` directory.
 
 Raw data sitting in JSON files helps nobody. In this post, we'll turn that data into a static dashboard that:
 
@@ -279,7 +279,7 @@ Let's talk about what "good" looks like on each section:
 
 ## What's Next
 
-We have data collection and a dashboard. But nobody's going to stare at charts every day. In **[Part 3: Alerting on What Matters]({% post_url 2026-03-10-measuring-genai-effectiveness-alerting %})**, we'll build an automated alert system that surfaces problems before they become crises, including detecting wasted seats, declining metrics, and review bottlenecks.
+We have data collection and a dashboard. But nobody's going to stare at charts every day. In **[Part 3: Alerting on What Matters](/blog/2026/03/10/measuring-genai-effectiveness-alerting/)**, we'll build an automated alert system that surfaces problems before they become crises, including detecting wasted seats, declining metrics, and review bottlenecks.
 
 Full source code: [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard)
 

@@ -7,7 +7,7 @@ tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices, en
 excerpt: "Our polling-based dashboard works great for a single org. Here's how to redesign the architecture when you have 100,000 repos across 100 orgs."
 ---
 
-In Parts [1]({% post_url 2026-03-10-measuring-genai-effectiveness-data-collection %}), [2]({% post_url 2026-03-10-measuring-genai-effectiveness-dashboard %}), and [3]({% post_url 2026-03-10-measuring-genai-effectiveness-alerting %}) we built a complete metrics collection, dashboard, and alerting system. It works great for a single org with a few dozen repos.
+In Parts [1](/blog/2026/03/10/measuring-genai-effectiveness-data-collection/), [2](/blog/2026/03/10/measuring-genai-effectiveness-dashboard/), and [3](/blog/2026/03/10/measuring-genai-effectiveness-alerting/) we built a complete metrics collection, dashboard, and alerting system. It works great for a single org with a few dozen repos.
 
 Now let's break it.
 
@@ -455,9 +455,9 @@ Here's the journey we've taken across all four posts:
 
 | Post | What You Get | Best For |
 |------|-------------|----------|
-| [Part 1: Collection]({% post_url 2026-03-10-measuring-genai-effectiveness-data-collection %}) | Python scripts polling GitHub APIs | Getting started, POC |
-| [Part 2: Dashboard]({% post_url 2026-03-10-measuring-genai-effectiveness-dashboard %}) | Static GitHub Pages dashboard | Small-medium orgs |
-| [Part 3: Alerting]({% post_url 2026-03-10-measuring-genai-effectiveness-alerting %}) | Automated threshold-based alerts | Proactive monitoring |
+| [Part 1: Collection](/blog/2026/03/10/measuring-genai-effectiveness-data-collection/) | Python scripts polling GitHub APIs | Getting started, POC |
+| [Part 2: Dashboard](/blog/2026/03/10/measuring-genai-effectiveness-dashboard/) | Static GitHub Pages dashboard | Small-medium orgs |
+| [Part 3: Alerting](/blog/2026/03/10/measuring-genai-effectiveness-alerting/) | Automated threshold-based alerts | Proactive monitoring |
 | Part 4: Scaling (this post) | Event-driven architecture | Enterprise scale |
 
 You don't need to jump straight to the enterprise pattern. Start with Parts 1-3. Fork [the companion repo](https://github.com/jmassardo/copilot-metrics-dashboard), set up your secrets, and let the nightly cron run. When you outgrow it, you'll know - the collection workflow will start timing out or hitting rate limits, and this post gives you the blueprint for what comes next.

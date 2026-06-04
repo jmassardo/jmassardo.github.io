@@ -37,7 +37,7 @@ A custom-built automated ventilation system designed to safely extract fumes and
 
 ## Related Posts
 
-{% assign related_posts = site.tags.3dprinting %}
+{% assign related_posts = site.tags['3dprinting'] %}
 {% if related_posts.size > 0 %}
 <ul class="related-posts">
 {% for post in related_posts limit:5 %}

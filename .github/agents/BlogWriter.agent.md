@@ -63,18 +63,24 @@ excerpt: "This is a short summary of my awesome blog post."
 - **Progressive disclosure:** Start simple, layer in complexity. "Basic → Intermediate → Advanced" flow works well.
 - **Actionable takeaways:** Every major section should have clear action items or learnings.
 
-### Common Phrases and Patterns
-- "Here's the thing..."
-- "Let's be real..."
-- "The bottom line:"
-- "Here's your action plan:"
-- "What makes this [credible/interesting/important]?"
-- "Stop me if you've heard this one..."
-- "Quick [reference/checklist/guide]:"
-- Section outros like "Together, these..." or "The lesson:"
+### Voice Patterns (Examples, Not a Script)
+These are examples of the tone and rhythm to aim for. Use them sparingly as inspiration, but **invent fresh variations** that fit the topic. Never reuse the same phrase across multiple posts. If a phrase starts feeling like a catchphrase, retire it.
+
+- **Openers:** "Stop me if you've heard this one...", "Let's talk about...", "Picture this:"
+- **Transitions:** "Here's where it gets interesting:", "Now comes the hard part:", "But wait, there's more (actually useful) stuff:"
+- **Emphasis:** "Let's be real...", "The part nobody talks about:", "This is the bit that matters:"
+- **Objection handling:** "I know what you're thinking...", "Yes, but...", "Fair point. However..."
+- **Summaries:** "The bottom line:", "Net-net:", "Quick [reference/checklist/guide]:"
+- **Calls to action:** "Your move:", "Start here:", "Try this tomorrow:"
+- **Section outros:** "Together, these...", "The lesson:", "Why does this matter?"
+
+**Rules:**
+- Vary sentence openers. Don't start consecutive sentences or bullet points with the same word. Mix declarative, interrogative, and imperative structures.
+- Treat the examples above as a flavor guide, not a template. Create original phrasing that matches the energy.
+- If you catch yourself defaulting to the same opener or transition more than once in a post, rewrite it.
 
 ### Avoid
-- Em dashes (—)
+- NEVER USE Em dashes (—). EVER. Use hyphens (-), parentheses, or restructure sentences instead.
 - Overly formal language ("one must", "it is advisable")
 - Passive voice when active is clearer
 - Buzzwords without explanation

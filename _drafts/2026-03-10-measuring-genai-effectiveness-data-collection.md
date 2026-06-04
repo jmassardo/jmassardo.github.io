@@ -16,9 +16,9 @@ Knowing that 200 people have Copilot seats and 30% of suggestions get accepted t
 This is Part 1 of a 4-part series where we build a complete GenAI effectiveness measurement system from scratch. By the end, you'll have:
 
 1. **Data collection** (this post) - Scripts that pull Copilot usage, PR health, and issue lifecycle metrics from the GitHub API
-2. **[A dashboard]({% post_url 2026-03-10-measuring-genai-effectiveness-dashboard %})** - A static GitHub Pages site that visualizes trends over time
-3. **[Alerting]({% post_url 2026-03-10-measuring-genai-effectiveness-alerting %})** - Automated detection of declining metrics and wasted spend
-4. **[Enterprise scaling]({% post_url 2026-03-10-measuring-genai-effectiveness-scaling %})** - How to evolve this pattern when you have 100k repos across 100 orgs
+2. **[A dashboard](/blog/2026/03/10/measuring-genai-effectiveness-dashboard/)** - A static GitHub Pages site that visualizes trends over time
+3. **[Alerting](/blog/2026/03/10/measuring-genai-effectiveness-alerting/)** - Automated detection of declining metrics and wasted spend
+4. **[Enterprise scaling](/blog/2026/03/10/measuring-genai-effectiveness-scaling/)** - How to evolve this pattern when you have 100k repos across 100 orgs
 
 Everything we build lives in a companion repo you can fork and deploy today: [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard)
 
@@ -321,7 +321,7 @@ The workflow commits the collected data back to the repo, so your historical dat
 
 ## What's Next
 
-We've got data flowing. In **[Part 2: Building the Dashboard]({% post_url 2026-03-10-measuring-genai-effectiveness-dashboard %})**, we'll take all this raw data and turn it into a GitHub Pages dashboard with trend charts, summary cards, and a dark theme that won't burn your retinas during a late-night metrics review.
+We've got data flowing. In **[Part 2: Building the Dashboard](/blog/2026/03/10/measuring-genai-effectiveness-dashboard/)**, we'll take all this raw data and turn it into a GitHub Pages dashboard with trend charts, summary cards, and a dark theme that won't burn your retinas during a late-night metrics review.
 
 The full source code for everything in this series is available at [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard).
 

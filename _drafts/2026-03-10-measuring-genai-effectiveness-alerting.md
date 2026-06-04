@@ -9,7 +9,7 @@ excerpt: "Dashboards are great until nobody looks at them. Here's how to build a
 
 Dashboards are great. You know what's not great? Expecting busy people to check a dashboard every day.
 
-In **[Part 1]({% post_url 2026-03-10-measuring-genai-effectiveness-data-collection %})** we built data collection. In **[Part 2]({% post_url 2026-03-10-measuring-genai-effectiveness-dashboard %})** we built a dashboard. Now let's make sure the important stuff finds **you** instead of waiting for you to find it.
+In **[Part 1](/blog/2026/03/10/measuring-genai-effectiveness-data-collection/)** we built data collection. In **[Part 2](/blog/2026/03/10/measuring-genai-effectiveness-dashboard/)** we built a dashboard. Now let's make sure the important stuff finds **you** instead of waiting for you to find it.
 
 In this post, we'll build an alerting system that evaluates every metric against configurable thresholds and surfaces problems in two ways:
 
@@ -271,7 +271,7 @@ Alerts are only useful if you know what to do when they fire. Here's a quick ref
 
 We've got collection, visualization, and alerting. But everything we've built so far assumes a single org with a manageable number of repos. What happens when you need to do this at enterprise scale - 100 orgs, 100,000 repos, rate limits that laugh at your pagination loops?
 
-In **[Part 4: Scaling for the Enterprise]({% post_url 2026-03-10-measuring-genai-effectiveness-scaling %})**, we'll redesign the architecture from pull-based polling to event-driven streaming.
+In **[Part 4: Scaling for the Enterprise](/blog/2026/03/10/measuring-genai-effectiveness-scaling/)**, we'll redesign the architecture from pull-based polling to event-driven streaming.
 
 Full source code: [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard)
 
