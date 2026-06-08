@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Myth of the 10x Engineer vs. the Reality of 10x Systems"
-date: 2026-02-25 10:00:00 -0500
+date: 2026-06-12 10:00:00 -0500
 category: Blog
 tags: [engineering, culture, teams, leadership, productivity]
 excerpt: "The lone heroic engineer is a persistent myth. In reality, high-performing systems matter more than high-performing individuals. Sustainable excellence comes from design, not mythology."

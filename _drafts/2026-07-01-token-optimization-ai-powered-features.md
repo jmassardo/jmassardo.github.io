@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Token Optimization for AI-Powered Features"
-date: 2026-05-06 10:00:00 -0500
+date: 2026-07-01 10:00:00 -0500
 category: Blog
 tags: [ai, llm, devops, cost-optimization, architecture, best-practices]
 excerpt: "Building AI features into your product? Here's how to control token costs in production - from prompt engineering and context management to caching, model routing, and monitoring."

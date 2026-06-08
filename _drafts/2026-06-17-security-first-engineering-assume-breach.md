@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Security-First Engineering: Designing Systems That Assume Breach"
-date: 2026-03-09 10:00:00 -0500
+date: 2026-06-17 10:00:00 -0500
 category: Blog
 tags: [security, engineering, architecture, devops, defense-in-depth]
 excerpt: "Security is often treated as a gate at the end of development. Instead, treat it as a foundational design assumption. Designing as if breach is inevitable leads to stronger systems."

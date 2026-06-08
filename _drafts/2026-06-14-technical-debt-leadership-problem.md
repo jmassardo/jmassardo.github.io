@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Technical Debt Is a Leadership Problem, Not an Engineering One"
-date: 2026-03-02 10:00:00 -0500
+date: 2026-06-14 10:00:00 -0500
 category: Blog
 tags: [engineering, technical-debt, leadership, prioritization, devops]
 excerpt: "Technical debt is often blamed on careless engineers. But debt accumulates because of prioritization, incentives, and planning decisions made upstream. Addressing it requires ownership at the decision-making level."

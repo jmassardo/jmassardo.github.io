@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Building an Internal Engineering Safety Playbook"
-date: 2026-03-11 10:00:00 -0500
+date: 2026-06-22 10:00:00 -0500
 category: Blog
 tags: [engineering, incidents, reliability, operations, devops]
 excerpt: "Organizations often respond to incidents inconsistently. A safety playbook provides shared language, decision thresholds, and escalation paths. Clarity during stress is an engineered outcome."

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Git Worktrees: Work on Multiple Branches Without Losing Your Mind"
-date: 2026-03-20 10:00:00 -0500
+date: 2026-06-27 10:00:00 -0500
 category: Blog
 tags: [git, devops, developer-tools, automation, best-practices]
 excerpt: "Git worktrees let you check out multiple branches simultaneously in separate directories. Here is why you should care and how to actually use them."

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 4: Scaling for the Enterprise"
-date:   2026-03-10 10:00:00 -0500
+date: 2026-06-21 10:00:00 -0500
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices, enterprise]
 excerpt: "Our polling-based dashboard works great for a single org. Here's how to redesign the architecture when you have 100,000 repos across 100 orgs."

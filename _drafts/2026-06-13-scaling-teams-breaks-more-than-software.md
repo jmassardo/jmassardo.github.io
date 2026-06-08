@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Scaling Teams Breaks More Often Than Scaling Software"
-date: 2026-02-27 10:00:00 -0500
+date: 2026-06-13 10:00:00 -0500
 category: Blog
 tags: [engineering, scaling, leadership, teams, conways-law]
 excerpt: "Software systems scale more predictably than human systems. Communication paths, ownership boundaries, and decision latency degrade as teams grow. Scaling teams requires as much intentional architecture as scaling code."

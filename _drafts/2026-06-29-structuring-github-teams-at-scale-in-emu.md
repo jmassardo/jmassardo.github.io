@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Structuring GitHub Teams at Scale in Enterprise Managed Users"
-date:   2026-03-25 10:00:00 -0500
+date: 2026-06-29 10:00:00 -0500
 category: Blog
 tags: [github, devops, enterprise, security, best-practices, emu, automation]
 excerpt: "A practical guide to designing a GitHub team structure that scales cleanly in EMU environments - from IdP group mapping to nested team hierarchies to day-to-day access management."

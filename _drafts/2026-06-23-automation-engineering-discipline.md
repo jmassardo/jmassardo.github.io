@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Automation as an Engineering Discipline, Not a Shortcut"
-date: 2026-03-13 10:00:00 -0500
+date: 2026-06-23 10:00:00 -0500
 category: Blog
 tags: [automation, engineering, devops, reliability, best-practices]
 excerpt: "Automation is frequently introduced to 'go faster.' But speed alone is a poor justification. Poorly designed automation can amplify failures. Automation should reduce fragility, not hide it."

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 3: Alerting on What Matters"
-date:   2026-03-10 10:00:00 -0500
+date: 2026-06-18 10:00:00 -0500
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Dashboards are great until nobody looks at them. Here's how to build automated alerts that surface declining metrics and wasted spend before they become problems."

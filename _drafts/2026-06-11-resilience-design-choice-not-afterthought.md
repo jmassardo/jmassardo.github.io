@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Resilience Is a Design Choice, Not an Afterthought"
-date: 2026-02-20 10:00:00 -0500
+date: 2026-06-11 10:00:00 -0500
 category: Blog
 tags: [engineering, resilience, architecture, reliability, devops]
 excerpt: "Resilience doesn't magically appear during an incident. It's baked in long before failure occurs through intentional architectural decisions, operational habits, and organizational priorities."

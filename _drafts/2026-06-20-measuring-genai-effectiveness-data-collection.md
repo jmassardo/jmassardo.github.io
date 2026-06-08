@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 1: Data Collection"
-date:   2026-03-10 10:00:00 -0500
+date: 2026-06-20 10:00:00 -0500
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Copilot adoption numbers don't tell you if AI is making your team better. Here's how to collect the metrics that actually matter."

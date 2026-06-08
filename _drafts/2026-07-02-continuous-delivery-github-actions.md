@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Continuous Delivery with GitHub Actions: From Green Build to Production"
-date: 2026-05-11 10:00:00 -0500
+date: 2026-07-02 10:00:00 -0500
 category: Blog
 tags: [github, github-actions, ci-cd, devops, automation, best-practices]
 excerpt: "Your CI pipeline builds and tests your code. Now what? Here's how to build reliable, safe continuous delivery workflows with GitHub Actions."

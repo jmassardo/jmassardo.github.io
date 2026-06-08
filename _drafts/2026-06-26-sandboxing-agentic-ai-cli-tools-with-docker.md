@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Sandboxing Agentic AI CLI Tools with Docker: Run YOLO Mode Without Burning It All Down"
-date: 2026-03-18 10:00:00 -0500
+date: 2026-06-26 10:00:00 -0500
 category: Blog
 tags: [ai, copilot, cli, docker, podman, containers, devops, automation, security, developer-tools]
 excerpt: "A practical guide to running agentic AI CLI tools like Copilot CLI inside containers so you can go full autopilot without risking your host system, production databases, or sanity."

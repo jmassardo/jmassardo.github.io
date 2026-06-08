@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 2: Building the Dashboard"
-date:   2026-03-10 10:00:00 -0500
+date: 2026-06-19 10:00:00 -0500
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Raw data is useless if nobody looks at it. Here's how to build a static GitHub Pages dashboard that turns your metrics into actionable trends."

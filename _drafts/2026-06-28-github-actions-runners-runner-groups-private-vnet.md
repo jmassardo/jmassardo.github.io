@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "GitHub Actions Runners: Runner Groups and Azure Private Networking"
-date: 2026-03-20 10:00:00 -0500
+date: 2026-06-28 10:00:00 -0500
 category: Blog
 tags: [github, actions, enterprise, runner, azure, networking, security]
 excerpt: "A comprehensive guide to configuring GitHub Actions runners, organizing them with runner groups, and securing CI/CD workflows with Azure Private VNet integration."
