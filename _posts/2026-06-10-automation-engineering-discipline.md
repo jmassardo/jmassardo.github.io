@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Automation as an Engineering Discipline, Not a Shortcut"
-date: 2026-06-23 10:00:00 -0500
+date: 2026-06-10 10:00:00 -0500
 category: Blog
 tags: [automation, engineering, devops, reliability, best-practices]
 excerpt: "Automation is frequently introduced to 'go faster.' But speed alone is a poor justification. Poorly designed automation can amplify failures. Automation should reduce fragility, not hide it."
@@ -11,7 +11,7 @@ excerpt: "Automation is frequently introduced to 'go faster.' But speed alone is
 
 Music to every engineer's ears. Who doesn't want to replace tedious manual work with elegant automated solutions?
 
-Regardless of how many times I wave my wand, automation isn't magic. It's engineering. And like all engineering, it has tradeoffs, risks, and failure modes.
+But here's the thing: automation isn't magic. It's engineering. And like all engineering, it has tradeoffs, risks, and failure modes.
 
 Bad automation doesn't just fail to help. It actively makes things worse. It amplifies errors. It hides problems. It creates new categories of failure that didn't exist before.
 
@@ -134,7 +134,7 @@ Automation is good at following rules. It's bad at judgment calls. If the operat
 
 ### When You Don't Understand the Process
 
-If you can't clearly articulate what the manual process is and why, you're not ready to automate it. Automation encodes your understanding. If your understanding is wrong, the automation will be wrong at scale. I used to be in a systems management community and there was a member who had the motto: `Standardize, Simplify, Automate`. Variability is hard to automate. Good automation requires rules and guardrails.
+If you can't clearly articulate what the manual process is and why, you're not ready to automate it. Automation encodes your understanding. If your understanding is wrong, the automation will be wrong at scale.
 
 ## Automation Maturity
 
@@ -146,13 +146,7 @@ Think of automation maturity as a ladder:
 4. **Automated with guardrails:** Automation handles the process but has safeguards, monitoring, and easy override.
 5. **Full autonomous:** Automation handles everything including recovery from failures.
 
-Most organizations should aim for level 4. Level 5 is only appropriate for well-understood processes where you have extremely high confidence in the automation, rock solid monitoring and response, and reliable rollback/rollforward options to resolve a failure.
-
-## Safety and Security
-
-Last but certainly not least, ensure you have audit and validation processes for automation. Sure the monitoring system is reporting that the automation is 🟢, but how are you validating that it did the actual work? How are you validating that someone isn't hijacking your credentials and doing something nefarious with it. 
-
-With all automation, it pays to do period reviews of the code, the logs, the credentials, everything. More often than not, you'll find something you didn't expect. I'd much rather find that on 2 PM on a Wednesday afternoon during a periodic audit than at 2AM on a Saturday morning when prod is down due to a runaway process...
+Most organizations should aim for level 4. Level 5 is only appropriate for well-understood, low-risk processes where you have extremely high confidence in the automation.
 
 ## TL;DR
 
