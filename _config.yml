@@ -1,15 +1,17 @@
 # Site Info
 title: "Caffeine, Code, & Chaos"
 tagline: 'Systems engineer. Robotics geek. Maker of shiny things. Part race car, part glitter.</br> Powered by caffeine and curiosity.'
-description: 'A Jekyll theme adapted from <a href="http://lanyon.getpoole.com/" target="_blank">Lanyon</a>.'
+description: 'Technical blog by Jenna Massardo covering DevOps, platform engineering, automation, GitHub, and practical systems design.'
 #baseurl: "/"
-#url: http://www.dxrf.com
+url: https://www.dxrf.com
 logo: '/public/logo.png'
 
 # Site configurations
 plugins:
   - jekyll-paginate
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Collections
 collections:
@@ -70,7 +72,6 @@ hero:
   caption: Welcome to my world! <br><small> Thanks <a href="https://xkcd.com/">XKCD</a> for another awesome comic</small>
 
 # Plugins
-mathjax: true # whether support mathjax
 google_analytics_token: 'G-R8J4XTV6XW' # leave blank if you don't want google analytics
 #disqus_short_name: '' # leave blank if you don't want disqus
 
