@@ -14,6 +14,28 @@
     {% endif %}
   </title>
 
+  {% seo title=false %}
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": {{ site.author.name | jsonify }},
+      "url": {{ site.url | jsonify }},
+      "sameAs": [
+        {% assign first_same_as = true %}
+        {% for contact in site.author.contact %}
+          {% assign contact_url = contact[1] %}
+          {% if contact_url contains 'http://' or contact_url contains 'https://' %}
+            {% unless first_same_as %},{% endunless %}
+            {{ contact_url | jsonify }}
+            {% assign first_same_as = false %}
+          {% endif %}
+        {% endfor %}
+      ]
+    }
+  </script>
+
   <!-- CSS -->
   <link rel="preload" href="{{ site.baseurl }}/public/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ site.baseurl }}/public/css/main.css"></noscript>
@@ -24,13 +46,6 @@
 
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
-
-  {% if site.mathjax %}
-  <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG"> </script>
-  <script type="text/x-mathjax-config">
-MathJax.Hub.Config({ tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ], processEscapes: true } });
-  </script>
-  {% endif %}
 
   <!-- Mermaid diagram support -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>

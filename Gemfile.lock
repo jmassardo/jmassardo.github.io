@@ -325,6 +325,8 @@ DEPENDENCIES
   html-proofer
   jekyll-feed
   jekyll-paginate
+  jekyll-seo-tag
+  jekyll-sitemap
   kramdown (>= 2.4.0)
   minima (~> 2.5)
   nokogiri (>= 1.15.5)
