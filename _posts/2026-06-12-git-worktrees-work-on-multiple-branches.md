@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Git Worktrees: Work on Multiple Branches Without Losing Your Mind"
-date: 2026-06-27 10:00:00 -0500
+date: 2026-06-12 10:00:00 -0500
 category: Blog
 tags: [git, devops, developer-tools, automation, best-practices]
 excerpt: "Git worktrees let you check out multiple branches simultaneously in separate directories. Here is why you should care and how to actually use them."
@@ -145,7 +145,7 @@ cd ../my-app-task-2 && copilot --autopilot -p "Refactor the API layer to use mid
 cd ../my-app-task-3 && copilot --autopilot -p "Add JSDoc to all exported functions"
 ```
 
-Three agents, three branches, zero conflicts. For a deeper dive on containerizing this pattern, check out [Sandboxing Agentic AI CLI Tools with Docker](/blog/2026/03/18/sandboxing-agentic-ai-cli-tools-with-docker).
+Three agents, three branches, zero conflicts.
 
 ### Pattern 4: Compare Two Branches Side by Side
 
