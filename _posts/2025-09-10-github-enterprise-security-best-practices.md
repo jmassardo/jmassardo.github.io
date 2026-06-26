@@ -7,6 +7,8 @@ tags: [github, enterprise, security, identity-management, devops, best-practices
 excerpt: "A comprehensive, battle-tested guide to securing GitHub Enterprise that you can actually implement without breaking everything. From EMU to custom roles, here's how to build a fortress around your code without turning your developers into security theater performers."
 ---
 
+*Updated 2026-06-24: Added a Personal Access Token Security section (fine-grained PATs, lifetime enforcement, scope discipline, org-wide PAT policies, and audit log monitoring with links to the relevant GitHub audit log event categories). Also fixed a broken Custom Properties code block, moved the Access Control Flow diagram into the IAM section where it belongs, switched the audit log streaming example to env-var-style secrets, and updated GitHub Advanced Security references to the current Code Security + Secret Protection branding.*
+
 ## Introduction
 
 Let's be honest: securing GitHub Enterprise often feels like trying to nail jell-O to a wall while blindfolded. You know you need to lock things down, but you also can't turn your development environment into a bureaucratic nightmare where opening a PR requires three forms of ID and a blood sample.
@@ -61,6 +63,45 @@ Manual team management is like manually managing DNS records – technically pos
 - [ ] Create process for new team requests
 - [ ] Establish regular access reviews
 
+### The Access Control Flow: How It All Connects
+
+Here's the core concept that many people struggle with – the simple flow from identity groups to repository access:
+
+```mermaid
+graph LR
+    subgraph "Your Identity Provider"
+        A[IDP Group:<br/>platform-engineering]
+    end
+
+    subgraph "GitHub"
+        B[GitHub Team:<br/>Platform Engineering]
+        C[Repository:<br/>platform-api]
+        D[Repository:<br/>infrastructure]
+    end
+
+    A -->|Syncs to| B
+    B -->|"Write" role| C
+    B -->|"Admin" role| D
+
+    style A fill:#e1f5fe
+    style B fill:#e8f5e8
+    style C fill:#fff3e0
+    style D fill:#fff3e0
+```
+
+**That's it.** Three simple steps:
+
+1. **People are assigned to IDP groups** (Active Directory, LDAP, etc.)
+2. **IDP groups automatically map to GitHub teams** (via SCIM sync)
+3. **GitHub teams are given specific roles on specific repositories**
+
+When Sarah joins the platform engineering team:
+- HR adds her to the `platform-engineering` AD group
+- She automatically becomes a member of the GitHub `Platform Engineering` team
+- She immediately gets `Write` access to `platform-api` and `Admin` access to `infrastructure`
+- No manual GitHub administration required
+
+When she leaves or changes teams, the same process works in reverse.
 
 ### Custom Organization and Repository Roles
 
@@ -75,6 +116,124 @@ GitHub's default roles are like off-the-rack suits – they'll work, but custom 
 - **Code Reviewer**: Can review and merge PRs, but can't modify repository settings
 - **Release Manager**: Can create releases and manage deployment keys
 - **Security Champion**: Can manage security settings and view security advisories
+
+## Personal Access Token Security: The Credentials Everyone Forgets About
+
+Personal access tokens (PATs) are the security equivalent of leaving your house key under the doormat – convenient until somebody finds it. Long-lived, over-scoped, organization-wide PATs are one of the most common attack vectors I see in enterprise breaches, and they're almost always preventable.
+
+If you're letting developers create classic PATs with `repo` scope and no expiration, you're effectively handing out master keys to your entire codebase. Let's fix that.
+
+### Prefer Fine-Grained Personal Access Tokens
+
+GitHub's fine-grained PATs are the modern replacement for classic tokens, and they're not even close in terms of security posture. Classic PATs grant broad scopes across every repository the user can access, while fine-grained PATs let you scope down to specific repositories with granular permissions.
+
+**Why fine-grained PATs win**:
+- **Repository-specific access**: Select exactly which repos the token can touch
+- **Granular permissions**: Read vs. write on specific resources (contents, issues, pull requests, actions, etc.)
+- **Mandatory expiration**: Can't be created without an end date
+- **Organization approval workflow**: Admins can require approval before tokens become active
+- **Better audit trail**: Token usage is logged with specific resource access
+
+**Classic PATs should be**:
+- Banned outright if possible (enforce via organization settings)
+- Treated as legacy credentials with an active migration plan
+- Never used for new integrations or automation
+
+### Enforce Maximum Token Lifetimes
+
+A PAT with no expiration is a credential that will outlive the employee who created it, the project it was created for, and possibly the company itself. Set organization-wide maximum lifetimes and stick to them.
+
+**Recommended lifetime tiers**:
+- **Development/exploration**: 7 days
+- **Standard automation**: 30-90 days
+- **Long-running integrations**: 1 year maximum (and reconsider whether a GitHub App would be better)
+
+```yaml
+# Organization-level PAT policy
+personal_access_tokens:
+  fine_grained:
+    enabled: true
+    require_approval: true
+    max_lifetime_days: 90
+  classic:
+    enabled: false  # Disable if your workflows allow
+    max_lifetime_days: 30  # If you must allow them
+  allowed_repositories: "selected"  # Not "all"
+```
+
+### Limit Scope and Repository Access
+
+The principle of least privilege applies double for credentials that can be exfiltrated in a single API call.
+
+**Scope discipline checklist**:
+- [ ] Grant only the permissions actually required (read-only when possible)
+- [ ] Scope tokens to specific repositories, never "all repositories"
+- [ ] Avoid `admin:org`, `delete_repo`, and other destructive scopes unless absolutely necessary
+- [ ] Separate tokens by purpose – don't reuse one token across multiple integrations
+- [ ] Document what each token does and who owns it
+
+**Common over-scoping mistakes**:
+- Granting `repo` (full control) when `contents:read` would suffice
+- Using `workflow` scope on tokens that don't need to modify Actions workflows
+- Org-wide access for tokens that only touch one or two repositories
+- Write access for read-only reporting or monitoring tools
+
+### Prefer GitHub Apps and OIDC Over PATs
+
+Honestly, the best PAT is the one you didn't create. Before issuing a new token, ask whether the use case can be solved with something better:
+
+- **GitHub Apps**: Better for service-to-service integrations, with short-lived installation tokens and granular permissions
+- **OIDC for CI/CD**: Workload identity federation eliminates long-lived secrets entirely for cloud deployments
+- **GitHub Actions secrets with environment protection rules**: For workflow-specific credentials
+
+A quick word on **deploy keys**: they're often suggested as a PAT alternative, but they're really not much better. Deploy keys are shared, long-lived credentials with no individual accountability – if three services use the same deploy key and it leaks, you have no idea which one was compromised, and rotating it breaks all three at once. Treat them the same way you'd treat a classic PAT: avoid them for new integrations and migrate to GitHub Apps when you can.
+
+PATs should be a last resort for human-driven, interactive use cases – not the default for every integration.
+
+### Enforce Organization-Wide PAT Policies
+
+GitHub Enterprise gives you organization-level controls to enforce these practices. Use them.
+
+**Settings to lock down** (Organization → Settings → Personal access tokens):
+- **Restrict access via fine-grained personal access tokens**: Require approval for tokens accessing your org
+- **Allow access via fine-grained personal access tokens**: Set maximum lifetime
+- **Restrict access via personal access tokens (classic)**: Disable entirely, or at minimum require justification
+- **Enforce SAML SSO**: Require token authorization for SSO-protected orgs
+
+### Monitor and Rotate
+
+Even with all the right policies, tokens leak. Monitor for it.
+
+One important caveat up front: the [`personal_access_token`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token) and [`auto_approve_personal_access_token_requests`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#auto_approve_personal_access_token_requests) audit log categories only cover **fine-grained PATs** – they're tied to the organization-level approval and policy flow that classic PATs don't participate in. Classic PATs are largely invisible in the audit log beyond [`org_credential_authorization`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#org_credential_authorization) events for SSO-protected orgs and indirect signals like secret scanning hits. If you want meaningful PAT telemetry, you need to be on fine-grained tokens. (Yet another reason to disable classic PATs.)
+
+**Monitoring essentials for fine-grained PATs**:
+- Stream PAT lifecycle events to your SIEM – at minimum [`personal_access_token.request_created`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token), [`personal_access_token.access_granted`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token), [`personal_access_token.access_revoked`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token), and [`personal_access_token.request_denied`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token)
+- Alert when policy guardrails get loosened, especially [`personal_access_token.access_restriction_disabled`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token), [`personal_access_token.auto_approve_grant_requests_enabled`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token), and [`personal_access_token.expiration_limit_unset`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#personal_access_token)
+- Alert on tokens with unusual scope combinations
+- Track tokens that haven't been used in 30+ days (candidates for revocation)
+- Review pending fine-grained PAT approval requests on a regular cadence
+
+**For classic PATs (until you've migrated everyone off)**:
+- Watch for SSO authorization changes via [`org_credential_authorization.grant`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#org_credential_authorization) and [`org_credential_authorization.revoke`](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#org_credential_authorization)
+- Use secret scanning with push protection to catch tokens accidentally committed to repositories
+- Periodically inventory active classic PATs at the user level – there is no org-wide dashboard, so this is largely a manual exercise
+
+**Rotation strategy**:
+- Automate rotation for service-account tokens via your secret manager
+- Calendar reminders for human-owned tokens approaching expiration
+- Quarterly review of all active tokens in the organization
+- Immediate revocation when employees change roles or leave
+
+### PAT Security Implementation Checklist
+
+- [ ] Disable classic PATs at the organization level (or enforce short lifetimes)
+- [ ] Require approval for all fine-grained PATs accessing your org
+- [ ] Set maximum token lifetime to 90 days or less
+- [ ] Document approved use cases for PATs vs. GitHub Apps vs. OIDC
+- [ ] Migrate existing classic PATs to fine-grained tokens or GitHub Apps
+- [ ] Enable secret scanning with push protection across all repositories
+- [ ] Stream token-related audit events to your SIEM
+- [ ] Establish a quarterly token review and cleanup process
 
 ## Repository Security: Building Walls That Actually Keep Bad Things Out
 
@@ -313,59 +472,20 @@ Custom properties are like labels that actually do something useful. Use them to
 - **Business Criticality**: `critical`, `high`, `medium`, `low`
 - **Technology Stack**: `nodejs`, `python`, `java`, `golang`
 
-```json
+A payload for setting these values on a repository via the [custom properties REST API](https://docs.github.com/en/rest/repos/custom-properties) looks like:
+
 ```json
 {
-  "team_name": "platform-engineering",
-  "idp_group": "cn=platform-engineering,ou=teams,dc=company,dc=com",
-  "sync_enabled": true,
-  "privacy": "closed",
-  "default_permission": "pull"
+  "properties": [
+    { "property_name": "data_classification", "value": "confidential" },
+    { "property_name": "compliance_scope", "value": ["sox", "pci-dss"] },
+    { "property_name": "business_criticality", "value": "critical" },
+    { "property_name": "technology_stack", "value": ["nodejs", "python"] }
+  ]
 }
 ```
 
-### The Access Control Flow: How It All Connects
-
-Here's the core concept that many people struggle with - the simple flow from identity groups to repository access:
-
-```mermaid
-graph LR
-    subgraph "Your Identity Provider"
-        A[IDP Group:<br/>platform-engineering]
-    end
-
-    subgraph "GitHub"
-        B[GitHub Team:<br/>Platform Engineering]
-        C[Repository:<br/>platform-api]
-        D[Repository:<br/>infrastructure]
-    end
-
-    A -->|Syncs to| B
-    B -->|"Write" role| C
-    B -->|"Admin" role| D
-
-    style A fill:#e1f5fe
-    style B fill:#e8f5e8
-    style C fill:#fff3e0
-    style D fill:#fff3e0
-```
-
-**That's it.** Three simple steps:
-
-1. **People are assigned to IDP groups** (Active Directory, LDAP, etc.)
-2. **IDP groups automatically map to GitHub teams** (via SCIM sync)
-3. **GitHub teams are given specific roles on specific repositories**
-
-When Sarah joins the platform engineering team:
-- HR adds her to the `platform-engineering` AD group
-- She automatically becomes a member of the GitHub `Platform Engineering` team
-- She immediately gets `Write` access to `platform-api` and `Admin` access to `infrastructure`
-- No manual GitHub administration required
-
-When she leaves or changes teams, the same process works in reverse.
-
-### Custom Organization and Repository Roles
-```
+Once values are set, you can target them from rulesets, security configurations, and `safe-settings` to apply policy based on what a repository *is* rather than maintaining hand-curated lists.
 
 ### Inner Source Management: Controlled Sharing
 
@@ -399,7 +519,8 @@ If you're not monitoring your GitHub audit logs, you're basically flying blind t
 - Failed authentication attempts
 - Unusual access patterns
 
-**Implementation strategy**:
+**Implementation strategy** (illustrative pseudo-config – actual destinations are configured in the enterprise admin UI under *Settings → Audit log → Log streaming*; credentials should come from a secrets manager, never be hardcoded):
+
 ```json
 {
   "audit_log_streaming": {
@@ -407,18 +528,18 @@ If you're not monitoring your GitHub audit logs, you're basically flying blind t
     "destinations": [
       {
         "type": "splunk",
-        "endpoint": "https://splunk.company.com/api/audit",
-        "token": "your-splunk-token"
+        "endpoint": "https://splunk.company.com/services/collector",
+        "token": "${SPLUNK_HEC_TOKEN}"
       },
       {
         "type": "datadog",
-        "endpoint": "https://api.datadoghq.com/api/v1/audit",
-        "api_key": "your-datadog-key"
+        "endpoint": "https://http-intake.logs.datadoghq.com/api/v2/logs",
+        "api_key": "${DATADOG_API_KEY}"
       }
     ],
     "events": [
       "repo.create",
-      "repo.delete",
+      "repo.destroy",
       "org.update_member",
       "team.add_member",
       "team.remove_member"
@@ -469,7 +590,7 @@ Create dashboards that actually tell you useful information instead of pretty gr
 Here are some additional areas I typically discuss with customers, but I know there's more. **This is where I need your help** – what am I missing?
 
 ### Secret Management
-- GitHub Advanced Security secret scanning
+- GitHub Secret Protection (secret scanning + push protection)
 - Integration with enterprise secret management tools
 - Custom secret scanning patterns for proprietary systems
 - Automated secret remediation workflows
@@ -546,7 +667,7 @@ Let's make this the definitive guide to GitHub Enterprise security that actually
 - [GitHub Enterprise Security Best Practices](https://docs.github.com/en/enterprise-cloud@latest/admin/overview/best-practices-for-enterprises)
 - [Enterprise Managed Users Documentation](https://docs.github.com/en/enterprise-cloud@latest/admin/identity-and-access-management/using-enterprise-managed-users-for-iam/about-enterprise-managed-users)
 - [Repository Rulesets Documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
-- [GitHub Advanced Security Features](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security)
+- [GitHub Code Security and Secret Protection](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security) (formerly bundled as GitHub Advanced Security)
 - [Audit Log Streaming Documentation](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise)
 
 ---
