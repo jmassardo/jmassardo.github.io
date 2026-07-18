@@ -7,6 +7,9 @@ on:
     paths:
       - '_posts/**'
 
+permissions:
+  contents: read
+
 jobs:
   post-to-bluesky:
     runs-on: ubuntu-latest
