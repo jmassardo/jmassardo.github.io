@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bambuddy Companion — Bambu Lab Print Farm Manager</title>
+  <meta name="description" content="Monitor and manage your Bambu Lab 3D printer farm from your phone. Real-time status, print queue, file management, and more.">
+  <meta property="og:title" content="Bambuddy Companion">
+  <meta property="og:description" content="Monitor and manage your Bambu Lab 3D printer farm from your phone.">
+  <meta property="og:image" content="images/app-icon.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="images/app-icon.png">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-card-hover: #1c2129;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79b8ff;
+      --green: #3fb950;
+      --border: #30363d;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .nav-brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+    .nav-brand span {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 36px;
+    }
+    .hero-badges {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .badge:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+    .badge svg { width: 22px; height: 22px; fill: var(--text); }
+
+    /* ── Screenshots ── */
+    .screenshots {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 0 0 40px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screenshots img {
+      width: 220px;
+      height: auto;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      scroll-snap-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Features ── */
+    .features {
+      padding: 80px 0;
+    }
+    .features h2 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--accent); }
+    .feature-icon {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* ── Requires section ── */
+    .requires {
+      padding: 60px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .requires h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    .requires p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 24px;
+      font-size: 0.95rem;
+    }
+    .requires a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .requires a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero { padding: 48px 0 32px; }
+      .screenshots img { width: 180px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .nav-links { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="./" class="nav-brand">
+        <img src="images/app-icon.png" alt="Bambuddy Companion icon">
+        <span>Bambuddy Companion</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="support.html">Support</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/jmassardo/bambuddy-mobile">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Your Bambu Lab print farm,<br><span class="accent">in your pocket.</span></h1>
+      <p>Monitor printers, manage queues, browse files, and control your entire Bambu Lab fleet — all from your phone or tablet.</p>
+
+      <div class="hero-badges">
+        <a href="#" class="badge">
+          <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          App Store — Coming Soon
+        </a>
+        <a href="#" class="badge">
+          <svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+          Google Play — Coming Soon
+        </a>
+      </div>
+
+      <div class="screenshots">
+        <img src="images/screenshot-dashboard.png" alt="Dashboard — fleet overview with status chips and printer cards" loading="lazy">
+        <img src="images/screenshot-printer.png" alt="Printer detail — live status, AMS slots, and controls" loading="lazy">
+        <img src="images/screenshot-queue.png" alt="Print queue — job list with progress and controls" loading="lazy">
+        <img src="images/screenshot-files.png" alt="File browser — 3MF library with folders and upload" loading="lazy">
+        <img src="images/screenshot-archives.png" alt="Archives — print history and statistics" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="container">
+      <h2>Everything you need to run your farm</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🖨️</div>
+          <h3>Multi-printer dashboard</h3>
+          <p>See every printer at a glance — status, progress, temperatures, and active filament. Filter by state, search by name.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Print queue &amp; batches</h3>
+          <p>Queue jobs across your fleet with priority, ordering, and batch grouping. Retry, reorder, or cancel from anywhere.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📂</div>
+          <h3>File management</h3>
+          <p>Browse, upload, and organize 3MF/STL files. Folder support, search, and one-tap print from your library.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎛️</div>
+          <h3>Full printer control</h3>
+          <p>Pause, resume, stop, adjust speed, toggle the chamber light, home axes, calibrate — all the controls from the web UI.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📷</div>
+          <h3>Live camera</h3>
+          <p>View the live camera feed from any printer. Check first layers and monitor prints without leaving the couch.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧵</div>
+          <h3>Filament inventory</h3>
+          <p>Track spools, remaining filament, colors, and storage locations. NFC tag scanning for quick spool identification.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Stats &amp; archives</h3>
+          <p>Print history, success rates, usage statistics, and archived job details with full metadata.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔧</div>
+          <h3>Maintenance tracking</h3>
+          <p>Log maintenance tasks, track intervals, and get reminders so your printers stay in top shape.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Projects</h3>
+          <p>Organize related files and prints into projects. Track progress across multi-part builds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="requires">
+    <div class="container">
+      <h2>Requires a Bambuddy server</h2>
+      <p>Bambuddy Companion connects to your self-hosted <a href="https://bambuddy.cool">Bambuddy</a> instance. It's the mobile client for the Bambuddy print farm management platform — not a standalone app.</p>
+      <p><a href="https://bambuddy.cool">Learn more about Bambuddy →</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Built by <a href="https://www.dxrf.com">Jenna Massardo</a> · <a href="support.html">Support</a> · <a href="privacy.html">Privacy</a> · <a href="https://github.com/jmassardo/bambuddy-mobile">GitHub</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support — Bambuddy Companion</title>
+  <meta name="description" content="Get help with Bambuddy Companion via GitHub Issues and Discussions.">
+  <link rel="icon" type="image/png" href="images/app-icon.png">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-card-hover: #1c2129;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --border: #30363d;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+    .nav-brand span { font-size: 1.15rem; font-weight: 600; }
+    article { padding: 60px 0 80px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 40px; }
+    h2 { font-size: 1.25rem; margin: 36px 0 12px; }
+    p { margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .support-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .support-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .support-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+      text-decoration: none;
+    }
+    .support-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .support-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .support-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0; }
+
+    .faq h3 {
+      font-size: 1rem;
+      margin: 24px 0 8px;
+      color: var(--text);
+    }
+    .faq p {
+      font-size: 0.9rem;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 540px) {
+      .support-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">
+        <img src="images/app-icon.png" alt="Bambuddy Companion icon">
+        <span>Bambuddy Companion</span>
+      </a>
+    </div>
+  </nav>
+
+  <article>
+    <div class="container">
+      <h1>Support</h1>
+      <p class="subtitle">All support is provided through GitHub. Email support is not available.</p>
+
+      <div class="support-cards">
+        <a href="https://github.com/jmassardo/bambuddy-mobile/issues/new" class="support-card">
+          <div class="icon">🐛</div>
+          <h3>Report a bug</h3>
+          <p>Found something broken? Open a GitHub Issue with steps to reproduce and we'll look into it.</p>
+        </a>
+        <a href="https://github.com/jmassardo/bambuddy-mobile/discussions" class="support-card">
+          <div class="icon">💬</div>
+          <h3>Ask a question</h3>
+          <p>Need help getting set up or have a general question? Start a GitHub Discussion.</p>
+        </a>
+        <a href="https://github.com/jmassardo/bambuddy-mobile/issues/new?labels=enhancement" class="support-card">
+          <div class="icon">💡</div>
+          <h3>Request a feature</h3>
+          <p>Have an idea that would make the app better? Open an issue tagged as an enhancement.</p>
+        </a>
+        <a href="https://github.com/jmassardo/bambuddy-mobile" class="support-card">
+          <div class="icon">📖</div>
+          <h3>View the source</h3>
+          <p>Bambuddy Companion is open source. Browse the code, check the README, or submit a PR.</p>
+        </a>
+      </div>
+
+      <div class="faq">
+        <h2>Common questions</h2>
+
+        <h3>How do I connect the app to my Bambuddy server?</h3>
+        <p>Open the app and enter your Bambuddy server URL (e.g. <code>https://bambuddy.local</code>). Sign in with your Bambuddy username and password. The app connects directly to your self-hosted instance.</p>
+
+        <h3>The app can't reach my server</h3>
+        <p>Make sure your phone is on the same network as your Bambuddy server (or that your server is accessible remotely). Check that the URL is correct and the server is running.</p>
+
+        <h3>Which printers are supported?</h3>
+        <p>Any printer supported by your Bambuddy server — including Bambu Lab X1C, X1E, P1S, P1P, A1, and A1 Mini.</p>
+
+        <h3>Is there email support?</h3>
+        <p>No. All support is handled through <a href="https://github.com/jmassardo/bambuddy-mobile/issues">GitHub Issues</a> and <a href="https://github.com/jmassardo/bambuddy-mobile/discussions">Discussions</a> so conversations are public and searchable for everyone.</p>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container">
+      <p><a href="./">← Back to Bambuddy Companion</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Bambuddy Companion</title>
+  <meta name="description" content="Privacy policy for the Bambuddy Companion mobile app.">
+  <link rel="icon" type="image/png" href="images/app-icon.png">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --border: #30363d;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+    .nav-brand span { font-size: 1.15rem; font-weight: 600; }
+    article { padding: 60px 0 80px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    .updated { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 40px; }
+    h2 { font-size: 1.25rem; margin: 36px 0 12px; }
+    p, ul { margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem; }
+    ul { padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="./" class="nav-brand">
+        <img src="images/app-icon.png" alt="Bambuddy Companion icon">
+        <span>Bambuddy Companion</span>
+      </a>
+    </div>
+  </nav>
+
+  <article>
+    <div class="container">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: July 18, 2026</p>
+
+      <h2>Overview</h2>
+      <p>Bambuddy Companion is a mobile client that connects to your self-hosted Bambuddy server. Your privacy is important to us — the app is designed to keep your data under your control.</p>
+
+      <h2>Data collection</h2>
+      <p>Bambuddy Companion does <strong>not</strong> collect, transmit, or store any personal data on external servers. Specifically:</p>
+      <ul>
+        <li>No analytics or tracking SDKs are included.</li>
+        <li>No crash reporting services phone home.</li>
+        <li>No advertising frameworks are present.</li>
+        <li>No data is shared with third parties.</li>
+      </ul>
+
+      <h2>Data stored on your device</h2>
+      <p>The app stores the following locally on your device to function:</p>
+      <ul>
+        <li><strong>Server URL</strong> — the address of your Bambuddy instance.</li>
+        <li><strong>Authentication token</strong> — stored securely in the device keychain/keystore to keep you signed in.</li>
+        <li><strong>User preferences</strong> — theme, layout, and display settings.</li>
+      </ul>
+      <p>This data never leaves your device except to communicate directly with your own Bambuddy server.</p>
+
+      <h2>Network communication</h2>
+      <p>All network traffic flows exclusively between the app and the Bambuddy server you configure. The app communicates over HTTPS (or your server's configured protocol). No requests are made to any other servers.</p>
+
+      <h2>Camera &amp; NFC permissions</h2>
+      <p>The app may request access to your device camera (for QR code scanning during server setup) and NFC (for filament spool tag scanning). These features are used only for their stated purpose and no images or scan data are stored or transmitted externally.</p>
+
+      <h2>Children's privacy</h2>
+      <p>Bambuddy Companion is not directed at children under 13 and does not knowingly collect information from children.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>If this policy is updated, the revised version will be posted on this page with an updated date. Continued use of the app after changes constitutes acceptance of the revised policy.</p>
+
+      <h2>Contact</h2>
+      <p>If you have questions about this privacy policy, please open a discussion on the <a href="https://github.com/jmassardo/bambuddy-mobile/discussions">GitHub Discussions</a> page.</p>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container">
+      <p><a href="./">← Back to Bambuddy Companion</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
