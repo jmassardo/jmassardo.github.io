@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GitHub Well-Architected for Financial Services: Series Overview and Compliance Crosswalk"
-date: 2026-11-05 10:09:00 -0600
+date: 2026-11-05 10:00:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, regulatory, enterprise]
 excerpt: "An opinionated, requirement-by-requirement guide to running GitHub at a bank, insurer, or payments company, built on GitHub Well-Architected and mapped to regulations across the US, Canada, LATAM, and the EU."
