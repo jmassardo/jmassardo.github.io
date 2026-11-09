@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 1: Platform Foundat
 date: 2026-11-05 10:01:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, data-residency, enterprise-managed-users, audit-log]
-excerpt: "Before you tune a single Copilot policy, decide where your code lives, who can make it public, and how you will prove it to an examiner: here is the opinionated foundation for running GitHub at a regulated financial institution."
+excerpt: "Run GitHub as a financial institution's engineering platform: clear service ownership, deliberate data boundaries, measurable operations, and rehearsed recovery backed by defensible evidence."
 permalink: /blog/github-waf-financial-services/platform-foundation/
 ---
 
@@ -26,14 +26,106 @@ permalink: /blog/github-waf-financial-services/platform-foundation/
 
 ## Leadership brief
 
-- **The risk:** Public repositories, personal forks, and gists can expose customer data, internal hostnames, or credentials beyond downstream controls.
-- **Our position:** Run **GHEC with data residency (GHE.com), including EMU**, by default. Approve alternatives through the [deployment decision](#choosing-your-deployment-model). Reserve **GHES** for requirements cloud cannot meet; isolate personal-account open source work.
-- **The guardrails:** No public repositories or default private/internal forks. Gate outsiders and deletions; governance owns targeting properties and complete classification.
-- **The evidence:** Independent archives, daily boundary checks, code **and metadata** recovery, and scoped vendor assessment.
+- **The outcome:** Payments, banking applications, infrastructure, and shared libraries run on a supported engineering platform, not a collection of unrelated repository settings.
+- **Our position:** Give the platform a product owner, an operational owner, and a funded roadmap. Run **GHEC with data residency (GHE.com), including EMU**, by default; approve alternatives through the [deployment decision](#choosing-your-deployment-model).
+- **The guardrails:** No public repositories or default private/internal forks. Gate outsiders and deletions; governance owns targeting properties and complete classification. Keep open-source publication in an isolated, approved environment.
+- **The service commitment:** Define objectives for provisioning, platform-dependent release operations, evidence delivery, and recovery. Independently archive records, rehearse code **and metadata** recovery, and assess provider dependencies.
 
-A six-month Copilot governance project cannot save Friday's "quick test" repo full of public production connection strings. **Secure the platform before the tooling on top.**
+A payments team needs a repository before its next delivery cycle. Retail banking needs a shared library, and release operations needs a recovery path if the code host is unavailable. Each request lands with a different administrator.
 
-This part covers deployment, enterprise topology, data boundaries, classification, evidence, recovery, and provider risk.
+If the answer depends on who happens to be online, you do not have a platform service yet. You have helpful people and an increasingly exciting dependency.
+
+**Applying the GitHub Well-Architected Framework (WAF) in a financial institution means making safe delivery the normal, usable path.** Ownership, architecture, security, collaboration, and productivity must work together. Compliance evidence should describe that operation, not substitute for it.
+
+This part establishes the service model, deployment, topology, data boundaries, classification, evidence, recovery, and provider oversight. Parts 2 and 3 build access and collaborative change practices on that foundation.
+
+## Apply all five WAF pillars to the platform
+
+The five pillars are **Governance, Architecture, Application Security, Collaboration, and Productivity**. Use them as connected design questions, not five separate approval queues.
+
+| Pillar | Financial-institution application | Engineering outcome and verification |
+|---|---|---|
+| **Governance** | Assign service ownership, risk tiers, decision rights, and expiring exceptions. | Teams know who can decide. Reconcile ownership and measure unresolved decisions and exceptions. |
+| **Architecture** | Choose hosting, organization boundaries, integration paths, and recovery dependencies deliberately. | Release operations survives a rehearsed disruption. Compare measured recovery with approved RTO/RPO. |
+| **Application Security** | Apply classification, exposure controls, network restrictions, and audit collection by default. | New repositories enter with working protection. Negative-test provisioning and data-boundary controls. |
+| **Collaboration** | Publish the service catalog, support routes, design decisions, and shared contribution model. | Business lines can reuse approved capabilities without bypassing information barriers. Test a cross-team onboarding journey. |
+| **Productivity** | Offer repeatable provisioning, clear documentation, and actionable operational feedback. | Engineers spend less time waiting or repairing configuration. Track request-to-ready time and recurring support work. |
+
+These are engineering outcomes **and** inputs to assurance. A quarterly sign-off cannot rescue a platform that prevents teams from shipping routine changes.
+
+## Run the platform as a product
+
+### What: an owned platform service
+
+**Treat GitHub as an internal product with named customers and an operating contract.** The platform team serves application engineers, infrastructure maintainers, security reviewers, release operations, and evidence consumers.
+
+The product owner prioritizes investment and adoption. The operational owner runs the service and incidents. Repository owners remain accountable for their code and business services; the platform team does not inherit every application's production risk.
+
+### Why: maintenance needs a mandate
+
+Ownership turns enterprise policy into a maintained service. It also exposes a common gap: everyone funds new features, but nobody funds access support, recovery tests, or integration maintenance.
+
+Use the [WAF governance design principles](https://learn.github.com/well-architected/library/governance/design-principles/) to make decision rights explicit. The institution remains accountable when GitHub or another provider operates part of the service.
+
+### How: publish the service contract
+
+Publish a short service catalog and review it with representatives from payments, banking applications, infrastructure, and shared-library teams:
+
+| Service | Accountable owner | Supported path and completion condition |
+|---|---|---|
+| Repository onboarding | Platform product owner | Request, approved classification, team access, baseline controls, and a tested starter workflow |
+| Identity and access | IAM service owner | Approved entitlement, working access, prompt removal, and failure escalation |
+| Policy and security integration | Platform control owner with AppSec | Versioned baseline, tested updates, exception route, and usable failure messages |
+| Release integration | Release operations owner | Supported build/deploy interfaces, incident contacts, and an independent recovery route |
+| Evidence and recovery | Named archive and recovery owners | Complete collection, retrieval, restoration, and tested dependency recovery |
+
+One person may hold multiple roles in a small team, but required independent approval and review still need separate authorized people.
+
+**Risk-tier the service, not just its paperwork.** A critical payments repository needs release-window support and more frequent recovery rehearsal. A non-production training repository needs a reliable onboarding path, but not the same operational coverage.
+
+Use the approved business-criticality and regulatory scope to assign support, test cadence, escalation, and residual-risk authority. Missing classification receives the restrictive baseline until reviewed.
+
+Maintain a backlog that combines engineering feedback, operational defects, assurance findings, and provider changes. Publish supported patterns and retirement dates. Do not make each business line rediscover the same integration failure.
+
+### Verify: test the customer journey
+
+Monthly, review service demand, request-to-ready time, support backlog age, incidents, failed provisioning, and overdue control work. Break results down by service tier and business line.
+
+Ask a team unfamiliar with the platform to onboard a small banking application using only the published path. Record manual interventions and fix their causes. Successful documentation works when its author is on vacation.
+
+## Operational service objectives
+
+### What: measure the delivery experience
+
+**Set measurable service objectives for the institution-owned platform experience.** Separate GitHub's contractual commitments from the integration, support, and recovery outcomes your team can actually operate.
+
+### Why: reachability is not usability
+
+A reachable GitHub homepage does not mean engineers can sign in, run required checks, publish packages, or complete an authorized release. Availability must follow the delivery journey.
+
+### How: define indicators and responses
+
+Define each indicator's population, measurement point, target, time window, owner, and alert threshold. Set actual targets through business-impact analysis and baseline measurements, not borrowed availability percentages.
+
+| Journey | Useful indicator | Response when the objective is missed |
+|---|---|---|
+| Approved repository request to first successful test | Elapsed request-to-ready time; failed provisioning rate | Repair the template or integration; route blocked teams to the platform owner |
+| Engineer authentication and repository access | Synthetic access success plus real sign-in failures | Joint IAM/platform triage, with the credential path identified |
+| Protected change to release eligibility | Required-check availability, queue wait, integration failures | Separate service failures from genuine code failures; do not disable controls to clear a queue |
+| Audit event to durable receipt | Ingestion lag, missing intervals, reconciliation errors | Archive incident and supported backfill before source retention expires |
+| Recovery authorization to usable release path | Measured restoration time and recovered-data age | Remediate against approved RTO/RPO and repeat the failed scenario |
+
+Use synthetic checks that read approved test resources and avoid customer data. Document their limits; one successful probe does not establish access to every repository.
+
+For example, payments release operations may require coverage during settlement windows. Measure the complete path through identity, Git access, trusted checks, artifact retrieval, and deployment authorization.
+
+Agree an **error-budget response**: when repeated service failures consume the allowed tolerance, prioritize reliability fixes over optional platform changes. Mandatory security remediation still proceeds through controlled change.
+
+### Verify: exercise the operational response
+
+Review the scorecard with service consumers monthly and after material incidents. Assign actions to named owners, preserve measurement gaps as unknowns, and demonstrate alert routing with an injected integration failure.
+
+Keep the regulatory evidence below, but use these measures to answer an additional question: **can teams deliver safely without heroic intervention?**
 
 ## The requirements
 
@@ -71,7 +163,7 @@ These requirements shape the foundation; compliance determines applicability and
 
 ## Deployment model differences
 
-Platform differences follow; identity, Actions, and Copilot differences are in their own parts.
+Platform differences follow; detailed identity, pipeline, and optional AI-service behavior belong in their respective parts.
 
 | Topic | GHEC (personal accounts) | GHEC with EMU | GHEC with data residency (GHE.com) | GHES |
 |---|---|---|---|---|
@@ -165,7 +257,9 @@ Separate organizations for classification/regulatory boundaries, not org charts.
 
 ### Verify
 
-Export the list of organizations and owners quarterly. Any org without a documented purpose is a finding waiting to happen.
+Export the list of organizations and owners quarterly. Reconcile each purpose with classification boundaries, support ownership, and actual repository use.
+
+Test a legitimate cross-business-line contribution, such as a banking team proposing a payments-library fix. It should reach the right maintainers without creating another organization or expanding access to restricted code.
 
 ## Enterprise policies: closing the data boundary
 
@@ -288,7 +382,9 @@ Run collection outside developer control with tested access to every private rep
 
 The scheduler must open a routed incident on violations, API/permission errors, missed runs, and unacknowledged findings. Retain start/end times, inventory IDs/counts, policy capture, site results, exit status, and incident closure in the [controlled evidence archive](#evidence-retention-and-integrity). Test this alert path with a seeded violation in an isolated test environment.
 
-**Agent outputs inherit the highest source classification.** Confidential, Restricted, and unclassified repositories remain out of agent scope until session access, context isolation, and retention are verified. [Part 7](/blog/github-waf-financial-services/copilot-and-agents/#ai-data-session-access-and-privacy) owns those session/privacy controls; repository privacy alone is not sufficient.
+**Derived data keeps its source obligations.** Review logs, exported documentation, build artifacts, support attachments, and shared examples can cross the same boundary as source code. Classify them for the information they contain, and approve their destinations.
+
+For AI services specifically, **agent outputs inherit the highest source classification**. Confidential, Restricted, and unclassified repositories remain out of agent scope until session access, context isolation, and retention are verified. [Part 7](/blog/github-waf-financial-services/copilot-and-agents/#ai-data-session-access-and-privacy) owns those distinct controls; repository privacy alone is not sufficient.
 
 Alert on these [audit events](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise):
 
@@ -320,6 +416,8 @@ Investigate repeated visibility changes, not just individual events.
 | `app-id` | string | CMDB/ITSM application ID | Governance team |
 
 Yes, "Public" is in the list even with no public repos. It describes the **data** (say, docs headed for publication), not the repository.
+
+Make the same inventory useful to engineers: `owner-team` routes support, `app-id` connects repositories to banking services, and criticality guides release and recovery planning. Classification should help people find the right owner, not merely supply another field to fill in.
 
 ### Why
 
@@ -461,6 +559,8 @@ Classify destinations for the data received and restrict collection to approved 
 
 **EU-DORA-12**, **US-FFIEC-BCM**, **CA-OSFI-E21**, and **US-NYDFS-500.16** require institution-owned recovery. The WAF [mirror pattern](https://learn.github.com/well-architected/library/architecture/recommendations/building-resilience-with-repository-mirroring/) is a rehearsed break-glass path to a separate GHES/Git service, not active-active operation.
 
+The engineering goal is a **usable, authorized delivery path**. Recovering a Git repository without its packages, identity mappings, or release instructions can leave the payments team just as blocked as before.
+
 ### How
 
 **Mirroring (any model):**
@@ -487,6 +587,18 @@ Include required refs, LFS, release assets, packages, and deployment dependencie
 
 **GHES:** configure [Backup Service](https://docs.github.com/en/enterprise-server@3.22/admin/backing-up-and-restoring-your-instance/about-the-backup-service-for-github-enterprise-server) in the Management Console, plus validated off-site/[remote archives](https://docs.github.com/en/enterprise-server@3.22/admin/backing-up-and-restoring-your-instance/configuring-remote-archives-for-backups). Its dedicated snapshot volume is not off-site. [backup-utils](https://github.com/github/backup-utils/blob/master/README.md) recommends the built-in service for new deployments. [HA](https://docs.github.com/en/enterprise-server@3.22/admin/monitoring-and-managing-your-instance/configuring-high-availability/about-high-availability-configuration) does not replace backups: corruption can replicate.
 
+**Rehearse the business journey, not just the restore command.** The recovery owner maintains a scenario, expected result, authorized operators, dependency list, and abort criteria for each critical service.
+
+For a payments release drill:
+
+1. Declare the primary code-host path unavailable in an isolated exercise. Start the RTO clock at the approved incident/recovery trigger.
+2. Select the last approved release SHA and measure its recovered-data age against RPO. Confirm artifacts, packages, configuration, and readable change evidence are available.
+3. Use replacement identity and vault access from the recovery environment. Verify the alternative does not require the failed service to authenticate or retrieve its runbook.
+4. Reapply access and change protections, then run tests and an independently authorized deployment to a non-production target. Demonstrate rejection of an unapproved revision too.
+5. Reconcile changes made during recovery, define return-to-primary authority, and validate the handback procedure. Record elapsed time, manual steps, missing dependencies, and remediation owners.
+
+Maintain scenarios for accidental repository deletion, lost metadata, unavailable IdP, failed artifact retrieval, and archive corruption. Rotate scenarios by risk tier; a tabletop helps coordination but does not replace a technical restore.
+
 ### Verify
 
 - Alert on mirror **freshness**: compare source and mirror object IDs per ref.
@@ -495,6 +607,7 @@ Include required refs, LFS, release assets, packages, and deployment dependencie
 - **GHEC:** download the **GitHub.com Services Continuity and Incident Management Plan** from the Compliance tab and attach it to your BCM vendor dependency record.
 - Restore a selected change's **code and evidence** into an isolated environment. Verify manifest counts, hashes, chronology, approvals, ruleset configuration, and access restrictions; record any native-restoration limitations.
 - Exercise the [provider exit plan](#provider-exit-and-concentration-risk); a mirror alone is not an exit strategy.
+- Have release operations and a consuming application team witness the drill. Close recovery gaps with a retest, not only an updated document.
 
 ## Vendor assurance and third-party risk
 
@@ -518,7 +631,11 @@ Review opinions, exceptions, remediation, complementary user entity controls (**
 
 ### Provider exit and concentration risk
 
-Inventory GitHub, Actions infrastructure, and the enabled Copilot/model-provider chain. Record legal provider, service, business function, criticality, regions, subcontractors, assurance scope, contract owner, and renewal/termination terms. For DORA-covered entities, maintain the [Article 28(3) register of ICT contractual arrangements](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2554#art_28); distinguish dependencies from direct contracts and assess critical/important functions.
+Inventory GitHub and the delivery dependencies around it: IdP, DNS/network paths, runners, package registries, secrets/signing services, ITSM, and evidence destinations. Add enabled AI/model providers where applicable.
+
+Record legal provider, service, business function, criticality, regions, subcontractors, assurance scope, contract owner, and renewal/termination terms. For DORA-covered entities, maintain the [Article 28(3) register of ICT contractual arrangements](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2554#art_28); distinguish dependencies from direct contracts and assess critical/important functions.
+
+**Connect the register to operations.** For each critical delivery journey, record which dependency can stop it, the escalation route, the tested fallback, and who can invoke it. A provider-status notification needs an institution owner who can determine whether settlement-window releases are affected.
 
 The platform, BCM, and third-party risk owners approve and exercise an exit plan:
 
@@ -526,7 +643,7 @@ The platform, BCM, and third-party risk owners approve and exercise an exit plan
 2. **Scope:** recover Git history/refs, LFS/packages/releases, issues, PR/review/check evidence, policies/rulesets, identity mappings, pipeline definitions, and deployments. Record export and native-restoration gaps.
 3. **Replacement:** identify another code host and build/deploy path, replacement identity/secrets, artifact verification, independent approval, and archived evidence access.
 4. **Execution:** document cost, capacity, RTO/RPO, transition assistance, data return/deletion, and rehearse recovery plus an independently approved deployment without the original service.
-5. **Concentration:** test whether the alternative still depends on the same cloud, identity, runner infrastructure, or model provider. Retain results, gaps, owners, and remediation dates.
+5. **Concentration:** test whether the alternative still depends on the same cloud, identity, runner infrastructure, artifact store, or enabled model provider. Retain results, gaps, owners, and remediation dates.
 
 [Part 6](/blog/github-waf-financial-services/actions-hardening/) implements pipeline recovery; [Part 7](/blog/github-waf-financial-services/copilot-and-agents/) adds model-provider requirements. A mirror of `main` and a downloaded SOC report are not this plan.
 
@@ -534,7 +651,7 @@ The platform, BCM, and third-party risk owners approve and exercise an exit plan
 
 Refresh annually and on material changes. Escalate period gaps; assess bridge letters/current evidence without treating them as extensions of an auditor's opinion. Track findings to closure with second-line sign-off.
 
-Review the register, contracts, concentration assessment, and exit rehearsal alongside assurance findings, including hosted-runner and model-provider dependencies.
+Review the register, contracts, concentration assessment, and exit rehearsal alongside assurance findings. Include hosted runners, identity, artifacts, and any enabled model-provider dependencies. Feed material changes into the service backlog, threat model, and recovery scenarios.
 
 ## Control matrix
 
@@ -558,12 +675,16 @@ Review the register, contracts, concentration assessment, and exit rehearsal alo
 
 ## Summary and key takeaways
 
-The foundation is boring on purpose. Everything else depends on it.
+**A well-architected platform makes routine engineering predictable and disruption survivable.** Its value shows up when a team onboards without a ticket maze, shares code within approved boundaries, or recovers an authorized release without improvising.
+
+Data boundaries and evidence remain essential. Pair them with ownership, service objectives, and customer feedback so they support delivery rather than becoming a parallel reporting exercise.
 
 **Your checklist:**
 
+- [ ] Name product, operational, IAM, evidence, and recovery owners; publish supported services and risk-tiered escalation.
+- [ ] Baseline request-to-ready time, delivery-path availability, evidence lag, and recovery performance. Agree targets and reliability actions with consumers.
 - [ ] Choose **GHEC with data residency, including EMU**; document and approve any alternative.
-- [ ] Read the [out-of-region data list](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/about-storage-of-your-data-with-data-residency) with privacy before choosing GHE.com, and enable the Copilot residency policy if you do.
+- [ ] Read the [out-of-region data list](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/about-storage-of-your-data-with-data-residency) with privacy before choosing GHE.com; separately review Copilot residency policy if enabling that service.
 - [ ] Stand up one enterprise with **green, red, and sandbox** organizations. Push back on more.
 - [ ] Enforce no public repos and disable private/internal forks by default. Remediate previously public Pages and existing lower-control forks.
 - [ ] Keep GA controls beneath **preview** policies, or document a named, expiring risk acceptance and fallback.
@@ -572,8 +693,9 @@ The foundation is boring on purpose. Everything else depends on it.
 - [ ] **Stream audit logs** with Git events, API request events, and source IPs, and alert on the boundary events.
 - [ ] Recover **code and metadata**, archive checks at merge, and test immutable evidence retrieval and completeness.
 - [ ] Assess report scope, subservice exclusions, bridge evidence, CUECs, and the shared provider exit plan.
+- [ ] Rehearse a payments release recovery across identity, source, artifacts, authorization, and evidence; retest identified gaps.
 
-**Start here:** run the inventory diagnostic, then complete policy, permissions, fork, and Pages verification. Any violation or unknown result needs a routed owner and closure evidence.
+**Start here:** choose one critical delivery journey and name its service owner. Run the inventory diagnostic, complete boundary verification, and test that journey through onboarding and recovery. Route every violation or unknown result to an accountable owner.
 
 **Previous:** [Series Overview and Compliance Crosswalk](/blog/github-waf-financial-services/)
 **Next:** [Part 2: Identity and Access Management](/blog/github-waf-financial-services/identity-and-access/).

@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 7: Copilot and AI A
 date: 2026-11-05 10:07:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, copilot, ai, agents, model-risk]
-excerpt: "How to govern GitHub Copilot and its agents at a financial institution: lock policy at the enterprise, allow models by exception, treat every agent as an untrusted contributor, and keep the evidence your examiners will ask for."
+excerpt: "Apply the financial institution's GitHub operating model to optional Copilot adoption: choose useful workflows, evaluate outcomes, govern providers and data, and retain independent review of agent changes."
 permalink: /blog/github-waf-financial-services/copilot-and-agents/
 ---
 
@@ -24,18 +24,39 @@ permalink: /blog/github-waf-financial-services/copilot-and-agents/
 
 ## Leadership brief
 
-- **The risk:** Agents write, push, and review at machine speed. A poisoned instruction or permissive policy can affect hundreds of repositories; AI vendors can become unmanaged third parties.
-- **Our position:** Copilot extends Parts 1-6, never replaces them. Enterprise policy governs model/preview exceptions; agents are untrusted contributors subject to human-code gates.
+- **The capability:** Copilot can support selected engineering workflows; adoption should solve an identified problem rather than define the institution's platform strategy.
+- **The risk:** Agents write, push, and review at machine speed. A poisoned instruction or permissive policy can affect many repositories; AI vendors can become unmanaged third parties.
+- **Our position:** Apply the existing access, change, security, and delivery model, then add controls for models, context, and agent execution. Adoption is optional; independent review is not.
 - **The regulatory frame:** Use third-party/ICT risk and SDLC controls. US SR 26-2 excludes generative AI; OSFI E-23 and the EU AI Act still require applicable governance.
 - **The evidence:** IdP-linked seats, available policy/agent audit events, approved session evidence, budget reports, and training records. Record export gaps; session streaming is a preview, not a complete archive.
 
 ---
 
-Monday's SIEM dashboard shows 37 weekend PRs from `Copilot`. One edits a workflow; another adds an MCP server. The CISO asks: "Who approved that?"
+A banking applications team wants help writing tests and updating repetitive code. Another team proposes delegating dependency changes to a cloud agent. Those are different workflows with different context, permissions, and review costs. Buying seats does not settle either design.
 
-With Parts 1-6 in place, the answer is boring: independent human review, CODEOWNERS routing, approved workflow execution, scanning, and audit attribution to the session requester.
+This installment applies the platform operating model to that capability choice. Parts 1-6 already cover how the institution manages GitHub regardless of who writes the code. Here we address the additional questions: which providers receive context, which execution routes are acceptable, how agent changes are attributed, and whether the chosen use case actually helps.
 
-**Platform guardrails come first.** Copilot policy cannot fix public customer data or unrestricted default-branch pushes. Establish those foundations before governing the AI layer.
+**This is an optional extension, not the destination of the series.** Institutions not using Copilot can use the rest of the series without implementing this chapter. Institutions using it retain the same independent review, scanning, release approval, and evidence standards as other changes.
+
+## Choose the use case and evaluate the outcome
+
+Apply the five-pillar approach to a bounded pilot, not a blanket claim that AI makes engineering faster:
+
+| Pillar | Application to this capability |
+|---|---|
+| **Governance** | Name the service and business owners; approve use cases, providers, data terms, budgets, and exceptions |
+| **Architecture** | Select supported clients and execution routes; test network/data boundaries and continued delivery without the capability |
+| **Application Security** | Inspect generated changes and dependencies using the same secure-development and remediation process |
+| **Collaboration** | Make the requester and reviewer accountable, maintain shared instructions, and provide training and a feedback route |
+| **Productivity** | Compare task completion, review effort, rework, quality, and cost against the existing workflow |
+
+**What we do:** Start with a defined task class in an approved, lower-risk repository, such as tests using synthetic data. Name an owner, completion criteria, permitted context, reviewers, budget, and a stop/expand decision date.
+
+**Why:** Suggestions accepted, seats assigned, and PRs opened measure activity. They do not prove a payments team ships more reliable changes or spends less total effort.
+
+**How:** Capture the current workflow first. Pilot IDE assistance separately from autonomous changes; approval for one route does not approve the other. Include setup, review, correction, and support effort in the comparison. Keep a documented non-AI delivery path and an accessible way to report unsuitable output.
+
+**Verify:** Review sampled changes and team feedback alongside completion time, review delay, failed checks, escaped defects, and cost. Compare similar work and record uncertainty rather than attributing every movement to Copilot. Expand only when both the engineering case and the route-specific control tests support it. Use [WAF's impact-measurement scenario](https://learn.github.com/well-architected/library/scenarios/measuring-genai-impact/) as a starting point, not a promise of benefit.
 
 **Check current behavior before rollout.** The **Copilot in the cloud** policy covers both Actions and GitHub-hosted sandbox sessions ([Copilot on GitHub.com](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github)). Their enforcement differs. Source dates appear in the references; re-verify features and previews before implementing.
 
@@ -437,10 +458,12 @@ Apply the [AI data/session privacy policy](#ai-data-session-access-and-privacy) 
 
 ## Summary and key takeaways
 
-Copilot governance is **platform governance with new nouns**: agents are contributors, instructions are code, models are vendors, MCP servers are integrations. Extend Parts 1-6 rather than bypassing them.
+Copilot is one capability within a well-architected GitHub platform. Apply existing contributor, configuration, integration, and vendor disciplines, then address its distinct context, model, and execution risks. Do not waive the common baseline or mistake adoption for platform maturity.
 
 Your checklist:
 
+- [ ] Define a useful task class, baseline, accountable owner, and pilot exit criteria
+- [ ] Evaluate review effort, quality, rework, and cost as well as adoption; retain a usable non-AI path
 - [ ] Confirm Parts 1-6 controls apply to agent PRs with no exemptions
 - [ ] Complete AUP/training, provider approval, licensing, and budgets before IdP-driven seat assignment
 - [ ] Lock compliance-relevant policies at the enterprise; disable both default availability policies

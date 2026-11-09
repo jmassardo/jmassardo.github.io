@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 3: Source Code Mana
 date: 2026-11-05 10:03:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, change-management, rulesets, sox]
-excerpt: "Turn SOX, DORA, OSFI, and PCI change-management expectations into enforced GitHub rulesets, real separation of duties, and evidence your auditors can pull without a screenshot marathon."
+excerpt: "Make financial-services repositories easy to find, maintain, and contribute to, with clear ownership, effective reviews, risk-tiered change controls, and evidence that follows the release."
 permalink: /blog/github-waf-financial-services/change-control/
 ---
 
@@ -24,14 +24,138 @@ permalink: /blog/github-waf-financial-services/change-control/
 
 ## Leadership brief
 
-> - **The risk:** An unreviewed or self-approved financial-system change creates SOX ITGC, DORA change-management, and OSFI segregation-of-duties gaps.
-> - **Our position:** Independent code review and independent change authorization are separate gates. Centrally pinned **required workflows** check pre-merge eligibility; the independently controlled deployment gate revalidates authoritative ITSM state and the implementation window before production execution.
-> - **Exceptions are designed, not improvised:** branch bypass is PR-only, with independently approved JIT membership and automatic expiry. Push rulesets need a separately controlled exception because they do not support PR-only bypass.
-> - **The evidence:** archive reviews, check results, workflow identity, ITSM decisions, and ruleset configuration **at merge**, then reconcile every protected branch update and production deployment. GitHub retention is not an audit archive.
+> - **The outcome:** Engineers can find the right repository, understand its contract, reach accountable maintainers, and contribute a safe change across business lines.
+> - **Our position:** Repository ownership, documentation, and useful review are part of change management. Independent source review and independent change authorization remain separate responsibilities.
+> - **The enforcement:** Centrally pinned **required workflows** check pre-merge eligibility; an independent deployment gate revalidates authoritative ITSM state and the implementation window. Branch bypass is PR-only; push-rule exceptions require separate control.
+> - **The feedback:** Measure review delays, rework, failed checks, bypasses, and escaped defects. Archive merge-time evidence and reconcile protected-branch updates and deployments so both engineers and auditors can reconstruct what happened.
 
-The auditor asks for every Q3 general-ledger change and proof of independent approval before deployment. An engineer starts collecting screenshots. Another discovers branch protection was disabled "for an hour."
+The retail banking team finds a rounding bug in a library shared with payments. Nobody knows which repository is authoritative. The README points to a retired team, and the only available reviewer has never touched the posting logic.
 
-GitHub supplies enforcement primitives, not an authorization or evidence program. Let's connect them without mistaking a green badge for a control.
+Adding another approval requirement will not fix that. **A well-architected source platform makes code discoverable, responsibility explicit, and review worth the wait.** Controls then preserve those decisions through merge and release.
+
+This chapter starts with repository stewardship and collaboration, then implements the rulesets, authorization, release integrity, emergency paths, and evidence needed in a financial institution. A green badge is useful; knowing what it actually establishes is better.
+
+## WAF outcomes for source and change
+
+| Pillar | Apply it here | Verify the engineering outcome |
+|---|---|---|
+| **Governance** | Name maintainers, change authorities, control owners, and risk-tiered contribution rules. | No active repository lacks an accountable team; exceptions have independent authority and expiry. |
+| **Architecture** | Document component boundaries, consumers, compatibility, and release dependencies. | A library or infrastructure change has a known impact and a tested rollback/recovery path. |
+| **Application Security** | Protect source, control files, review independence, and release provenance. | Negative tests reject unauthorized revisions and checks cannot be spoofed by local workflows. |
+| **Collaboration** | Support discoverability, contribution guidance, maintainer response, and controlled inner source. | Banking and payments teams can improve shared code without expanding access to restricted systems. |
+| **Productivity** | Keep changes reviewable, checks actionable, and queues observable. | Review wait and rework decrease without higher defect escape or weakened accountability. |
+
+Use the [WAF DevOps feedback principles](https://learn.github.com/well-architected/library/collaboration/recommendations/applying-devops-methodology/) to improve the whole journey. Counting approvals alone tells you very little about whether anyone understood the change.
+
+## Repository ownership, discoverability, and documentation
+
+### What: every repository has a maintained contract
+
+**Assign an accountable owning team and an operational maintainer route to every active repository.** Ownership includes code quality, support, dependency updates, documentation, contribution triage, and retirement.
+
+The governance-approved `owner-team` and `app-id` from [Part 1](/blog/github-waf-financial-services/platform-foundation/#data-classification-with-custom-properties) remain the authoritative inventory links. `CODEOWNERS` routes path-level review; it does not replace business ownership or change authority.
+
+### Why: discovery and maintenance are delivery capabilities
+
+When teams cannot find a supported library, they build another one. When they cannot reach its maintainers, they copy it. Both choices multiply patching, compatibility, and evidence work.
+
+Clear ownership also makes incidents less theatrical. Release operations should not need Git archaeology to find someone authorized to explain a banking application's rollback.
+
+### How: publish the information a contributor needs
+
+Use a descriptive repository name, a concise About description, and a consistent README. Link the repository to its service catalog entry and record the actual support route.
+
+| Repository information | Minimum useful content |
+|---|---|
+| Purpose and status | What it does, supported consumers, active/maintenance/deprecated status, and replacement if retiring |
+| Ownership | Owning team, maintainer contact, support hours, and incident escalation |
+| Setup and tests | Prerequisites, approved dependency sources, safe test-data guidance, and verified build/test commands |
+| Architecture | Boundaries, important dependencies, design decisions, and links to interface contracts |
+| Contribution | Issue/PR route, expected tests and documentation, reviewer routing, and response expectations |
+| Release and recovery | Version/compatibility policy, release authority, deployment runbook, rollback constraints, and recovery references |
+| Information handling | Classification reference and where sensitive operational details belong |
+
+GitHub [surfaces a repository README](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) and [contribution guidelines](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors). Put `CONTRIBUTING.md` where GitHub recognizes it, and keep operational commands specific to the actual project.
+
+For example, the README of a shared payment-amount library can start with this **documentation outline**, not fabricated build commands:
+
+```markdown
+# Payment amount library
+
+## Purpose and supported consumers
+Shared amount validation for approved banking and payments applications.
+
+## Owners and support
+Owning team: payments-libraries.
+Use the linked internal service catalog for support and incident escalation.
+
+## Build and test
+Document prerequisites, exact tested commands, and synthetic test fixtures here.
+
+## Compatibility and release
+Link the version policy, supported versions, release process, and migration notes.
+
+## Contributing
+See CONTRIBUTING.md for proposal, testing, review, and authorization requirements.
+```
+
+Replace outline instructions before admitting the repository as supported. A template with six TODOs is a starting point, not completed onboarding.
+
+Use an approved, non-sensitive vocabulary for discovery, such as `shared-library`, `banking`, or `terraform-module`. **[Topic names are always public](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics), even when created in a private repository.** Never use client names, confidential projects, or information-barrier labels as topics.
+
+Topics and names help discovery; governance-owned properties control scope. Do not treat a searchable tag as an access boundary or an authoritative compliance inventory.
+
+At ownership transfer, reconcile team grants, code owners, service-catalog records, support coverage, and open work. When retiring a repository, document consumers and replacement, apply retention requirements, revoke unused integrations, and archive through the approved lifecycle.
+
+### Verify: prove someone else can use it
+
+At onboarding and material ownership changes, ask an engineer outside the owning team to find the repository, identify maintainers, run safe tests, and propose a small documentation change.
+
+Review active-repository ownership coverage and stale/deprecated entries monthly. Critical banking services need current runbooks and backup maintainer coverage, not just a team slug that resolves.
+
+## Controlled inner source across financial business lines
+
+### What: share contributions without sharing everything
+
+**Let approved teams improve shared code through a documented maintainer model.** Start with a library or infrastructure module used by more than one business line.
+
+Inner source does not require making every repository internal. Internal visibility grants broad enterprise read; private repositories with scoped teams can support collaboration where need-to-know requires it.
+
+### Why: reuse needs a contribution path
+
+A retail banking team should be able to fix a shared validation bug without forking an unsupported copy. Payments maintainers still own compatibility, review quality, and release decisions.
+
+The goal is lower duplication and faster shared fixes, not bypassing information barriers. MNPI, customer-specific data, credentials, and regulated workloads retain their handling requirements.
+
+### How: establish the contribution agreement
+
+1. **Approve the sharing boundary.** The business owner and governance classify the repository, audience, consumer relationships, and contribution rights. Use [Part 2's team-based access](/blog/github-waf-financial-services/identity-and-access/#least-privilege-base-permissions-and-roles), not ad hoc direct grants.
+2. **Publish the entry point.** Maintainers explain when an issue or design proposal should precede a PR, how to request access, and which changes need consumer consultation.
+3. **Make safe testing possible.** Supply synthetic fixtures and interface/contract tests. Do not require contributors to access production customer data or every consuming application.
+4. **Preserve maintainer accountability.** External-to-team contributors propose changes; eligible owners review and release them. Broad contribution rights do not imply release authority, bypass, or control-file ownership.
+5. **Coordinate adoption.** Record affected consumers, compatibility decisions, release notes, and migration responsibilities. Banking and payments owners agree how breaking changes will be introduced.
+6. **Fund maintenance.** Agree a response target and a backup reviewer route. If contribution demand exceeds capacity, prioritize it openly rather than leaving PRs to age indefinitely.
+
+For the rounding fix, the banking contributor supplies a failing synthetic test and proposed correction. Payments maintainers review currency and posting semantics; both consumer teams run relevant contract tests. Release operations publishes the approved version, and consuming applications follow their own change paths.
+
+Controlled branches in the shared repository replace the need for casual forks under this series' default fork restrictions. Any permitted fork still needs Part 1's explicit boundary review.
+
+**Risk-tier the contribution path without weakening mandatory controls:**
+
+| Change context | Collaboration and review focus | Accountable decision |
+|---|---|---|
+| Non-executable documentation | Accuracy, discoverability, sensitive information, and whether content changes operational instructions | Maintainer confirms scope; apply the approved change policy rather than assuming all Markdown is low risk |
+| Shared banking/payments library | Compatibility, dependency consumers, domain tests, and coordinated adoption | Library owner and affected service owners decide compatibility and rollout within their authority |
+| Infrastructure repository | Plan/impact review, environment boundaries, recovery, and blast radius | Infrastructure owner plus independent authorized reviewers/change authority |
+| Critical payments or regulated banking change | Business behavior, security, final-revision review, authorization, release window, and fallback | Domain owners, independent change authority, and release operations fulfill separate duties |
+
+These are institutional operating patterns, not regulatory exemptions. The restrictive all-repository baseline below remains active. Governance must approve and test any scoped relaxation; a repository maintainer cannot declare their own work out of scope.
+
+### Verify: measure collaboration that produces maintained code
+
+Track time to maintainer response, contribution completion, abandoned PRs, adoption across consumers, and recurring requests for duplicate libraries. Review the reasons, not a contributor leaderboard.
+
+Sample a cross-business-line contribution quarterly. Demonstrate scoped access, useful review, consumer testing, documented adoption, and retained authorization where required. Failure to route a legitimate contribution is a platform defect worth fixing.
 
 ## The requirements
 
@@ -53,7 +177,7 @@ Regulations set a floor your policies must meet. The second line validates appli
 | INT-PCI-10.5.1 | [PCI DSS v4.0.1, Req. 10.5.1](https://www.pcisecuritystandards.org/document_library/) | Applicable audit log history: at least 12 months, with the most recent three months immediately available for analysis. |
 | INT-NIST-SSDF | [NIST SP 800-218 (SSDF) v1.1](https://csrc.nist.gov/pubs/sp/800/218/final) | Reference framework. PS.1 (protect code from tampering) and PS.3 (protect releases) map directly here. |
 
-The common thread: **independent approval**, **controlled implementation**, and **reconstructable evidence**.
+The common thread: **independent approval**, **controlled implementation**, and **reconstructable evidence**. Ownership, documentation, and collaboration make those duties executable by real engineering teams.
 
 ## Deployment model differences
 
@@ -70,7 +194,7 @@ Change-control features are mostly consistent across GitHub deployment models. H
 
 ## Prerequisites: independent review and trusted control owners
 
-Before deploying rulesets, assign independent code reviewers, change authorities, policy maintainers, and evidence collectors. No one approves their own source change, ITSM authorization, bypass elevation, or policy SHA promotion.
+Before deploying rulesets, connect repository ownership to independent code reviewers, change authorities, policy maintainers, and evidence collectors. Staff backup coverage for critical paths. No one approves their own source change, ITSM authorization, bypass elevation, or policy SHA promotion.
 
 - Final source review must come from someone other than the author and last pusher; owned paths need code-owner approval. Dismiss stale reviews and prohibit workflow approvals.
 - Application developers cannot write to the central workflow repository or access its ITSM credentials. Its maintainers need independent review too.
@@ -80,7 +204,9 @@ The [review configuration](#pull-request-review-and-separation-of-duties) below 
 
 ## Link every change to a ticket
 
-Every regulated PR links to an **authoritative ITSM change record**. A pinned central workflow checks pre-merge eligibility; [Part 6's independent production broker](/blog/github-waf-financial-services/actions-hardening/#control-4-environments-and-separation-of-duties-for-deployments) performs final current-state authorization. A clickable reference does neither.
+Every regulated PR links to an **authoritative ITSM change record**. The PR explains what changes, why it is needed, how it was tested, which consumers are affected, and how to recover.
+
+A pinned central workflow checks pre-merge eligibility; [Part 6's independent production broker](/blog/github-waf-financial-services/actions-hardening/#control-4-environments-and-separation-of-duties-for-deployments) performs final current-state authorization. A clickable reference does neither.
 
 DORA RTS 17(1)(d) requires documented purpose, scope, and timeline; B-13 2.5.3 requires traceability. Configure [autolinks](https://docs.github.com/en/enterprise-cloud@latest/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/configuring-autolinks-to-reference-external-resources) for identifiers such as `CHG0012345`. GitHub [closing keywords](https://docs.github.com/en/enterprise-cloud@latest/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue) link issues only on default-branch PRs. An issue is an approval record only under an independently governed institutional process.
 
@@ -181,7 +307,7 @@ After replacing placeholders and validating the central workflows, the platform 
 - **App identity is not workflow identity.** `integration_id: 15368` only identifies GitHub Actions. A developer-controlled workflow can emit the same job name from the same app. It is not our trusted gate.
 - **`workflows` pins the source repository, path, and commit SHA**, using the API's documented `sha` field. Pin actions and reusable workflows inside that source too. SHA changes require independent approval and an archived policy version.
 - **Merge queue** needs workflows that handle `merge_group` and validate the candidate revision. The authorization service must bind approved PR revisions to that candidate, not reuse a stale green decision.
-- **Two approvals** are this template's conservative GA floor, including AI-authored changes, without relying on the preview unattributed-Copilot approval feature. Staff independent reviewers and add path-specific requirements where needed; code review still does not replace ITSM authorization.
+- **Two approvals** are this template's conservative GA floor for every PR, not a claim that every cited regulation prescribes that number. Staff independent reviewers, provide backup coverage, and add path-specific requirements where needed; code review still does not replace ITSM authorization.
 - Migrating from branch protection? Use [converting branch protections to rulesets](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/converting-branch-protections-to-rulesets) and then remove the old rule once the ruleset is active.
 
 GitHub also publishes prebuilt starting points in [`github/ruleset-recipes`](https://github.com/github/ruleset-recipes). Treat them as drafts to adapt, not finished controls.
@@ -210,6 +336,8 @@ On regulated branches, every change needs an approving review from someone who i
 
 OSFI B-13 2.5.2 and DORA RTS 17(1)(b) require independent approval; PCI DSS 6.2 expects pre-release review. [Bypassing reviews](https://learn.github.com/well-architected/library/scenarios/anti-patterns/) defeats that chain.
 
+Engineering needs more than eligible identities. Review should find business-logic errors, incompatible interfaces, unsafe infrastructure changes, and missing operational documentation before consumers discover them.
+
 ### How
 
 | Gap an auditor will probe | Control that closes it |
@@ -223,6 +351,18 @@ OSFI B-13 2.5.2 and DORA RTS 17(1)(b) require independent approval; PCI DSS 6.2 
 
 Last-push approval [does not dismiss stale reviews](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). Enable both controls for regulated repositories.
 
+**Make the review effective:**
+
+- **Author:** keep the change cohesive; explain behavior before/after, impacted consumers, tests, risks, and rollback. Separate unrelated refactoring so reviewers can follow the intent.
+- **Domain reviewer:** challenge business invariants. For a payments change, inspect rounding, duplicate processing, retry behavior, and error handling where relevant.
+- **Technical reviewer:** examine security, compatibility, infrastructure impact, and failure behavior. Run or inspect targeted tests rather than treating passing CI as complete analysis.
+- **Maintainer:** coordinate cross-line consumer feedback and ensure documentation/release notes match the implementation. Resolve disagreements on the record.
+- **Platform owner:** keep checks fast enough to use and failures understandable. Route infrastructure/check failures separately from application defects.
+
+Set first-response and review-completion expectations with maintainers by risk tier. Escalate a stalled critical change to backup reviewers; do not lower independence or turn bypass into the normal queue-management tool.
+
+For a shared banking library, a second approval from someone who cannot explain the compatibility impact adds less value than a well-staffed domain review. Meet the configured approval floor **and** verify review quality.
+
 **CODEOWNERS done right.** Per [About code owners](https://docs.github.com/en/enterprise-cloud@latest/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners), owners need explicit write access, enterprise teams are not supported as code owners, and invalid lines are silently skipped. Keep the file in `.github/` and make the platform team own the file itself, as the [WAF governance policies page](https://learn.github.com/well-architected/library/governance/recommendations/governance-policies-best-practices/) recommends:
 
 ```text
@@ -235,13 +375,15 @@ Last-push approval [does not dismiss stale reviews](https://docs.github.com/en/e
 /.github/CODEOWNERS       @acme-bank/platform-engineering
 ```
 
-**AI-authored changes.** GitHub documents an additional approval for unattributed Copilot PRs in **public preview**, on by default. Our production template instead requires two approvals for every PR as a GA alternative; it does not depend on that preview setting. Legal must verify applicable feature terms before evaluation. [Part 7](/blog/github-waf-financial-services/copilot-and-agents/) covers agent governance in depth.
+**Distinct AI attribution caveat:** GitHub documents an additional approval for unattributed Copilot PRs in **public preview**, on by default. Our production template requires two approvals for every PR as a GA alternative and does not depend on that preview setting. Legal must verify applicable feature terms before evaluation. [Part 7](/blog/github-waf-financial-services/copilot-and-agents/) covers agent governance; the ownership and review duties here apply regardless of who or what drafted the code.
 
 ### Verify
 
 - **CODEOWNERS health:** the [list CODEOWNERS errors API](https://docs.github.com/en/enterprise-cloud@latest/rest/repos/repos#list-codeowners-errors) on every regulated repo, weekly. A broken line means a path with no required owner.
 - **Per-change evidence:** archive author, eligible reviewers, review states/commit IDs and merger. The collector and reconciliation design below must be implemented and validated to produce a complete population.
 - **Settings drift:** `GET /orgs/{org}/actions/permissions/workflow` should return `can_approve_pull_request_reviews: false`. Check monthly.
+- **Review effectiveness:** sample payment, banking-app, infrastructure, and shared-library changes according to risk. Check that reviews addressed relevant behavior and tests, not only approval eligibility. Correlate escaped defects, rework, and repeated emergency fixes with review gaps.
+- **Review flow:** inspect time to first response, waiting versus active review time, change size, and reruns. Improve documentation, staffing, test reliability, or change decomposition before adding another approval.
 
 ## Required status checks and merge queue
 
@@ -252,6 +394,8 @@ Central SHA-pinned workflows check build/test, [ITSM eligibility](#link-every-ch
 ### Why
 
 NYDFS 500.8 and FFIEC DAM need defined technical criteria; DORA RTS 17(1)(a) needs security verification. Central, versioned workflows make those criteria independently governable.
+
+Reliable checks and merge queues also reduce rebase churn and broken shared branches. Measure queue time, flaky-check reruns, and time to actionable failure so the delivery benefit remains visible.
 
 ### How
 
@@ -426,6 +570,10 @@ Phase through test repositories, pilot teams, and the whole tier before enforcem
 
 **Acceptance:** require negative tests, no unexplained bypasses, complete targeting, functioning archive/reconciliation, and control-owner approval. Retain CSV and acceptance records. Escalate expired pilots to the second line; the operating period starts only when enforcement and supporting controls work.
 
+Pilot with representative payments, banking-app, infrastructure, and shared-library maintainers. Publish what contributors will see, how to fix ordinary failures, and where to escalate platform defects.
+
+Compare review wait, check duration, queue failures, and bypass demand before and after rollout. A successful rollout improves predictability while preserving the required protection; a lower failure count alone is not proof.
+
 ## Evidence for auditors
 
 ### What we do
@@ -504,10 +652,16 @@ Rows **contribute to** requirements. Second-line compliance validates applicabil
 
 ## Summary and key takeaways
 
-Change control on GitHub is not about turning on more settings. It is about making the settings **central**, **targeted**, and **self-documenting** so the evidence exists before anyone asks for it.
+**Good change management makes shared engineering safer and easier to sustain.** Teams can find the code, reach its owners, understand how to contribute, and get meaningful review without inventing their own release process.
+
+Central rulesets, independent authorization, protected releases, and durable evidence preserve that collaboration through production. Keep the distinction clear: ownership enables decisions, review challenges the implementation, change authority approves the risk, and release operations executes the authorized deployment.
 
 Start here:
 
+- [ ] Reconcile owning teams and service IDs for every active repository; maintain backup coverage for critical services.
+- [ ] Publish usable READMEs, contribution guidance, tested setup instructions, compatibility policy, and release/recovery links.
+- [ ] Establish a controlled shared-library contribution path across business lines, with scoped access and explicit consumer responsibilities.
+- [ ] Measure maintainer response, review wait, rework, flaky checks, and escaped defects. Improve flow without weakening independence.
 - [ ] Consume Part 1's governance-owned properties; validate `app-id` mapping and restrictive coverage for missing/invalid classification.
 - [ ] Build baseline, production, and regulated rulesets at the enterprise (GHEC) or org (GHES) level, stored as JSON in a policy repo.
 - [ ] Turn on approvals, code owner review, dismiss stale approvals, and last-push approval for the regulated tier.
@@ -521,6 +675,8 @@ Start here:
 - [ ] Automate bypass detection, expiry and independent PIR deadlines.
 - [ ] Archive checks at merge and reconcile all protected branches, direct pushes and deployments with uncapped paginated APIs.
 - [ ] Obtain second-line validation of every contributes-to mapping and internal-audit validation of report completeness.
+
+**Start here:** take one shared-library fix from discovery to consumer adoption. Ask a second team to follow the documented path, then verify both useful review and the complete authorization/evidence trail. Use the gaps as the next platform backlog.
 
 Previously: [Part 2: Identity and Access Management](/blog/github-waf-financial-services/identity-and-access/), which covers the teams and IdP groups these rulesets depend on. Next up: [Part 4: Secrets Protection](/blog/github-waf-financial-services/secrets-protection/), where push protection and delegated bypass get the FSI treatment.
 

@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 6: CI/CD and GitHub
 date: 2026-11-05 10:06:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, github-actions, ci-cd, devops, supply-chain]
-excerpt: "Your pipeline is remote code execution with production credentials, so here is how a regulated institution locks down GitHub Actions, separates deployment duties, and produces evidence an examiner will actually accept."
+excerpt: "Apply GitHub Well-Architected to an FI delivery platform with reusable golden paths, independent production authorization, efficient CI, accountable runner capacity, and rehearsed recovery."
 permalink: /blog/github-waf-financial-services/actions-hardening/
 ---
 
@@ -24,17 +24,62 @@ permalink: /blog/github-waf-financial-services/actions-hardening/
 
 ## Leadership brief
 
-> - **The risk:** Third-party actions, unsafe triggers, and standing cloud keys can turn a build into a production compromise.
-> - **Our position:** Approve and pin executable code, default tokens to read-only, and use environment-bound OIDC request roles. The independent production broker rejects approvals from any release contributor.
-> - **Runner posture:** Under an IP allowlist, use supported larger hosted runners with authorized static egress or ephemeral self-hosted runners behind approved NAT. Use private networking for internal deployments.
-> - **The evidence:** Policy exports, approval/rejection/change events, target deployment decisions, and independent archives that outlive GitHub's 400-day maximum.
-> - **The ask:** Fund platform ownership of shared workflows, the action allowlist, and runner fleet.
+> - **The outcome:** Banking teams can onboard, test, and release through supported delivery paths without rebuilding pipeline plumbing or weakening production controls.
+> - **The policy:** Approve executable code, restrict tokens and identity, and enforce independent production authorization at the target. Repository YAML cannot authorize itself.
+> - **The service:** Platform engineering owns reusable workflows, runner isolation, capacity, upgrades, and recovery. Business-service owners own workload demand and release readiness.
+> - **The evidence:** Reconciled policy, authorization, deployment, and archive records prove controls. Queue time, feedback latency, reruns, and cost explain how well the service operates.
+> - **The ask:** Fund the platform as an operational service, including on-call support, spare capacity, and continuity exercises, not just initial workflow migration.
 
-At quarter-end, a payments hotfix uses an action pinned to a floating tag. The tag now points to code that exfiltrates environment variables, including your stored cloud key. Convenient automation just became an incident.
+The payments team needs a quarter-end hotfix. Their build waits behind a large test matrix, the infrastructure team uses a different deployment workflow, and the only person who understands the production runner is on leave.
 
-[GitHub Well-Architected](https://learn.github.com/well-architected/library/application-security/recommendations/actions-security/) calls CI/CD "remote code execution as a service." Treat pipelines as privileged production systems: control who changes them, what executes, credential access, and evidence.
+A secure pipeline that cannot deliver the fix is still a platform failure. So is a fast pipeline that lets a contributor approve their own production change. Financial institutions need **delivery continuity and control integrity together**.
 
-Change control lives in [Part 3](/blog/github-waf-financial-services/change-control/), secrets in [Part 4](/blog/github-waf-financial-services/secrets-protection/), and attestations in [Part 5](/blog/github-waf-financial-services/code-scanning-supply-chain/). This part hardens the pipeline itself.
+[GitHub Well-Architected](https://learn.github.com/well-architected/library/application-security/recommendations/actions-security/) treats CI/CD as privileged execution. We apply that guidance to the whole service: what runs, who authorizes it, how teams adopt it, what capacity it needs, and how delivery survives an outage.
+
+Change control lives in [Part 3](/blog/github-waf-financial-services/change-control/), credentials in [Part 4](/blog/github-waf-financial-services/secrets-protection/), and scanner/provenance semantics in [Part 5](/blog/github-waf-financial-services/code-scanning-supply-chain/). These controls serve payments releases, banking applications, and infrastructure changes regardless of who wrote the code.
+
+## Apply the five WAF pillars to the delivery service
+
+| Pillar | FI platform application | How we verify it |
+|---|---|---|
+| **Governance** | Define execution policy, production authority, cost owners, and exceptions | Policy drift tests, independent decisions, and named budget/capacity ownership |
+| **Architecture** | Separate untrusted CI from deployment; design isolated runners and recovery paths | Boundary tests, dependency maps, and outage rehearsals |
+| **Application Security** | Pin approved code, scope identity, reject unsafe inputs, and verify artifacts at the target | Negative tests plus per-release authorization/provenance records |
+| **Collaboration** | Maintain reusable golden paths with contribution and support processes | Onboarding exercises, reviewed changes, and consumer upgrade records |
+| **Productivity** | Reduce feedback delay, redundant work, and avoidable compute spend | Queue/execution latency, reruns, cache correctness, and cost per workload |
+
+**Two contracts, not one giant gate:** required checks, independent production approval, runner boundaries, and evidence completeness are mandatory institutional controls. Onboarding time, p95 queue delay, and build cost are engineering service objectives. Missing a latency target should trigger capacity or workflow work, not permission to skip required checks.
+
+## Golden paths: make the supported route worth adopting
+
+**What we do.** Publish a small catalog of supported delivery patterns rather than one enormous workflow with 80 boolean inputs. Start with a banking API, a packaged web service, and an infrastructure plan/apply path.
+
+**Why.** Shared workflows concentrate maintenance and make controls consistent. They also become a common dependency, so platform engineering must own compatibility, support, and safe upgrades. Follow WAF's [reusability guidance](https://learn.github.com/well-architected/library/collaboration/recommendations/scaling-actions-reusability/) and GitHub's [reusable workflow documentation](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows).
+
+**How.** Give each catalog entry a named maintainer/deputy and an explicit contract:
+
+| Contract element | What an adopting team needs |
+|---|---|
+| Inputs and outputs | Supported build command, artifact format/digest, test reports, and release metadata |
+| Security boundary | Required token scopes, explicit secret inputs, runner group, and deployment request identity |
+| Policy integration | Part 3's independently required checks and Control 4's target authorization |
+| Compatibility | Supported toolchains, tested examples, immutable approved workflow commit, upgrade/deprecation window |
+| Operations | Support contact, incident route, capacity class, known limitations, and recovery runbook |
+
+Prefer explicit secret passing over blanket inheritance; a build path should not receive deployment secrets. A reusable workflow is a delivery component, **not automatically an enforcing policy**. Require the relevant controls independently so a repository cannot remove them by replacing its caller YAML.
+
+Onboard a payments API with a short, repeatable sequence:
+
+1. Reconcile classification, service ownership, compliance scope, and network requirements.
+2. Select the catalog path and approved immutable commit. Register runner access, dependency sources, and the artifact registry.
+3. Run a synthetic non-production build and deployment request. Confirm successful output and deliberate denial for a missing check, unauthorized identity, or mismatched digest.
+4. Record the support handoff, rollback/recovery route, and first production change evidence.
+
+For infrastructure, separate read-oriented planning from authorized application and protect plan/state contents. Do not quietly let PR jobs inherit production apply privileges.
+
+Treat central workflow changes like product releases. Test them against representative consumer repositories, pilot the new immutable revision, publish migration notes, and track consumer upgrades. Urgent security changes need an accelerated approved rollout, not an unreviewed mutable reference.
+
+**Verify.** Monthly, onboard a clean representative repository and record manual steps, support contacts, time to first useful check, and failure recovery. A one-business-day non-production onboarding objective is a starting service target, not a regulatory promise. Quarterly, reconcile deployed workflow revisions and unsupported consumers; do not confuse catalog publication with adoption.
 
 ## The requirements
 
@@ -238,7 +283,7 @@ Per the [deployments and environments reference](https://docs.github.com/en/acti
 |---|---|
 | Release identity | Bind approval to artifact digest, source head SHA, prior production digest/SHA, target environment, change ticket, and policy version. |
 | Current ITSM authorization | Immediately before production execution, query authoritative ITSM state independently of PR/queue checks. Require an independently approved, non-cancelled change, a window containing current UTC time, and a verified mapping from approved scope/version to the final reviewed/merged revision and artifact. Missing, stale, out-of-scope or expired evidence denies authorization. Use a short-lived single-use execution authorization and revalidate if execution is delayed. |
-| Contributor population | Independently enumerate the complete release delta from the previous production baseline, including merged PR authors, all commit authors/committers, and accountable human requesters of agent changes. Squash/rebase must not hide contributors. |
+| Contributor population | Independently enumerate the complete release delta from the previous production baseline, including merged PR authors, all commit authors/committers, and accountable human requesters of automated changes. Squash/rebase must not hide contributors. |
 | Identity resolution | Resolve contributors and approvers to trusted institution identities. Email strings in Git commits alone are spoofable. Missing identities, incomplete pagination, API errors, or ambiguous release ancestry deny authorization. |
 | Independent approval | Every required production approver must be outside the entire contributor set, requester set, and run-initiator set. Resolve bot initiation to accountable humans; a bot is not a SoD exemption. |
 | Enforcement | Only the broker has production-write privileges. Actions can submit requests; app writers cannot alter gate policy, mint approval records, or assume a direct production-write role. |
@@ -301,7 +346,7 @@ Block `pull_request_target` by default; restrict deployment dispatch to release 
 | CI on pull requests in IP-allowlisted organizations | Linux/Windows larger hosted runner with authorized static egress, or ephemeral self-hosted runner behind authorized NAT | Standard hosted and macOS larger runners cannot supply supported static-IP egress |
 | CI without an IP allowlist, under an approved deployment exception | Standard GitHub-hosted | Ephemeral, isolated VM per job |
 | Deployments to private networks (Azure, or on-premises via ExpressRoute/VPN) | Larger runners with Azure private networking | Private connectivity, no inbound ports, runner groups for access control |
-| Specialized hardware, air-gapped, or GHES | Ephemeral self-hosted via ARC | Only when hosted options cannot meet the need |
+| Specialized hardware, restricted-network, or GHES | Ephemeral self-hosted; ARC where Kubernetes is appropriate | Validate required control-plane and dependency connectivity; self-hosting does not imply offline operation |
 | Anything | Persistent self-hosted runners | **No.** Not for production pipelines. |
 
 At the enterprise level, disable repository-level self-hosted runners. Put every non-standard runner in a runner group restricted to specific organizations, repositories, and (for production) **selected workflows**.
@@ -325,6 +370,48 @@ Runner isolation supports **INT-NIST-SSDF PO.5**, **INT-SWIFT-CSCF-OVERVIEW**, a
 - **Monthly:** `GET /enterprises/{enterprise}/actions/permissions/self-hosted-runners` confirms repo-level runners are disabled. Export runner groups and their repository and workflow access lists.
 - **Continuous:** Alert on `org.runner_group_updated`, `org.runner_group_runners_added`, and any `org.self_hosted_runner_online` event from a runner you do not recognize.
 - **Quarterly:** Confirm runner images and ARC are current. Self-hosted runners on GHEC must stay within 30 days of the latest runner release, per the WAF ARC guidance.
+
+## Operate CI performance, cost, and capacity
+
+**What we do.** Treat CI as a measured service with workload owners, not an unlimited pile of free YAML. Platform engineering owns fleet capacity and health; service teams own test design and demand; the budget owner agrees spending and escalation thresholds.
+
+**Why.** WAF's [effective CI guidance](https://learn.github.com/well-architected/library/productivity/recommendations/effective-ci/) belongs beside hardening. Long queues and flaky checks encourage reruns and unsafe workarounds. Overprovisioning every job buys a larger bill, not necessarily a faster release.
+
+**How.** First separate **queue time, execution time, approval wait, and archive/broker delay**. Measure p50/p95 by workload and runner class. A two-minute test behind a twenty-minute queue needs a different fix from a twenty-minute compiler step.
+
+| Improvement | Practical application | Boundary to preserve |
+|---|---|---|
+| Remove duplicate work | Review overlapping push/PR triggers; cancel obsolete PR validation | Preserve required checks and reviewed-revision binding; retain required evidence |
+| Right-size execution | Benchmark banking API builds on approved runner sizes; bound matrix parallelism | Do not move sensitive work to an unauthorized runner to save money |
+| Cache selectively | Cache package downloads using OS/toolchain/lockfile-aware keys | Treat restored data as untrusted; never cache credentials or rely on caches for release inventory |
+| Improve tests | Run cheap deterministic feedback early; isolate and fix flaky tests with owners and expiry | Do not silently drop mandatory security or release tests |
+| Control storage | Separate short-lived scratch output from governed release/evidence records | Honor Control 8 and Part 1 retention; do not delete required evidence to meet a budget |
+
+Use [dependency caching](https://docs.github.com/en/actions/concepts/workflows-and-actions/dependency-caching) only after confirming trust and access boundaries. A cache miss must remain a correct build. Periodically run an uncached representative build to expose hidden downloads, revoked registry credentials, and incomplete lockfiles.
+
+For replaceable **PR validation only**, this workflow-level fragment cancels obsolete work for the same PR:
+
+{% raw %}
+```yaml
+# Fragment for a pull_request validation workflow, not deployment
+concurrency:
+  group: pr-validation-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+```
+{% endraw %}
+
+See [concurrency behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency). Do not apply this cancellation pattern to production deployments, migrations, or non-idempotent infrastructure changes. Concurrency is not a transactional lock or independent production authorization; Control 4's broker still governs execution and duplicate requests.
+
+Assign cost/capacity ownership explicitly:
+
+- **Platform owner:** runner pools, image lifecycle, concurrency ceilings, scaling limits, and on-call diagnostics.
+- **Service owner:** expected demand, expensive matrices, flaky-test cleanup, and planned release peaks.
+- **Budget owner:** spending review and escalation. Attribute runner minutes, storage, and self-hosted infrastructure costs by workload where billing and internal telemetry permit.
+- **Release operations:** prioritize incident delivery using approved pool reservations or scheduling arrangements. Verify these locally; do not assume GitHub provides a cross-workload priority queue.
+
+Start with illustrative objectives such as p95 queue delay below two minutes for routine PRs and actionable feedback within ten minutes for a representative API. Baseline first, agree capacity, and publish exceptions for large builds. Budget alerts are signals, not authorization to stop a critical payments fix without the continuity decision.
+
+**Verify.** Review queue/execution trends, cancellation/rerun rates, spend per workload, and supported-path adoption monthly. Compare before/after changes using equivalent workloads. Track mandatory-control failures separately; fast green checks with missing coverage are not a productivity win.
 
 ## Control 7: Untrusted input (fork PRs, pull_request_target, and script injection)
 
@@ -422,15 +509,31 @@ gh api /repos/$OWNER/$REPO/actions/runs/$RUN_ID/approvals
 
 ### What we do
 
-For critical workloads, keep deployment logic in versioned scripts that the workflow calls, maintain an alternate, audited invocation path with its own short-lived identity, and rehearse it.
+For critical workloads, operate runner recovery and delivery continuity alongside security controls. Keep deployment logic in versioned scripts, maintain an alternate audited invocation path with its own short-lived identity, and rehearse both routine fleet failures and control-plane outages.
 
 ### Why
 
-Operational resilience regulators (EU-DORA-9, CA-OSFI-B13, US-FFIEC-AIO) care whether you can deploy a fix when a dependency is down. "We'll wait for the status page to go green" is not a continuity plan.
+Operational resilience expectations (including applicable DORA, OSFI B-13, and FFIEC guidance) extend beyond preventing compromise. The institution must understand whether it can deliver a fix when its runner pool, registry, identity provider, or CI control plane fails. "We'll wait for the status page to go green" is not a continuity plan.
 
 ### How
 
 Following [WAF's resilience guidance](https://learn.github.com/well-architected/library/architecture/recommendations/designing-resilient-ci-cd/), preserve portable deployment scripts, approved artifacts, immutable release IDs, tooling, and attestation/trust bundles. Use the GitHub Status API to identify the failure; do not switch paths when both depend on the failed service.
+
+**Runner service runbook:** distinguish a runner-capacity incident from a GitHub outage before invoking emergency access.
+
+| Failure | Prepared response | Acceptance evidence |
+|---|---|---|
+| Approved runner image breaks builds | Drain affected capacity; provision fresh ephemeral workers from the last approved image | Successful representative build and cleanup; image/version recorded |
+| Pool saturation at a release peak | Apply agreed concurrency limits and provision approved reserve capacity | Queue recovery without crossing runner/network boundaries |
+| Runner host or ARC cluster failure | Recreate workers in a separately approved failure domain where supported | No inherited workspace; correct group, image, egress, and identity |
+| Package registry or network dependency fails | Use approved mirrors/retained packages where permitted, or pause | Integrity and licensing checks still pass; no fallback to arbitrary public downloads |
+| CI control plane unavailable | Use the independently reachable recovery path below for approved artifacts | Same authorization, provenance, and evidence obligations enforced |
+
+A runner group is an access boundary, not a high-availability guarantee. For self-hosted capacity, document autoscaling limits, registration dependencies, image sources, teardown verification, and who answers the pager. For hosted capacity, document regional availability, quotas, provider escalation, and tested alternatives.
+
+Define recovery objectives against the **business service**, such as the latest acceptable time to deliver a payments incident fix. Record dependencies on GitHub, registries, cloud APIs, DNS, identity/PAM, the broker, and the archive. Two pools behind the same failed NAT are not two recovery paths.
+
+Keep reserve capacity within the approved cost envelope and exercise it. Drain/rebuild suspect workers rather than reusing a potentially compromised workspace to meet a queue target. A temporary recovery image must still meet the institution's security and provenance requirements.
 
 **Concrete emergency lifecycle:** the same independently governed deployment broker is reachable from a hardened recovery workstation through the institution's identity system, without Actions. This is a required platform design, not a runnable institution adapter:
 
@@ -446,6 +549,8 @@ If the broker, identity/PAM service, or durable evidence sink is also unavailabl
 ### Verify
 
 - **Semi-annually (or per your BCM schedule):** Run a tabletop or live rehearsal. Keep the record: who activated, what was deployed, approvals, and reconciliation.
+- **Quarterly:** exercise lost runner capacity, a failed image rollout, and an unavailable dependency using synthetic/non-production workloads. Measure time to resume delivery, confirm fresh-worker isolation and authorized egress, and assign corrective work with owners.
+- **At each continuity exercise:** show which dependencies are genuinely independent and compare measured recovery with the business-service objective. A missed objective is a resilience finding; it never waives production authorization.
 - **After each use:** Confirm temporary credentials were revoked and the deployment was reconciled into normal history.
 
 ## Control matrix
@@ -458,25 +563,34 @@ If the broker, identity/PAM service, or durable evidence sink is also unavailabl
 | Production SoD, including bot-initiated releases | EU-DORA-RTS-CHANGE, US-FFIEC-DAM, CA-OSFI-B13, MX-CNBV-CUB | Environments supplemental; trusted external deployment broker mandatory | Full contributor manifest; independent signed approvals; target deny/allow decision | Per deployment; quarterly negative tests |
 | Execution policy and central safeguards | US-FFIEC-DAM, EU-DORA-RTS-CHANGE, EU-DORA-9 | Part 3 required gates; action/token/actor/event payloads; GA fallback for previews | Policy export; `workflows.actions_policy_violation`; negative tests | Continuous; monthly |
 | Runner isolation | INT-NIST-SSDF, INT-SWIFT-CSCF-OVERVIEW, US-FFIEC-AIO, CA-AMF-ICT | Hosted and larger runners, Azure private networking, ARC, runner groups | Runner group export; runner audit events | Monthly; quarterly patch review |
+| Supported golden paths | Engineering service standard; supports US-FFIEC-DAM governance, not a standalone regulatory requirement | Approved reusable workflows, catalog contracts, pilot upgrades | Onboarding tests, consumer versions, support and deprecation records | Monthly onboarding sample; per upgrade |
+| CI efficiency and capacity ownership | Engineering service objectives; no universal regulatory latency or cost threshold | Workload telemetry, approved pools, concurrency and cache controls | Queue/execution trends, reruns, workload cost and named capacity/budget owners | Monthly; planned release peaks |
 | Untrusted input controls | EU-DORA-9, US-FFIEC-INFOSEC, INT-NIST-SSDF | Fork PR policies, event rules, code scanning | Fork policy export; code scanning alerts | Monthly; continuous |
 | Retention and log archive | INT-PCI-10.4, INT-PCI-10.5.1, EU-DORA-9 | Retention policy plus independent scheduled archive | Merge-time checks; signed hashed manifests; target/population reconciliation | Hourly backfill; daily reconcile; monthly second-line review |
-| CI/CD resilience | EU-DORA-9, CA-OSFI-B13, US-FFIEC-AIO | Portable deployment logic, alternate OIDC-independent identity | Rehearsal records | Semi-annual |
+| CI/CD resilience | CA-OSFI-B13, US-FFIEC-AIO; applicable DORA continuity obligations beyond Art. 9 | Runner recovery, portable deployment logic, independently governed recovery identity | Capacity/image recovery tests, measured recovery, emergency approval and reconciliation records | Quarterly runner exercises; semi-annual continuity rehearsal |
 
 ## Summary and key takeaways
 
-A pipeline is a privileged production system written in YAML. Govern execution, identity, independent authorization, and evidence accordingly.
+A well-architected FI delivery platform gives teams a supported way to ship, not just a list of things they cannot do. Reusable paths, fast feedback, and owned capacity make the controls sustainable.
+
+Keep execution, identity, independent production authorization, and evidence as hard boundaries. Treat queue delay, onboarding friction, cost, and recovery performance as operational work with owners. You need both columns; neither a secure outage nor a fast compromise is the target architecture.
 
 **Start here:**
 
+- [ ] Publish supported API, packaged-service, and infrastructure paths with maintainers, immutable revisions, explicit inputs, and tested onboarding.
 - [ ] Switch the enterprise Actions policy to selected actions, disable blanket verified-creator access, and require full-length SHA pinning. Manage the allowlist as code.
 - [ ] Confirm the default `GITHUB_TOKEN` is read-only and Actions cannot approve pull requests. Add `permissions: {}` to your workflow templates.
 - [ ] Remove stored cloud keys; bind OIDC request roles to environment and immutable identity claims. Protect provider-issued credentials for their full lifetime.
 - [ ] Configure production environments and deploy the independent target gate that blocks **all release authors/committers**, even on bot-initiated runs.
 - [ ] Use Part 3's required gates for action/token/trigger policy; restrict deployment actors and block `pull_request_target` with active controls.
 - [ ] Disable repository-level self-hosted runners. Use runner groups restricted to selected workflows for production.
+- [ ] Baseline queue/execution/approval delay, reruns, and workload cost. Assign capacity and budget owners; publish service objectives separately from gates.
+- [ ] Cancel only replaceable validation work, keep cache misses correct, and preserve mandatory test and evidence coverage.
 - [ ] Keep private/internal fork workflows off by default; document exceptions, approvals, and isolated secret-free execution.
 - [ ] Set retention to 400 days; implement timed capture, hourly backfill, daily reconciliation, and missing-evidence release gating.
-- [ ] Write down and rehearse your alternate deployment path.
+- [ ] Exercise runner/image recovery, approved reserve capacity, and an independently reachable deployment path without relaxing target controls.
+
+**First implementation slice:** onboard one payments API through a catalog path. Trace its check latency, runner demand, approval, artifact, target decision, and archived evidence. Then fail its runner pool in non-production and prove the recovery route works. That tests the platform, not just the YAML.
 
 **Previous:** [Part 5: Code Scanning and Software Supply Chain](/blog/github-waf-financial-services/code-scanning-supply-chain/)
 **Next:** [Part 7: Copilot and AI Agents](/blog/github-waf-financial-services/copilot-and-agents/)

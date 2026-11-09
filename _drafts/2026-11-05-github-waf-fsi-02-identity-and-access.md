@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 2: Identity and Acc
 date: 2026-11-05 10:02:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, identity, access-management, least-privilege]
-excerpt: "Who can get into your GitHub enterprise, what they can touch, and how fast you can take it away: an opinionated identity and access baseline for banks, insurers, and payment firms, with the evidence auditors will ask for."
+excerpt: "Give engineers and service identities the access they need without leaving permissions behind: practical onboarding, least privilege, reliable offboarding, and tested recovery for financial institutions."
 permalink: /blog/github-waf-financial-services/identity-and-access/
 ---
 
@@ -24,14 +24,66 @@ permalink: /blog/github-waf-financial-services/identity-and-access/
 
 ## Leadership brief
 
-> - **The risk:** A departed engineer's valid token or over-privileged service account can expose code, production, and customer data.
-> - **Our position:** The data-residency/EMU default puts humans under IdP control, except the setup user. Enforce MFA, verify credential-path coverage, use SCIM, and minimize standing privilege.
-> - **Machine access:** GitHub Apps are the default for automation. Fine-grained tokens are the governed exception, with approval and a maximum lifetime. Classic tokens are restricted.
-> - **The evidence:** Audit log events for every role, token, and membership change; an enterprise credential inventory export; membership reports; and a quarterly access review with documented sign-off.
+> - **The outcome:** Engineers can join a delivery team, change roles, and leave without weeks of access tickets or orphaned permissions. Automation has a service owner, not a borrowed employee identity.
+> - **Our position:** The data-residency/EMU default puts humans under IdP control, except the setup user. Enforce MFA, test every credential path, provision through SCIM, and use job-based team grants.
+> - **Machine access:** GitHub Apps are the default for automation. Govern exceptions by supported API, permission scope, credential lifetime, ownership, and recovery needs.
+> - **The accountability:** IAM operates the lifecycle; business and repository owners approve need; platform engineering maintains usable integration paths. Independent reviewers verify removal, privilege, and exceptions.
 
-HR terminates 40 contractors after a reorg. Three weeks later, a forgotten job still pulls code with one contractor's personal access token. The token never got the memo.
+An engineer moves from retail banking to payments. Their new team cannot get them into the test repository, but their old infrastructure-admin grant still works. Meanwhile, a release job depends on a token owned by someone who left last month.
 
-Offboarding means finding every credential, role, and app grant, not just disabling a human. Here's the IAM baseline and evidence that prove access ended.
+Neither delay nor excess privilege is an acceptable access model. **Good IAM makes the authorized path easy to use and the end of access verifiable.** That includes browser sessions, Git credentials, integrations, and the people who operate them.
+
+This chapter applies WAF to the complete identity lifecycle. We will retain the authentication detail because real access follows credential paths, not the tidy boxes on an organization chart.
+
+## WAF outcomes for identity and access
+
+| Pillar | Apply it here | Verify the engineering outcome |
+|---|---|---|
+| **Governance** | Assign entitlement owners, service sponsors, exception authority, and lifecycle deadlines. | Every grant has a current purpose and an accountable reviewer; overdue removals are incidents. |
+| **Architecture** | Design IdP, SCIM, Git, app, network, and emergency access as connected paths. | Joiner, mover, leaver, and IdP-failure tests work end to end. |
+| **Application Security** | Use least privilege, phishing-resistant MFA, governed credentials, and prompt revocation. | Allowed use succeeds; direct-access bypass and revoked credentials fail. |
+| **Collaboration** | Offer team-based access across business lines with explicit information barriers. | An approved library contributor reaches maintainers without receiving unrelated banking permissions. |
+| **Productivity** | Publish access bundles, setup instructions, approval routes, and actionable error guidance. | Measure time to first useful contribution, access-request rework, and avoidable support demand. |
+
+Use the [WAF governance checklist](https://learn.github.com/well-architected/library/governance/checklist/) to connect policy with operating practice. Tight access that nobody can use drives workarounds; fast access with no removal path creates a different incident.
+
+## Design a usable joiner, mover, and leaver journey
+
+### What: access as a supported service
+
+**Define approved access bundles by engineering job and business scope.** A payments contributor, infrastructure maintainer, shared-library reviewer, and release operator need different rights.
+
+Bundles are institution-maintained mappings to IdP groups, GitHub teams, and roles, not a new GitHub feature. Keep privileged administration and emergency elevation separate from ordinary development.
+
+### Why: remove waiting and accidental privilege
+
+Onboarding should produce working access and clear instructions. A role change should remove obsolete grants, not stack new ones on top. Offboarding should end access without breaking unrelated release automation.
+
+The [provisioning controls below](#provisioning-deprovisioning-and-team-sync) implement removal deadlines and failure handling. A request portal alone does not.
+
+### How: make the lifecycle concrete
+
+| Event | Supported path | Completion condition |
+|---|---|---|
+| Join payments engineering | Manager requests the job bundle; repository/business owner approves scope; IAM provisions the linked group | Engineer can authenticate, clone an approved repo, run safe tests, and find contribution instructions |
+| Move from banking applications to infrastructure | Review old and new entitlements together; approve any time-limited overlap | New access works, old access is removed, and any overlap has an owner and expiry |
+| Contribute to a shared library | Maintainer sponsors scoped team access under the approved collaboration model | Contributor can propose and test a change without accessing restricted consumer repositories |
+| Join as a vendor | Named business sponsor approves repositories, role, and end date | Guest/outside access matches the contract and is scheduled for removal |
+| Leave the institution | Trusted HR event triggers immediate removal and credential remediation | GitHub denies access and dependent service identities are separately reviewed |
+
+For each bundle, publish the approver, expected turnaround, support route, required workstation setup, and allowed credential methods. Include hostnames for the actual environment; GHE.com instructions that still say `github.com` make a surprisingly effective onboarding blocker.
+
+**Measure readiness, not just account creation.** A new banking-app engineer should complete a small documentation PR using synthetic test data. That validates authentication, team grants, Git access, signing setup, and review routing together.
+
+On a move or departure, inventory independent app installations, deploy keys, scheduled jobs, and credential custody. Transfer legitimate service ownership through review; do not copy the departing person's token into a shared vault and call it a service account.
+
+Set onboarding and ordinary-change service objectives with the consuming teams. Do not treat those targets as grace periods for leavers: the immediate-removal requirements below still apply.
+
+### Verify: test the whole lifecycle
+
+Monthly, review request-to-ready time, rejected/reworked requests, direct-grant exceptions, and the age of unresolved access failures by risk tier. Track movers as well as joiners and leavers.
+
+Have IAM and a delivery team test a new joiner, a cross-business-line move, an expiring vendor grant, and a failed provisioning event. Retain the successful task and denied-access results. Include a privileged payments or release-operations case in the risk-based sample.
 
 ## The requirements
 
@@ -170,7 +222,7 @@ printf 'Missing 2FA:\n%s\nInsecure methods:\n%s\n' "$disabled" "$insecure"
 
 ## Provisioning, deprovisioning, and team sync
 
-**What we do:** Provision humans through IdP assignments and repository access through linked teams, not manual grants. The setup-user exception is governed below.
+**What we do:** Provision humans through IdP assignments and repository access through linked teams, not manual grants. Treat group mappings as maintained service configuration with named business owners. The setup-user exception is governed below.
 
 **Why:** US-NYDFS-500.7, INT-PCI-7.2, and EU-DORA-RTS-ACCESS need timely removal. Without [SCIM for organizations](https://docs.github.com/en/enterprise-cloud@latest/organizations/managing-saml-single-sign-on-for-your-organization/about-scim-for-organizations), disabling a personal-account user's IdP access **does not remove org membership**; authorized tokens can outlive sessions.
 
@@ -202,12 +254,13 @@ IAM must test automated disablement through supported provisioning before produc
 - **SCIM health:** alert on `external_identity.scim_api_failure` and `external_group.scim_api_failure`. A failing sync is a silent offboarding failure.
 - **Dormant accounts:** reconcile the [candidate report](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-accounts-and-repositories/managing-users-in-your-enterprise/managing-dormant-users) with the daily inactivity feed. Retain disablement decisions and completion events. Test just before, exactly at, and just after the 60-day internal boundary and the applicable 90-day maximum.
 - **Failure drills:** exercise a lost HR event, failed SCIM call, stale feed, and unavailable IdP. Prove escalation and supported emergency containment work without claiming a queued request is completed revocation.
+- **Mover testing:** show that obsolete team membership, direct grants, inherited access, and privileged roles were reviewed together. A successful new assignment does not prove the old access ended.
 
 ## Least privilege: base permissions and roles
 
 **What we do:**
 
-- **Base permission:** `No permission` (or `Read` if you run a deliberate innersource program). Never `Write` or `Admin`.
+- **Base permission:** `No permission` by default, with explicit team grants. Approved organization-level `Read` needs a deliberate innersource design and the enterprise-policy conditions below. Never `Write` or `Admin`.
 - **Org owners:** at least two, and as few as possible beyond that.
 - **Everyone else:** predefined or custom roles scoped to the job.
 - **Security team:** the security manager role, not owner.
@@ -230,6 +283,8 @@ IAM must test automated disablement through supported provisioning before produc
 
 - Internal repositories remain enterprise-readable with base permission None. Sensitive repositories must be private.
 - Enterprise owners [lack org content access by default](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-accounts-and-repositories/managing-roles-in-your-enterprise/abilities-of-roles), but can join any org with an audit event.
+
+**Collaboration is not a synonym for broad privilege.** Banking and payments engineers can collaborate on an approved shared library while customer-specific applications and restricted infrastructure remain private. Grant contribution rights through scoped teams, retain independent maintainers, and review cross-line access against information barriers.
 
 **How:** prefer **enforced enterprise None** with explicit team grants. If organizations choose their own base permission for an approved innersource design, permit only None/Read in the institution standard and reconcile daily. GitHub's enforced enterprise value is not a configurable ceiling that lets every organization choose a lower value ([repository management policies](https://docs.github.com/en/enterprise-cloud@latest/admin/enforcing-policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise)). Restrict outside collaborator invitations to approved owners.
 
@@ -304,7 +359,7 @@ The same controls exist on [GHES 3.22](https://docs.github.com/en/enterprise-ser
 
 **What we do:**
 
-- **GitHub Apps** are the default for integrations and automation, installed at the enterprise level when broadly needed.
+- **GitHub Apps** are the default for integrations and automation. Approve the supported installation model, explicit permissions, and repository population; broad deployment still needs a business purpose.
 - **OAuth apps** require owner approval and an exception record.
 - **Deploy keys** are disabled at the enterprise level, with documented exceptions.
 
@@ -334,6 +389,46 @@ done <<< "$repos"
 Reconcile the observed repository count with the approved population. A hidden repository, denied key endpoint, or failed page makes the inventory incomplete. Installed apps and deploy keys require separate inventories; the enterprise credential CSV is not a complete list of every short-lived installation token or deploy key.
 
 **Verify:** `integration_installation.create` / `destroy`, `org.oauth_app_access_approved`, and `public_key.create` (fires for both user SSH keys and deploy keys). Review the installed app list and permissions quarterly.
+
+## Operate service identities throughout their lifecycle
+
+### What: a machine identity with an accountable owner
+
+**Every integration has a service record, a primary owner, and backup operational coverage.** Record the business purpose, criticality, installation/account IDs, repositories, permissions, credential custody, rotation method, and shutdown procedure.
+
+GitHub Apps, OAuth grants, service-account PATs, deploy keys, and `GITHUB_TOKEN` have different lifecycles. An app installation is not an employee entitlement, and its access may survive the departure of whoever created it.
+
+### Why: keep release operations independent of employee credentials
+
+A release publisher should not fail because its original author changes jobs. Equally, a retired banking application should not retain an integration that can still write to its repositories.
+
+Short-lived installation tokens reduce exposure, but the app's private key and installation permissions still require custody and review. Prefer the [documented GitHub App model](https://docs.github.com/en/enterprise-cloud@latest/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps) where the required API supports it; retain named exceptions where it does not.
+
+### How: scope, test, rotate, and retire
+
+| FI use case | Identity pattern | Operating requirement |
+|---|---|---|
+| Shared-library release publisher | Approved GitHub App with supported release permissions | Limit repositories; protect key custody; separately govern any tag/ruleset bypass |
+| Repository inventory collector | GitHub App where supported | Prove complete read scope and alert on missing repositories or permission failures |
+| Audit-log API fallback | Exception-owned service identity with the API's supported classic PAT/OAuth authentication | Prefer streaming; scope the credential, set rotation, and test collection continuity |
+| Build access within an Actions job | Job-scoped `GITHUB_TOKEN` with explicit required permissions | Apply [Part 6's pipeline controls](/blog/github-waf-financial-services/actions-hardening/) and verify actual network access |
+| Legacy deployment integration | Documented exception if an App cannot meet the need | Name a migration/retirement owner and test expiry, revocation, and failure recovery |
+
+Before installation or scope expansion, the integration owner documents needed operations and repositories. An independent authorized owner approves the grant; security reviews sensitive permissions and provider access according to risk.
+
+Test both a required operation and a forbidden one in an isolated repository. Confirm that the integration cannot reach an unrelated banking-app repository or perform an unneeded write. Endpoint permission requirements vary; choose the smallest **tested** set, not an invented universal permission bundle.
+
+Keep keys and tokens in approved secrets infrastructure. Document renewal and rotation steps, including how operators verify replacement access before disabling the old credential. Test the failure path without extending a credential indefinitely to avoid an outage.
+
+On owner departure, reassess custody and rotate affected credentials based on exposure and access. On service retirement, disable scheduled consumers, remove installations/grants and vault material through controlled procedures, then verify denial and update the inventory.
+
+### Verify: prove ownership and continuity
+
+Review service identities quarterly, with more frequent reconciliation for privileged integrations and named exceptions. Compare approved scope with installed permissions and observed use; investigate unused grants and unexplained expansion.
+
+Rehearse release-publisher key rotation and collector credential failure. Record operational interruption, alert routing, recovery time, and denied old-credential access. For critical services, demonstrate that the backup operator can follow the runbook.
+
+Reviewers need installation, key, and service-account inventories as well as the enterprise credential export. No single report represents every machine-access path.
 
 ## SSH certificate authorities
 
@@ -389,7 +484,7 @@ Revocation endpoints may return **202 Accepted** for queued work. That is not co
 
 ## Access reviews and the evidence pack
 
-**What we do:** A quarterly access review, owned by the business, with a repeatable evidence pack.
+**What we do:** A quarterly access review, owned by the business, with a repeatable evidence pack. Repository owners explain need; IAM supplies effective access and removal evidence; independent reviewers make and track decisions.
 
 **Why:** US-NYDFS-500.7 and INT-PCI-7.2 require periodic review; the [WAF checklist](https://learn.github.com/well-architected/library/governance/checklist/) also calls for discrepancy closure. Part 1's [evidence archive](/blog/github-waf-financial-services/platform-foundation/#evidence-retention-and-integrity) is a prerequisite because GitHub's audit log is not long-term retention.
 
@@ -439,25 +534,32 @@ Revocation endpoints may return **202 Accepted** for queued work. That is not co
 
 ## Summary and key takeaways
 
-Every later control in this series assumes you know who is acting and that their access is current. Get identity right and the rest gets easier to evidence.
+**Usable IAM gets the right engineer to useful work and removes access when the need ends.** Service identities need the same clarity of purpose, but their own custody, rotation, and retirement paths.
+
+Measure onboarding friction alongside revocation performance. Neither a fast approval queue nor a clean quarterly spreadsheet proves that access works as designed.
 
 **Your checklist:**
 
+- [ ] Publish job-based access bundles, approvers, setup instructions, and escalation routes for engineers, vendors, and release operators.
+- [ ] Test one joiner and one business-line move through a real, low-risk contribution. Remove obsolete access and time-box any approved overlap.
 - [ ] Implement the approved account model; personal-account enterprises enforce enterprise SAML.
 - [ ] Prefer Entra OIDC authentication where appropriate; default to the GA GitHub IP list and test every credential/CI path.
 - [ ] Enforce phishing-resistant MFA at the IdP; on personal accounts, also require GitHub 2FA with secure methods.
 - [ ] Implement immediate leaver removal, daily completion checks, and automated inactivity disablement with tested failure paths.
-- [ ] Set base permission to None or Read, keep org owners at two or three, and use custom and security manager roles.
+- [ ] Default to enforced base permission None and scoped teams; govern any Read alternative. Keep owner counts minimal but at least two per organization, and use suitable custom/security manager roles.
 - [ ] Require independently approved PAM checkout before emergency retrieval. Rotate the named SCIM exception within 90 days; do not silently exempt all admins.
 - [ ] Restrict classic PATs, require fine-grained PAT approval, and set a maximum lifetime.
 - [ ] Default to GitHub Apps; keep OAuth restrictions on; disable deploy keys after inventory.
+- [ ] Give every service identity a business purpose, owner, backup operator, tested permission scope, rotation runbook, and retirement path.
 - [ ] Stand up an SSH CA with short-lived certificates and require it.
 - [ ] Script and rehearse credential revocation and SSO lockdown.
 - [ ] Review the complete direct/inherited/custom-role population independently, reconcile counts, and archive evidence and timely closure.
 
+**Start here:** follow one banking engineer's move between teams and one release integration's credential rotation. Fix the points where ownership, access, or removal cannot be demonstrated.
+
 **Previous:** [Part 1: Platform Foundation and Data Boundaries](/blog/github-waf-financial-services/platform-foundation/)
 
-**Next:** [Part 3: Source Code Management and Change Control](/blog/github-waf-financial-services/change-control/), where we put these identities to work in rulesets, reviews, and separation of duties.
+**Next:** [Part 3: Source Code Management and Change Control](/blog/github-waf-financial-services/change-control/), where clear ownership and scoped access support discoverable repositories, useful reviews, and controlled contributions across teams.
 
 ## References
 

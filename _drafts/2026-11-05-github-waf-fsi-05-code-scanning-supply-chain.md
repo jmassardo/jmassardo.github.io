@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 5: Code Scanning an
 date: 2026-11-05 10:05:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, code-scanning, supply-chain, dependabot, sbom]
-excerpt: "How a regulated financial institution turns CodeQL, Dependabot, dependency review, and artifact attestations into enforced controls with remediation SLAs and evidence an examiner can actually test."
+excerpt: "Apply GitHub Well-Architected to secure banking software and shared dependencies through fast developer feedback, accountable risk-based remediation, enforced release controls, and artifact-bound evidence."
 permalink: /blog/github-waf-financial-services/code-scanning-supply-chain/
 ---
 
@@ -24,16 +24,32 @@ permalink: /blog/github-waf-financial-services/code-scanning-supply-chain/
 
 ## Leadership brief
 
-- **The risk:** A vulnerable or malicious third-party package can sit in payment, lending, or trading systems for months without active detection.
-- **Our position:** Scanning needs **enforcement**, **risk-based prioritization**, and **measured remediation SLAs**, not just dashboards.
-- **What we deploy:** GitHub Code Security on every in-scope repository, applied centrally through enforced security configurations. Rulesets block merges on high-severity findings, and security campaigns burn down existing debt.
-- **The evidence:** Security overview metrics (coverage, age of alerts, mean time to remediate), audit log events for every dismissal and configuration change, SBOM exports, and verifiable build provenance for what you ship.
+- **The outcome:** Payments, banking, and infrastructure teams get actionable security feedback while a change is still easy to fix, not a surprise queue before release.
+- **The policy:** Enforce required scanning and dependency gates, assign risk-based remediation deadlines, and independently approve exceptions. A dashboard is an input, not a risk decision.
+- **The operating model:** Platform engineering maintains scanner integrations; service teams own fixes; shared-library maintainers coordinate downstream upgrades; AppSec owns triage standards and exceptions.
+- **The evidence:** Complete scanner populations, first-detection and verified-fix records, approved decisions, artifact-bound SBOMs, and target-verified provenance. Report delivery friction separately from mandatory control failures.
 
 ---
 
-An examiner asks for your card service's component inventory, the detection and remediation dates for its last critical vulnerability, and proof that production runs the reviewed code.
+A shared authentication library has a new vulnerability. It appears in the mobile banking API, a payments adapter, and the infrastructure team's deployment utility. Three repositories, three owners, one patch that can break token validation.
 
-"Each team handles that differently" makes for a long week. GitHub can supply evidence, but buying a license is not a control. **Coverage, enforcement, and durable records** are.
+The useful question is not "how many alerts did we close?" We need to know which deployed services are affected, who owns the library fix and consumer upgrades, and how to prove the replacement reached production.
+
+This is where WAF becomes an operating model. Put feedback beside the pull request, standardize supported scanning, and connect findings to accountable remediation and release records. Buying another dashboard will not decide who patches the shared library.
+
+## Apply the five WAF pillars to secure delivery
+
+| Pillar | Application in a financial institution | Evidence of a useful outcome |
+|---|---|---|
+| **Governance** | Classify repositories; set gate thresholds, remediation policy, and exception authority | Reconciled scope, decision records, and overdue risk ownership |
+| **Architecture** | Model trust boundaries; inventory shared components and actual release artifacts | Threat models, consumer maps, artifact-bound SBOMs and provenance |
+| **Application Security** | Combine SAST, dependency review, and appropriate runtime testing | Successful required analyses and tested merge/deployment denial |
+| **Collaboration** | Route findings to service owners and coordinate shared fixes with maintainers | Accepted work items, linked consumer PRs, independently reviewed exceptions |
+| **Productivity** | Return actionable PR feedback and maintain low-friction scanner templates | Feedback latency, actionable-finding rate, and reduced repeat failures |
+
+**Separate two contracts.** Required coverage, thresholds, approved exceptions, and remediation deadlines are mandatory institutional policy. Feedback latency and triage response targets are engineering service objectives. Improve the service without weakening the gate.
+
+For example, target actionable PR feedback within ten minutes for a representative banking API. A slower scan is a platform service problem; a missing required scan remains a blocked merge. The target is illustrative, not a GitHub guarantee or regulatory deadline.
 
 ## The requirements
 
@@ -64,14 +80,13 @@ Regulators rarely name tools. They ask for secure development, vulnerability man
 
 ## Deployment model differences
 
-Check GHES and AI-assisted feature availability before rollout.
+Check runner, scanner, remediation-tracking, and provenance availability before rollout. Do not design the operating model around a feature your deployment cannot use.
 
 | Capability | GHEC (personal accounts) | GHEC with EMU | GHEC with data residency (GHE.com) | GHES |
 |---|---|---|---|---|
 | GitHub Code Security | Purchasable | Purchasable | Purchasable | Purchasable; required for **all** repos, including public |
 | Code scanning runners | GitHub-hosted or self-hosted | Same | Same | **Self-hosted only** (no GitHub-hosted runners) |
-| Copilot Autofix | Yes | Yes | Not listed as unavailable | **Not in the GHES 3.22 Code Security feature list** |
-| Agentic autofix | Yes | **No** (not available for EMU-owned repos) | No (GHE.com is EMU-only) | Not in the GHES 3.22 feature list |
+| Optional Copilot Autofix suggestions | Yes | Yes | Not listed as unavailable | **Not in the GHES 3.22 Code Security feature list** |
 | Security campaigns | Yes | Yes | Not listed as unavailable | Not in the GHES 3.22 feature list |
 | Dependabot | Built in | Built in | Built in; org/enterprise **dependency insights unavailable** | Requires **GitHub Connect** and **self-hosted runners**; advisories sync hourly |
 | Open source license compliance policy | Yes | Yes | Yes (explicitly supported) | Not available (GHEC feature) |
@@ -80,7 +95,7 @@ Check GHES and AI-assisted feature availability before rollout.
 
 Sources: [About GitHub Advanced Security](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security), [GHES 3.22 Advanced Security features](https://docs.github.com/en/enterprise-server@3.22/get-started/learning-about-github/about-github-advanced-security), [About autofix for code scanning](https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning), [Enabling Dependabot for GHES](https://docs.github.com/en/enterprise-server@3.22/admin/configuring-settings/configuring-github-connect/enabling-dependabot-for-your-enterprise), [GHE.com feature overview](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/feature-overview-for-github-enterprise-cloud-with-data-residency), [About open source license compliance](https://docs.github.com/en/code-security/concepts/supply-chain-security/open-source-license-compliance).
 
-**GHES takeaway:** budget for institution-owned remediation tracking, autofix alternatives, and build provenance alongside the scanning/enforcement core.
+**GHES takeaway:** budget for institution-owned remediation tracking and build provenance alongside the scanning/enforcement core. Human-reviewed fixes are the baseline on every deployment; assisted remediation is optional.
 
 ## Threat modeling: decide what "bad" looks like first
 
@@ -94,13 +109,15 @@ Scanners find known bug classes; threat models expose design risks such as broke
 
 ### How
 
-- Keep `docs/threat-model.md` in each Critical repo, owned in CODEOWNERS by security.
+- Keep `docs/threat-model.md` in each Critical repo, with the service architect accountable and AppSec participating in CODEOWNERS review.
+- For a payment initiation API, model authorization, replay, signing, downstream settlement calls, and privileged deployment changes. For an infrastructure module, model who can change network policy and assume deployment roles.
+- Assign each design risk to a test, control, or independently accepted gap. A scanner cannot prove that the correct customer authorized a payment.
 - Translate design risks into scanner coverage and tests. CodeQL default setup's **threat models (public preview)** add local taint sources for Java/Kotlin and C#, useful for batch and back-office apps. See [About setup types](https://docs.github.com/en/code-security/concepts/code-scanning/setup-types).
 - Keep a reviewed design model and GA scanner configuration as the baseline. Preview coverage is supplemental; any permitted gap requires named AppSec acceptance, expiry, and second-line approval under Part 1's preview controls.
 
 ### Verify
 
-Annually, the owner attests that the model is current, backed by commit history. Missing or stale models are SDLC findings.
+At significant change and at least annually, the owner demonstrates that the model is current using commit history and linked tests/control decisions. Missing or stale models are SDLC findings. Review a new settlement route before implementation, not only at the annual attestation.
 
 ## Coverage: GitHub Code Security everywhere it matters
 
@@ -108,7 +125,7 @@ Annually, the owner attests that the model is current, backed by commit history.
 
 Every repository touching production, customer data, or regulated processes gets **GitHub Code Security**, through an enterprise configuration set to **"Enforce for repository and organization owners."**
 
-**Procurement:** Advanced Security comprises **Secret Protection** ([Part 4](/blog/github-waf-financial-services/secrets-protection/)) and **Code Security** (scanning, Autofix, AI Scan, campaigns, custom Dependabot triage, dependency review, security overview). Dependency graph and Dependabot alerts are in all plans. See [product coverage](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security).
+**Procurement:** Advanced Security comprises **Secret Protection** ([Part 4](/blog/github-waf-financial-services/secrets-protection/)) and **Code Security** (code scanning and related remediation/supply-chain capabilities). Dependency graph and Dependabot alerts are in all plans. Validate entitlement and deployment availability for each selected capability using [product coverage](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security).
 
 ### Why
 
@@ -172,13 +189,41 @@ jobs:
 
 **Fragment prerequisites:** supply an approved scanner and `results.sarif`. SHAs were checked against [checkout v4.1.7](https://github.com/actions/checkout/releases/tag/v4.1.7) and [CodeQL action v4.31.5](https://github.com/github/codeql-action/releases/tag/v4.31.5) on **November 6, 2026**; [Part 6](/blog/github-waf-financial-services/actions-hardening/) owns institution approval. Here and in dependency review below, `ubuntu-latest` requires an approved non-allowlisted exception; otherwise select Part 6's authorized static-egress runner.
 
-**[AI Scan](https://docs.github.com/en/code-security/concepts/code-scanning/ai-scan):** verify release status and deployment availability. Keep GA scanning as enforcement; any permitted preview coverage gap needs named AppSec acceptance, expiry, and second-line approval under [Part 1's preview controls](/blog/github-waf-financial-services/platform-foundation/#feature-availability-and-preview-controls).
+**Optional supplemental detection:** [AI Scan](https://docs.github.com/en/code-security/concepts/code-scanning/ai-scan) requires its own release-status, deployment, and terms review. It does not replace required GA scanners. Any permitted coverage gap needs named AppSec acceptance, expiry, and second-line approval under [Part 1's preview controls](/blog/github-waf-financial-services/platform-foundation/#feature-availability-and-preview-controls).
 
 ### Verify
 
 - Use the **tool status page** per repo and the Coverage view in security overview to confirm scans are actually succeeding, not just "enabled."
 - Query `GET /orgs/{org}/code-scanning/alerts` via the [code scanning REST API](https://docs.github.com/en/rest/code-scanning/code-scanning) and confirm each in-scope repo has recent analyses from every required tool.
 - **Cadence:** coverage weekly (automated), tool inventory quarterly.
+
+## Make scanner feedback part of the developer workflow
+
+### What we do
+
+Offer tested scanner configurations for the institution's common workloads: banking APIs, web applications, infrastructure code, and packaged services. Return findings to the PR where possible and link every actionable result to an accountable service team.
+
+### Why
+
+Security feedback is most useful while the author still remembers the change. A weekly spreadsheet of unassigned CWEs is technically information, in the same way a box of receipts is technically accounting.
+
+Supported defaults reduce duplicated setup and inconsistent findings. They also let AppSec spend time on difficult risk decisions instead of debugging the same build configuration in twenty repositories.
+
+### How
+
+1. **Onboard by workload.** Record languages, build system, deployable components, required tools, runner needs, and owner/deputy. Unsupported languages or infrastructure formats require an approved alternative, not a green "enabled" badge.
+2. **Make the finding actionable.** Include affected revision, location/data flow, risk explanation, reproducible test or safe validation steps, and the responsible team. Use GitHub's native results where supported; institution-owned ticket routing must preserve the alert identity.
+3. **Keep one accountable work item.** Link related scanner findings and affected artifacts without deleting source records. Retain each first-detection timestamp and deadline; deduplication must not restart clocks.
+4. **Give reviewers useful guidance.** Add a short security section to the PR template: changed trust boundary, dependency/licensing changes, tests, and outstanding exception IDs. The template prompts discussion; required checks enforce policy.
+5. **Support the integrations.** Platform engineering owns failed analyses, template upgrades, and tool outages. Service teams own code fixes. AppSec resolves risk ranking, false positives, and exception decisions.
+
+For the shared authentication library, the library maintainer owns the corrected release and migration notes. Each banking service owner owns adoption and regression tests. Platform engineering can group the work into a campaign, but a central issue marked "fixed" does not prove every deployed consumer upgraded.
+
+### Verify
+
+Sample a PR from each supported workload monthly. Can an author understand the finding, reach the right owner, reproduce the issue safely, and prove remediation? Confirm that scanner failures route to platform support rather than appearing as an empty vulnerability queue.
+
+Track p50/p95 time to actionable feedback, unowned findings, repeat false-positive causes, and reopened fixes. A suggested one-business-day triage acknowledgement objective is a service measure, not permission to delay an urgent production finding.
 
 ## Merge protection: findings block the merge, not the release
 
@@ -256,7 +301,7 @@ Scanner-specific boundaries:
 
 ### What we do
 
-Prioritize using GitHub metadata (**severity, CWE, EPSS, scope, Autofix support**) and institution context (**criticality, internet exposure, regulatory scope**). Assign an SLA; dismissals require independent security approval.
+Prioritize using GitHub metadata (**severity, CWE, EPSS where available, dependency scope**) and institution context (**criticality, internet exposure, regulatory scope, affected deployed artifact**). Assign an owner and deadline; dismissals require independent security approval. Ease of fixing is a planning input, not a risk ranking.
 
 ### Why
 
@@ -265,6 +310,12 @@ Risk ranking and measured remediation support **INT-PCI-6.3**, **EU-DORA-RTS-PAT
 ### How
 
 **Start with an SLA table.** This is a starting point, not regulatory text. Your policy owns the numbers.
+
+**Ownership comes before sorting.** Route application findings to the service owner, shared-library defects to the maintainer plus affected consumers, and scanner failures to platform engineering. AppSec confirms disputed risk decisions; it does not become the default developer for every repository.
+
+Assess credible exploitation, reachability, available fixes, and compensating controls. An exploited internet-facing dependency needs immediate incident assessment even if its severity label is not Critical. A development dependency may execute during a privileged build, so "not runtime" is not a dismissal reason.
+
+**Example:** a vulnerable parser in the payments API gets a service-owned patch and regression test. The same package in a restricted reconciliation tool may have different exposure, but its owner must document that assessment. Missing runtime context means uncertainty, not "unaffected."
 
 | Security severity | Critical or internet-facing repo, or PCI/SOX scope | All other in-scope repos |
 |---|---|---|
@@ -279,7 +330,9 @@ Risk ranking and measured remediation support **INT-PCI-6.3**, **EU-DORA-RTS-PAT
 
 **Dismissals:** GA **Prevent direct alert dismissals** routes requests to security managers ([configuration](https://docs.github.com/en/code-security/how-tos/manage-security-alerts/manage-code-scanning-alerts/enable-delegated-alert-dismissal)). If unavailable or preview, restrict dismissal access, require independent exception-system approval, and reconcile every API/audit dismissal daily. Preview approval alone is not enforcement.
 
-**Autofix:** enabled by default for CodeQL, available on Code Security private/internal repos **including EMU**, and consumes no AI credits. **Agentic autofix** opens draft PRs but excludes EMU-owned repos. [Review and test all generated changes](https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning); normal review/rulesets still apply.
+**Optional assisted fix:** [Copilot Autofix](https://docs.github.com/en/code-security/concepts/code-scanning/autofix-for-code-scanning) can suggest CodeQL remediations on supported Code Security repositories, including EMU. Review and test suggestions under normal change controls; a generated patch neither changes ownership nor proves a fix. Agent execution and its distinct governance belong in [Part 7](/blog/github-waf-financial-services/copilot-and-agents/).
+
+**Close the loop:** tie the fix to a reviewed revision and successful re-analysis, then establish which release/artifact contains it and whether affected production consumers deployed it. Record code remediation and deployment completion separately. For dependencies without a patch, record interim mitigation, residual risk, independent approval, expiry, and reassessment triggers. Risk acceptance must remain visible alongside raw SLA breaches.
 
 ### Verify
 
@@ -398,24 +451,24 @@ The example reports a **7-day breach despite Low criticality**. Collector requir
 
 ### What we do
 
-Use scoped, owned **security campaigns** for existing debt. Campaigns never extend alert SLAs: Critical findings in Critical repos still have **7 days**.
+Use scoped, owned **security campaigns** for existing debt. Organize around a shared root cause, package migration, or service cohort, not just a large alert count. Campaigns never extend alert SLAs: Critical findings in Critical repos still have **7 days**.
 
 ### Why
 
-A dated remediation plan supports **EU-DORA-RTS-PATCH**, **INT-PCI-6.3**, and SSDF **RV.2**. WAF's [prioritization guide](https://learn.github.com/well-architected/library/application-security/recommendations/prioritizing-alerts/) targets Critical, Autofix-supported alerts and high-risk property values.
+A dated remediation plan supports **EU-DORA-RTS-PATCH**, **INT-PCI-6.3**, and SSDF **RV.2**. WAF's [prioritization guide](https://learn.github.com/well-architected/library/application-security/recommendations/prioritizing-alerts/) combines finding metadata with institutional context. Favor the highest risk; easy fixes can be a separate workstream.
 
 ### How
 
 Per [About security campaigns](https://docs.github.com/en/code-security/concepts/security-at-scale/about-security-campaigns) and [Creating and managing security campaigns](https://docs.github.com/en/code-security/how-tos/manage-security-alerts/remediate-alerts-at-scale/creating-managing-security-campaigns):
 
-- Build from a template or a filter. Filtering to `autofix:supported` alerts favors quick wins. Keep each campaign at **1,000 alerts or fewer**.
+- Build from a template or a risk-based filter. For example, group the shared authentication library's affected banking services with named consumer owners and compatible test plans. Keep each campaign at **1,000 alerts or fewer**.
 - Set a **due date** (your SLA, made visible) and **campaign managers**, who must be org owners or security managers.
 - Turn on **"Create issues"** for code campaigns so each repo gets a tracking issue.
 - Code campaigns cover default-branch alerts only. **Secret scanning** campaigns are in **public preview**.
 
 ### Verify
 
-At close, snapshot the **Campaigns** view or [API](https://docs.github.com/en/rest/campaigns/campaigns) and retain risk acceptances for remaining findings.
+At close, snapshot the **Campaigns** view or [API](https://docs.github.com/en/rest/campaigns/campaigns) and retain risk acceptances for remaining findings. Check adoption in affected release records, not only issue completion. Reserve team capacity for recurring dependency maintenance so every update does not require an emergency campaign.
 
 ## Dependabot: alerts, security updates, and version updates
 
@@ -423,7 +476,7 @@ At close, snapshot the **Campaigns** view or [API](https://docs.github.com/en/re
 
 - **Dependabot alerts** and **security updates** are on for every repo through the security configuration.
 - **Version updates** are on for Critical and High repos through a standard `dependabot.yml`, with **grouping** and a **cooldown**.
-- **Custom auto-triage rules** dismiss known noise and keep the queue honest.
+- **Custom auto-triage rules** handle validated noise through approved, sampled rules. Preserve auto-dismissed findings for evidence and reassessment.
 - **Malware alerts** are enabled.
 - **No auto-merge** of dependency updates without human review.
 
@@ -603,21 +656,24 @@ Procedures: [Using artifact attestations](https://docs.github.com/en/actions/how
 
 ## Evidence: security overview is your audit binder
 
-Security overview exposes **alert age, MTTR, net resolve rate, and introduced versus prevented** ([metric definitions](https://docs.github.com/en/code-security/reference/security-at-scale/overview-dashboard-metrics)). [Export CSVs](https://docs.github.com/en/code-security/how-tos/view-and-interpret-data/analyze-organization-data/export-data) from overview, risk, coverage, and PR views for second/third-line review.
+Security overview is an **index into the evidence**, not the complete audit binder. It exposes **alert age, MTTR, net resolve rate, and introduced versus prevented** ([metric definitions](https://docs.github.com/en/code-security/reference/security-at-scale/overview-dashboard-metrics)). [Export CSVs](https://docs.github.com/en/code-security/how-tos/view-and-interpret-data/analyze-organization-data/export-data) for second/third-line review, then join them to institutional ownership, exception, patch, and release records.
 
 Our monthly evidence pack:
 
 | Artifact | Source | Answers |
 |---|---|---|
 | Coverage CSV | Security overview > Coverage | "Is everything in scope actually scanned?" |
-| MTTR and alert age | Security overview > Overview | "Are you meeting your SLA?" |
+| MTTR and alert age | Security overview > Overview | "How is the queue trending?" (Not proof of tier-specific SLA compliance) |
 | Introduced vs. prevented | Security overview > Overview (Prevention) | "Does enforcement work?" |
 | SLA breach report | REST API script above | "Which findings are late, and who owns them?" |
 | Dismissal and bypass log | Audit log stream + Rule Insights | "Who made exceptions, and were they approved?" |
 | Campaign closeout snapshots | Campaigns view / campaigns REST API | "What's your plan for legacy debt?" |
 | SBOMs and attestation verifications | Release records | "What's in production, and where did it come from?" |
+| Feedback and routing measures | PR/check timestamps plus institutional work records | "Can teams act promptly, and where does work get stuck?" |
 
 These views reflect **default branches** and only show alerts from enabled features. An empty dashboard on an unscanned repo proves nothing, which is why the coverage CSV comes first.
+
+Report overdue high-risk findings and unverified production remediation separately from accepted exceptions and developer-service measures. Raw closure counts reward tidying the dashboard; they do not establish lower risk. Never use an average MTTR to hide one overdue critical payment-service finding.
 
 **Archive, don't bookmark:** [Part 1](/blog/github-waf-financial-services/platform-foundation/#evidence-retention-and-integrity) owns record retention, integrity, access, and retrieval standards. This chapter's population includes all in-scope repositories and required tools, open and closed findings with first-detection history, dismissals/auto-dismissals, patch-release metadata, exceptions, campaigns, and every shipped component/provenance record. Capture scanner/check evidence **at merge** and artifact-bound SBOM/provenance evidence **at release/deployment**, not at the monthly export. Use [Part 6's collector contract](/blog/github-waf-financial-services/actions-hardening/#control-8-retention-logs-and-attestations-as-evidence) for hourly paginated backfill, seven-day overlap, durable cursors, retries, and idempotency.
 
@@ -632,7 +688,7 @@ Reconcile the complete population daily. Missing pages, tool results, patch meta
 | Merge protection on high-severity findings | INT-PCI-6.2, US-NYDFS-500.8, CA-AMF-ICT | Org ruleset `code_scanning` rule | Rule Insights; `repository_ruleset.*` events; bypass review | Monthly sample; quarterly bypass review |
 | Risk-ranked triage with SLAs | INT-PCI-6.3, EU-DORA-RTS-PATCH, BR-CMN-4893, MX-CNBV-CUB | Alert metadata, custom properties, production context filters | SLA breach report; MTTR and alert age | Weekly report; monthly review |
 | Approved dismissals only | INT-PCI-6.3, US-NYDFS-500.8, CL-CMF-20-10 | GA delegated dismissal or independent exception approval with restricted access | `code_scanning.alert_closure_*`, `repository_vulnerability_alert.dismiss`; exception register | Daily reconciliation; monthly review |
-| Legacy debt burn-down | EU-DORA-RTS-PATCH, INT-PCI-6.3, INT-NIST-SSDF (RV.2) | Security campaigns + Copilot Autofix | Campaign snapshots at close | Quarterly |
+| Legacy debt burn-down | EU-DORA-RTS-PATCH, INT-PCI-6.3, INT-NIST-SSDF (RV.2) | Owned security campaigns and reviewed remediation | Campaign snapshots; downstream adoption evidence | Quarterly |
 | Dependency patching | INT-PCI-6.3, EU-DORA-RTS-PATCH, US-FFIEC-DAM | Dependabot alerts, security/version updates, auto-triage, malware alerts | Dependabot metrics; human-approved PR sample | Monthly; quarterly sample |
 | Block vulnerable/non-compliant dependencies at PR | INT-PCI-6.3, US-NYDFS-500.8, INT-NIST-SSDF (PW.4) | Dependency review action (required workflow), license compliance ruleset | Rule Insights; license exception register | Per PR; quarterly |
 | Component inventory | INT-PCI-6.3, US-FFIEC-DAM | Build-generated artifact SBOM and SBOM attestation; graph export supplemental | SBOM and shipped digest | Per release; quarterly sample |
@@ -643,7 +699,9 @@ Reconcile the complete population daily. Missing pages, tool results, patch meta
 
 ## Summary and key takeaways
 
-Buying scanners is easy. Operate a **closed loop** of coverage, merge blocking, risk-based SLAs, approved exceptions, and durable evidence.
+Apply WAF by connecting security feedback to the way banking teams actually deliver. Supported scanner paths reduce setup work; named owners and shared-component coordination turn findings into fixes.
+
+Keep required gates and remediation policy firm. Improve feedback speed and triage quality as an engineering service. Prove what reached production using artifact-bound evidence, not a reassuring dashboard color.
 
 **Your checklist:**
 
@@ -652,6 +710,8 @@ Buying scanners is easy. Operate a **closed loop** of coverage, merge blocking, 
 - [ ] Enforce Code Security, default setup, Dependabot, and GA delegated dismissal or independent approval fallback.
 - [ ] Stream `security_configuration.*`, `repository_ruleset.*`, and dismissal events to your SIEM.
 - [ ] Upload third-party scanner results as SARIF, one `category` per tool.
+- [ ] Publish supported scanning paths and route failed analyses to platform support.
+- [ ] Assign service, shared-library, and consumer owners; preserve first detection across linked work items.
 - [ ] Deploy active rulesets covering Critical/High **and** PCI/SOX repositories, with verified central workflow SHAs. Timebox Evaluate separately.
 - [ ] Publish an SLA table and automate a weekly breach report.
 - [ ] Launch campaigns without extending the 7-day Critical/top-tier SLA.
@@ -661,8 +721,10 @@ Buying scanners is easy. Operate a **closed loop** of coverage, merge blocking, 
 - [ ] Capture merge/release evidence on time; reconcile daily and block releases on required-evidence gaps.
 - [ ] Hand the monthly evidence pack to your second line before the examiner asks.
 
+**Try this with one shared dependency:** identify affected deployed services, assign the maintainer and consumer upgrades, and trace one fix from PR feedback through target deployment. Measure the waiting time between those steps. That is your first improvement backlog.
+
 **Previous:** [Part 4: Secrets Protection](/blog/github-waf-financial-services/secrets-protection/)
-**Next:** [Part 6: CI/CD and GitHub Actions Hardening](/blog/github-waf-financial-services/actions-hardening/), where we lock down the pipeline that produces all those attestations.
+**Next:** [Part 6: CI/CD and GitHub Actions Hardening](/blog/github-waf-financial-services/actions-hardening/), where we make the delivery platform governed, reusable, efficient, and recoverable.
 
 ## References
 
