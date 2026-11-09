@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "CI Health at Enterprise Scale: Finding and Fixing Pipeline Failures Across Hundreds of Orgs"
-date: 2026-06-30 10:00:00 -0500
+date: 2026-11-26 10:00:00 -0600
 category: Blog
 tags: [ci, devops, github-actions, pipelines, reliability, automation, enterprise, platform-engineering]
 excerpt: "A flaky, red pipeline is a tax on every engineer. At enterprise scale  -  hundreds of orgs, tens of thousands of repos  -  that tax becomes existential. Here's how a CI/CD platform team approaches health at scale."
@@ -12,6 +12,8 @@ A red pipeline is easy to ignore when it's one team's problem. But when you're r
 At enterprise scale, CI health isn't a developer experience nicety  -  it's an operational and business risk. A systemic flakiness problem that costs each developer 20 minutes a day multiplied across 5,000 engineers is 1,600+ engineering hours lost every single day.
 
 This post covers two levels: the fundamentals that apply to any team, and the platform engineering patterns that let a central CI/CD team actually manage health at fleet scale.
+
+**Fact-check anchor: November 3, 2026.** Enterprise policy examples below use current rulesets, not the retired standalone required-workflows feature.
 
 ## Why CI Health Matters More Than You Think
 
@@ -57,6 +59,10 @@ You can query the GitHub API directly, use the GitHub CLI, or pull this into a d
 gh run list --workflow=ci.yml --status=failure --limit=50
 ```
 
+That's a sample, not a 30-day census. For a date-bounded export, use the [workflow runs REST API](https://docs.github.com/en/rest/actions/workflow-runs#list-workflow-runs-for-a-repository) with `created`, `per_page=100`, and pagination. Filtered searches return at most **1,000 runs**, so partition busy repositories into smaller time windows.
+
+**Missing checks are not passing checks.** Track expected workflows by event and commit, then distinguish success, failure, cancellation, skipped jobs, pending checks, and missing coverage. A quiet dashboard can mean broken triggers or missing access, not healthy CI.
+
 ### 3. Look for Patterns
 
 Once you have data, look for patterns:
@@ -78,7 +84,7 @@ Flaky tests are one of the most corrosive CI health problems. They create noise,
 - Identify and quarantine flaky tests with a dedicated label or tag
 - Investigate root cause  -  race conditions, shared state, timing dependencies, network calls
 - Prefer retry-with-backoff for tests with legitimate external dependencies
-- Delete tests that can't be made reliable  -  a flaky test provides no signal
+- Replace or remove unreliable tests only after deciding how to preserve the coverage they were meant to provide
 
 **One rule:** never re-run a flaky test to "fix" a failing build without tracking the underlying issue. Re-runs hide problems.
 
@@ -115,7 +121,7 @@ Slow CI is a form of CI failure. If builds take 45 minutes, developers stop wait
 **Attack slow builds by:**
 - Parallelizing independent jobs and test suites
 - Using caching for dependencies and build outputs
-- Running only affected tests on PRs using path filters
+- Running only affected tests on PRs while keeping an always-reported required gate
 - Profiling job timing and cutting the long tail
 
 ## Building a Culture of CI Health
@@ -175,7 +181,7 @@ Your job as a platform team is not to fix every broken pipeline. It's to:
 
 ### 1. Centralized Observability: Build the Fleet View
 
-You cannot manage what you cannot see. The GitHub REST and GraphQL APIs give you access to workflow run data across every org and repo  -  but you need to ingest it at scale and put it somewhere queryable.
+You cannot manage what you cannot see. Use the GitHub **REST Actions API** for run, job, and log data. GraphQL helps with repository metadata and ownership. Access is limited to the repositories your identity can read; an enterprise role alone does not make every private repo observable.
 
 **Architecture pattern:**
 
@@ -192,14 +198,18 @@ Time-series or columnar store (e.g., ClickHouse, BigQuery, or Postgres with part
 Dashboards (Grafana, Looker, or a custom internal tool)
 ```
 
-Subscribe to `workflow_run` webhook events at the organization level. Each event contains the repo, workflow name, conclusion, run duration, head branch, and triggering actor. Pipe these into a data store and you have a real-time fleet health picture.
+Subscribe to [`workflow_run` webhooks](https://docs.github.com/en/webhooks/webhook-events-and-payloads#workflow_run) through organization webhooks or a GitHub App installed on the target repositories. A read-only collector typically needs **Actions: read** plus repository metadata access; add **Contents: read** only for workflow inventory.
+
+The payload identifies the repository, workflow, branch, actor, conclusion, and run timestamps. Fetch [jobs for each run attempt](https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt) to calculate execution duration and queue wait accurately. `updated_at` is not a dedicated completion-duration field.
+
+Validate webhook signatures, deduplicate deliveries, and key records by repository, run ID, and attempt. Backfill through REST to cover missed deliveries and re-runs. Track `workflow_job` events if you need job-level live queue telemetry.
 
 Key metrics to track per repo, per org, and fleet-wide:
 
 - **Pass rate** (rolling 7-day and 30-day)
-- **Flaky rate**  -  runs that failed then succeeded without a code change
+- **Suspected flaky rate**  -  failed runs that later succeeded at the same SHA (correlate with test results before calling a test flaky)
 - **P50/P95 duration** per workflow
-- **Queue wait time**  -  time between trigger and first runner pickup
+- **Queue wait time**  -  distinguish job queue delay from environment approval waits and dependency waits
 - **Re-run rate**  -  a proxy for flakiness when you don't have test-level data
 
 This data pipeline is your single most valuable investment in CI fleet health. Without it, you're flying blind.
@@ -216,30 +226,42 @@ Reusable workflows (`.github/workflows/` in a shared repo, called with `uses:`) 
 
 ```yaml
 # In any repo's .github/workflows/ci.yml
+name: CI
+on:
+  push:
+  pull_request:
+  merge_group:
+permissions:
+  contents: read
 jobs:
   build:
     uses: my-org/platform-workflows/.github/workflows/build.yml@v2
     with:
       language: java
       java-version: '21'
-    secrets: inherit
 ```
 
-The platform team owns the implementation. Teams own the configuration. When you need to roll out a fix  -  say, updating a pinned action version or adding a security scan step  -  you do it in one place and every consumer gets it on their next run (or immediately, if you control the ref).
+The platform team owns the implementation. Teams own the configuration. The sample assumes a real shared `build.yml` with those inputs, authorized cross-repository access, and no required secrets. Pass named secrets only when needed, rather than automatically using `secrets: inherit`.
 
-**Versioning matters.** Use semver tags on your shared workflow repo. Breaking changes go in major versions. Teams that haven't opted into `@v3` keep getting `@v2`. This lets you innovate without breaking everyone at once.
+**Versioning matters.** `@v2` above is an illustrative rolling major tag, not an immutable pin. Moving it updates consumers on their next run, but also changes their trusted code without a consumer PR. For production, pin the verified full commit SHA and use update PRs for rollout. Keep release tags for human-friendly versioning. See [reusing workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows) and [secure action pinning](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions).
 
 ### 3. Policy Enforcement at Scale with Required Workflows
 
-Reusable workflows only help if teams use them. Required workflows (configurable at the organization level) let you mandate that specific workflows run on all repos in an org, regardless of what's in the repo itself.
+Reusable workflows only help if teams use them. The current mechanism is a branch ruleset's **Require workflows to pass before merging** rule, configured at the organization or enterprise level. Use [required workflows through repository rules](https://github.blog/changelog/2023-10-11-requiring-workflows-with-repository-rules-is-generally-available/), not the retired standalone Actions required-workflows mechanism.
 
 Use required workflows to enforce non-negotiable platform standards:
 
-- Security scanning (SAST, secret detection, dependency vulnerability checks)
+- Mandatory platform validation implemented by compatible workflows
 - License compliance checks
 - Required status checks before merge
 
-This means a new repo automatically gets your security baseline the moment it's created, without any action required by the repo owner. The platform team owns the policy; individual teams can't opt out.
+Target the intended repositories and PR-only branches, then pilot in **Evaluate** mode before activating enforcement. This gates merges, not every push or every repository-creation event. Document authorized bypass actors and exceptions rather than promising nobody can opt out.
+
+Ruleset workflows support `pull_request`, `pull_request_target`, and `merge_group`, not arbitrary CI event coverage. Include `merge_group` when using a merge queue. Avoid privileged `pull_request_target` execution of untrusted code. Source-repository visibility and Actions sharing policies must allow every target repository to use the workflow.
+
+Ruleset workflows ignore event filters such as `paths`, `branches`, and `types`, and use the supported events' default activity types. Target branches through the ruleset itself. Keep mandatory gates always reported; a skipped workflow is not evidence that your baseline ran.
+
+**CodeQL is a special case:** ruleset workflows cannot use `github/codeql-action/init` or `analyze`; `upload-sarif` is the exception. Use supported code scanning setup and the **Require code scanning results** rule instead. See [available rules and workflow restrictions](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-workflows-to-pass-before-merging) and [ruleset troubleshooting](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/troubleshooting-rules).
 
 ### 4. Fleet-Wide Remediation: Automation at Scale
 
@@ -255,28 +277,56 @@ Build or adopt tooling that can:
 
 The GitHub CLI with scripting handles the basics. At scale, you'll want a proper service with rate limit handling, backoff, and state tracking.
 
-```bash
-# Find all repos in an org using a deprecated action
-gh api graphql --paginate -f query='
-  query($endCursor: String) {
-    organization(login: "my-org") {
-      repositories(first: 100, after: $endCursor) {
-        nodes { name }
-        pageInfo { hasNextPage endCursor }
-      }
-    }
-  }' | jq -r '.data.organization.repositories.nodes[].name' | while read repo; do
-  gh api repos/my-org/$repo/contents/.github/workflows \
-    --jq '.[].name' 2>/dev/null | while read workflow; do
-    content=$(gh api repos/my-org/$repo/contents/.github/workflows/$workflow --jq '.content' | base64 -d)
-    if echo "$content" | grep -q "actions/checkout@v2"; then
-      echo "$repo/$workflow"
-    fi
-  done
-done
+```python
+# inventory.py - read-only example; requires Python 3 and authenticated gh
+import json
+import re
+import subprocess
+import sys
+from urllib.parse import quote
+
+org = sys.argv[1]  # python3 inventory.py my-org
+
+def api(endpoint, *args):
+    result = subprocess.run(
+        ["gh", "api", endpoint, *args],
+        check=True, capture_output=True, text=True,
+    )
+    return result.stdout
+
+pages = json.loads(api(f"orgs/{quote(org, safe='')}/repos?per_page=100",
+                       "--paginate", "--slurp"))
+for repo in (r for page in pages for r in page):
+    if repo["archived"] or repo["disabled"]:
+        continue
+    name = repo["full_name"]
+    try:
+        # Read all workflow files at the same default-branch snapshot.
+        branch = quote(repo["default_branch"], safe="")
+        sha = json.loads(api(f"repos/{name}/commits/{branch}"))["sha"]
+        entries = json.loads(api(
+            f"repos/{name}/contents/.github/workflows?ref={sha}"
+        ))
+        for entry in entries:
+            if entry["type"] != "file" or not entry["name"].endswith((".yml", ".yaml")):
+                continue
+            path = quote(entry["path"], safe="/")
+            content = api(
+                f"repos/{name}/contents/{path}?ref={sha}",
+                "-H", "Accept: application/vnd.github.raw+json",
+            )
+            if re.search(r"actions/checkout@v2(?:[.\s'\"#]|$)", content):
+                print(f"MATCH\t{name}\t{entry['path']}\t{sha}")
+    except subprocess.CalledProcessError as error:
+        # A 404 may mean no workflow directory OR hidden/inaccessible content.
+        print(f"UNKNOWN\t{name}\t{error.stderr.strip()}", file=sys.stderr)
 ```
 
-That gives you the inventory. From there, automated PRs via the API (or tools like `multi-gitter`) can push the fix at scale.
+This is a **candidate inventory**, not a YAML parser or proof of absence. It scans visible, active repositories on the default branch only. Comments can match, and reusable-workflow dependencies need separate inspection.
+
+The [Contents API](https://docs.github.com/en/rest/repos/contents#get-repository-content) has a **1,000-entry directory limit**; use Git Trees for unusually large directories. An installation token only sees that installation's repositories. Run across every required installation/org, record unknowns, and honor primary/secondary rate limits. See [CLI pagination](https://cli.github.com/manual/gh_api).
+
+Review candidates before opening remediation PRs. GitHub Apps are a good fleet identity: keep collection read-only and grant the separate remediation installation only the needed Contents, Pull requests, and Workflows write permissions. No blanket enterprise-admin token required.
 
 ### 5. Ownership Mapping: Who Fixes What
 
@@ -287,12 +337,12 @@ At 40,000 repos, "everyone owns their own CI" is not a coherent strategy. You ne
 Extend your ownership model to include workflow files explicitly. A `CODEOWNERS` entry like:
 
 ```
-.github/workflows/  @my-org/platform-ci-team @repo-owner-team
+.github/workflows/  @my-org/platform-ci-team @my-org/repo-owner-team
 ```
 
-...means both the platform team and the repo team get notified on changes to workflow files. The platform team watches for anti-patterns; the repo team owns their own pipeline health.
+...requests reviews from those teams when they are visible and have explicit write access. Require code-owner review in your ruleset if it must block merging. Listing two owners does not require both to approve; one owner's approval can satisfy code-owner review. See [CODEOWNERS behavior](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
 
-For fleet-level ownership reporting, build a registry that maps repos to teams (GitHub's Teams API provides this) and join that against your health metrics. Now you can answer: "Which teams have the worst CI pass rates?" and route those insights to engineering leadership.
+For fleet-level ownership reporting, build a registry that maps repos to accountable teams. The Teams API provides access relationships, not an authoritative service owner, so join it with your service catalog and CODEOWNERS. Now you can answer: "Which teams have the worst CI pass rates?" and route those insights to engineering leadership.
 
 ### 6. Tiered Response: Triage at Scale
 
@@ -358,4 +408,3 @@ The data pipeline and the ownership map are the two foundations everything else 
 - CI health is a platform product problem at enterprise scale. Treat it like one.
 
 Your pipeline should help your engineers ship faster and safer. At 40,000 repos, that's not a wish  -  it's an engineering discipline.
-

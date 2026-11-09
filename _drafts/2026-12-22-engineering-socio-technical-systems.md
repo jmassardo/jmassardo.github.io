@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Engineering Is a Socio-Technical System (and We Keep Pretending It Isn't)"
-date: 2026-06-09 10:00:00 -0500
+date: 2026-12-22 10:00:00 -0600
 category: Blog
 tags: [engineering, leadership, culture, systems-thinking, devops]
 excerpt: "Modern engineering failures rarely stem from code alone. They emerge from the messy intersection of people, incentives, tooling, and organizational structure. It's time we stopped pretending otherwise."
@@ -33,7 +33,7 @@ Let's break down the "socio" side of your socio-technical system:
 
 How does information flow through your organization? If your architecture requires two teams to coordinate but those teams never talk, you've got a design flaw that no amount of API documentation will fix.
 
-Conway's Law isn't just a fun observation. It's a warning. Your system will reflect your communication structure, for better or worse.
+[Conway's Law](https://www.melconway.com/Home/Committees_Paper.html) isn't just a fun observation. It's a warning about how communication structures constrain design. Treat it as a design lens, not a guarantee that every service boundary copies the org chart.
 
 ### Ownership Boundaries
 
@@ -92,7 +92,7 @@ A socio-technical diagnosis is useful only if it changes daily behavior. Start w
 - **Cross-team interface contracts.** If one team's deploy can break another team's runtime, define coordination points explicitly.
 - **Incentive alignment.** Reward reliability and maintainability outcomes, not just feature throughput.
 
-Small structural changes compound fast. They prevent repeat incidents, reduce blame cycles, and make engineering work feel less chaotic.
+Small structural changes can reduce repeat incidents and blame cycles. Pick one recurring coordination failure, change the handoff, then check whether the next drill or incident actually goes better.
 
 ## TL;DR
 

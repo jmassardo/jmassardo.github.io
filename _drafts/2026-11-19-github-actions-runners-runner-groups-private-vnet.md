@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "GitHub Actions Runners: Runner Groups and Azure Private Networking"
-date: 2026-06-28 10:00:00 -0500
+date: 2026-11-19 10:00:00 -0600
 category: Blog
 tags: [github, actions, enterprise, runner, azure, networking, security]
 excerpt: "A comprehensive guide to configuring GitHub Actions runners, organizing them with runner groups, and securing CI/CD workflows with Azure Private VNet integration."
@@ -12,6 +12,8 @@ excerpt: "A comprehensive guide to configuring GitHub Actions runners, organizin
 If you're running GitHub Actions at scale in an enterprise environment, you've probably hit the point where the standard GitHub-hosted runners just don't cut it. Maybe you need access to internal resources behind a firewall, custom hardware configurations, or tighter control over where your code runs. That's where self-hosted runners, runner groups, and Azure Private VNet integration come into play.
 
 In this post, I'll walk you through setting up runners at the enterprise and organization level, organizing them with runner groups for better access control, and (the real fun part) connecting GitHub-hosted runners to your Azure Virtual Network for secure, private connectivity to your internal resources.
+
+**Fact-check anchor: November 3, 2026.** GitHub's old static-IP outbound template is no longer the recommended starting point. Use its current domain-based networking requirements, not a copied IP list.
 
 ## Understanding Runner Types
 
@@ -31,7 +33,7 @@ You deploy and manage these on your own infrastructure. They can be physical mac
 
 ### Larger Runners (GitHub-Hosted)
 
-Available on GitHub Team and Enterprise Cloud plans, these are beefier GitHub-hosted runners with more vCPUs and memory. The key benefit for this discussion: they support Azure Private VNet integration.
+Available on GitHub Team and Enterprise Cloud plans, these offer configurable hardware and networking. For Azure private networking, GitHub currently documents **2-64 vCPU Ubuntu and Windows larger runners**, with GPU and arm64 availability limited by region. **Standard runners and macOS are not supported**, and private networking requires **dynamic runner IPs**, not GitHub's static-IP option. See [Azure networking availability](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/about-azure-private-networking-for-github-hosted-runners-in-your-enterprise).
 
 ## Setting Up Enterprise Runners
 
@@ -72,7 +74,9 @@ For self-hosted runners:
 1. In the runner group, click **New runner**
 2. Select your operating system
 3. Follow the download and configuration instructions
-4. During configuration, the runner automatically joins the group you created it from
+4. Select the intended group when configuring the runner (`./config.sh --runnergroup private-network-runners`, alongside the generated URL/token arguments)
+
+Self-hosted runner groups control access, but **do not inject those machines into an Azure VNet**. Their networking remains yours to configure.
 
 For GitHub-hosted larger runners:
 
@@ -129,86 +133,55 @@ This is where things get interesting. Azure Private VNet integration lets you ru
 - Internal package registries and artifact stores
 - Any resource within your VNet
 
+More precisely, GitHub manages the compute and assigns the runner's NIC an address from your delegated subnet. **A runner group controls who may use the runner; its attached network configuration selects the Azure subnet.** Reachability still depends on DNS, routing, NSGs, and resource authentication.
+
 ### Prerequisites
 
 Before you start, you'll need:
 
 - GitHub Enterprise Cloud plan
-- Azure subscription with Contributor and Network Contributor roles
+- Azure account with subscription-level Contributor and Network Contributor roles
 - A supported Azure region (see the [official docs](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/about-azure-private-networking-for-github-hosted-runners-in-your-enterprise#about-supported-regions) for the full list)
+- A dedicated subnet with no existing NICs, plus network settings in the **same subscription and region** as the VNet
+- An explicit outbound path (NAT Gateway or a routed firewall), internal DNS resolution, and current GitHub domain allow-lists
+
+GitHub.com and GHE.com have different regional lists. GPU and arm64 lists are narrower than the general list. Check the platform and region together before reserving capacity.
+
+Azure APIs released after March 31, 2026 default new VNets to private subnets, so do not assume implicit internet egress. See [Azure default outbound access](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access). Bypass TLS interception for runner traffic unless you deliberately use a custom image with the required trust certificates, as described in [GitHub's prerequisites](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise#prerequisites).
 
 ### Step 1: Get Your Enterprise Database ID
 
 You'll need this ID to configure the Azure resources. Use the GraphQL API:
 
 ```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" -X POST \
-  -d '{ "query": "query($slug: String!) { enterprise (slug: $slug) { slug databaseId } }" ,
-        "variables": {
-          "slug": "YOUR_ENTERPRISE_SLUG"
-        }
-      }' \
-https://api.github.com/graphql
+gh api graphql \
+  -f query='query($slug: String!) { enterprise(slug: $slug) { databaseId } }' \
+  -f slug='YOUR_ENTERPRISE_SLUG' \
+  --jq '.data.enterprise.databaseId'
 ```
 
-Your token needs at least `read:enterprise` scope. Save the `databaseId` from the response.
+Use an authenticated enterprise owner with the documented `read:enterprise` scope. Save the `databaseId` from the response. For GHE.com, add `--hostname YOUR_SUBDOMAIN.ghe.com`. See [GitHub's database ID procedure](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise#1-obtain-the-databaseid-for-your-enterprise).
 
 ### Step 2: Configure Azure Resources
 
-GitHub provides a Bicep file with the necessary Network Security Group (NSG) rules. Save this as `actions-nsg-deployment.bicep`:
+**Use domain-based outbound controls.** GitHub states that the previously recommended IP addresses would close on or after July 1, 2026. Its legacy IP-based Bicep template remains in the docs with a migration warning, not a recommendation for new deployments.
 
-```bicep
-@description('NSG for outbound rules')
-param location string
-param nsgName string = 'actions_NSG'
+Read the current domain lists without authenticating:
 
-resource actions_NSG 'Microsoft.Network/networkSecurityGroups@2017-06-01' = {
-  name: nsgName
-  location: location
-  properties: {
-    securityRules: [
-      {
-        name: 'AllowVnetOutBoundOverwrite'
-        properties: {
-          protocol: 'TCP'
-          sourcePortRange: '*'
-          destinationPortRange: '443'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: 'VirtualNetwork'
-          access: 'Allow'
-          priority: 200
-          direction: 'Outbound'
-        }
-      }
-      {
-        name: 'AllowStorageOutbound'
-        properties: {
-          protocol: '*'
-          sourcePortRange: '*'
-          destinationPortRange: '443'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: 'Storage'
-          access: 'Allow'
-          priority: 230
-          direction: 'Outbound'
-        }
-      }
-      // Additional rules for GitHub IPs required
-      // See official docs for complete IP list
-    ]
-  }
-}
+```bash
+curl --fail --silent --show-error https://api.github.com/meta |
+  jq '.domains | {actions, actions_inbound}'
 ```
 
-**Note:** The official Bicep file includes all required GitHub IP addresses. Get the complete file from the [GitHub documentation](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise#prerequisites).
+Choose the appropriate exact or wildcard list for your firewall, and refresh specific lists **at least weekly**. NSGs do not implement FQDN allow-lists; use a DNS/domain-aware firewall or equivalent egress control. Allow your package registries and internal service ports too. See [GitHub's domain-control guidance](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise#dnsdomain-control-recommended).
 
 ### Step 3: Run the Azure Configuration Script
 
-Here's the script to set up your Azure resources:
+Here's the provisioning skeleton for a **new, dedicated VNet**. It creates an inbound-blocking NSG and the GitHub network settings resource. It does **not** configure your firewall, NAT Gateway, private DNS, or internal service access; connect those before starting runner jobs.
 
 ```bash
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Configure these values
 export AZURE_LOCATION=eastus
@@ -231,16 +204,22 @@ az login --output none
 az account set --subscription $SUBSCRIPTION_ID
 
 # Register the GitHub.Network resource provider
-az provider register --namespace GitHub.Network
+az provider register --namespace GitHub.Network --wait
 
 # Create resource group
 az group create --name $RESOURCE_GROUP_NAME --location $AZURE_LOCATION
 
-# Deploy NSG rules
-az deployment group create \
-  --resource-group $RESOURCE_GROUP_NAME \
-  --template-file ./actions-nsg-deployment.bicep \
-  --parameters location=$AZURE_LOCATION nsgName=$NSG_NAME
+# Block new inbound connections, including Azure's default VNet inbound allow.
+# Outbound NSG defaults remain permissive; the egress firewall must enforce domains.
+az network nsg create \
+  --resource-group "$RESOURCE_GROUP_NAME" \
+  --name "$NSG_NAME" --location "$AZURE_LOCATION"
+az network nsg rule create \
+  --resource-group "$RESOURCE_GROUP_NAME" --nsg-name "$NSG_NAME" \
+  --name DenyAllInbound --priority 100 --direction Inbound \
+  --access Deny --protocol '*' \
+  --source-address-prefixes '*' --source-port-ranges '*' \
+  --destination-address-prefixes '*' --destination-port-ranges '*'
 
 # Create VNet and subnet
 az network vnet create \
@@ -272,6 +251,8 @@ az resource create \
 
 The script outputs a `GitHubId`. Save this value for the next step.
 
+The `GitHub.Network/networkSettings` API version `2024-04-02` and `businessId` property above match [GitHub's documented resource setup](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise#2-use-a-script-to-configure-your-azure-resources). For production, put this provisioning in your normal reviewed infrastructure code.
+
 ### Step 4: Create the Network Configuration in GitHub
 
 1. Go to your Enterprise **Settings** > **Hosted compute networking**
@@ -280,6 +261,8 @@ The script outputs a `GitHubId`. Save this value for the next step.
 4. Click **Add Azure Virtual Network**
 5. Enter the `GitHubId` from the previous step
 6. Click **Add Azure Virtual Network**
+
+Enterprise setup comes first. Organizations inherit enterprise network configurations unless the enterprise explicitly allows independent organization configurations. See [network configuration policies](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/about-azure-private-networking-for-github-hosted-runners-in-your-enterprise#using-github-hosted-runners-with-an-azure-vnet).
 
 ### Step 5: Create a Runner Group with Network Configuration
 
@@ -299,24 +282,27 @@ The script outputs a `GitHubId`. Save this value for the next step.
 
 ## Using Private VNet Runners in Workflows
 
-Reference your runners by the runner name in your workflow:
+Reference both the group and the larger runner's configured label. This example assumes an Ubuntu runner named `ubuntu-private-4core` and working internal DNS:
 
 ```yaml
+name: Private network smoke test
+on:
+  workflow_dispatch:
+permissions: {}
 jobs:
   build:
-    runs-on: your-private-runner-name
+    runs-on:
+      group: private-network-runners
+      labels: ubuntu-private-4core
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      
       - name: Access internal resources
         run: |
-          # This can now reach resources in your Azure VNet
-          curl https://internal-api.yourcompany.local/health
-          
-      - name: Connect to private database
-        run: |
-          psql -h private-db.yourcompany.local -U app -d mydb -c "SELECT 1"
+          curl --fail --show-error --connect-timeout 10 --max-time 30 \
+            https://internal-api.yourcompany.local/health
 ```
+
+No checkout or database credentials are needed for this smoke test. For real database jobs, install the client and supply environment-scoped credentials. See [running jobs on larger runners](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/use-larger-runners).
 
 ## Security Considerations
 
@@ -326,38 +312,30 @@ When using private VNet integration, keep these security practices in mind:
 
 GitHub never needs inbound connections to your runners. Block them explicitly:
 
-```bicep
-{
-  name: 'DenyAllInbound'
-  properties: {
-    protocol: '*'
-    sourcePortRange: '*'
-    destinationPortRange: '*'
-    sourceAddressPrefix: '*'
-    destinationAddressPrefix: '*'
-    access: 'Deny'
-    priority: 4096
-    direction: 'Inbound'
-  }
-}
-```
+The script above adds `DenyAllInbound` at priority `100`, ahead of Azure's default VNet allow. Do not add a higher-precedence inbound allow that defeats it. NSGs are stateful, so replies to allowed outbound connections still work. See [Azure NSG rule processing](https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview).
 
 ### Use Private Repositories
 
-If you're using static IPs, forks could potentially run malicious code on your runners via pull requests. Stick to private repos or use careful branch protection rules.
+Private networking does not support GitHub static runner IPs. More importantly, **a private repository is not a trust boundary for every workflow**. Fork PRs and compromised contributors can still reach internal services if their jobs run on your private-network group. Restrict repository and workflow access, and keep untrusted PR validation on separate runners. Branch protection alone does not isolate runner networking. See [controlling larger-runner access](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/control-access).
 
 ### Monitor Network Traffic
 
-Enable Azure network logging to monitor all traffic to and from your runners:
+Use **VNet flow logs**, not new NSG flow logs. Azure no longer permits creating NSG flow logs and retires the feature September 30, 2027. See [NSG flow-log retirement](https://learn.microsoft.com/en-us/azure/network-watcher/nsg-flow-logs-overview).
+
+With Network Watcher enabled in the region and an existing supported storage account:
 
 ```bash
+az provider register --namespace Microsoft.Insights --wait
 az network watcher flow-log create \
-  --resource-group $RESOURCE_GROUP_NAME \
+  --location "$AZURE_LOCATION" \
+  --resource-group "$RESOURCE_GROUP_NAME" \
   --name runner-flow-logs \
-  --nsg $NSG_NAME \
+  --vnet "$VNET_NAME" \
   --storage-account your-storage-account \
   --enabled true
 ```
+
+See [VNet flow-log configuration and prerequisites](https://learn.microsoft.com/en-us/azure/network-watcher/vnet-flow-logs-manage). Prefer subnet/VNet-level monitoring rather than relying on NIC resources appearing in your subscription; GitHub's docs describe a move to service-subscription NIC provisioning.
 
 ### Restrict Runner Group Access
 
@@ -368,7 +346,7 @@ Only grant access to repositories and organizations that genuinely need private 
 ### Common Issues
 
 **Runner not connecting:**
-- Verify NSG rules allow outbound traffic to GitHub IPs
+- Verify DNS/domain egress rules allow GitHub's current meta-endpoint domains
 - Check that the GitHub.Network resource provider is registered
 - Ensure subnet delegation is correctly configured
 
@@ -381,13 +359,14 @@ Only grant access to repositories and organizations that genuinely need private 
 - Review NSG rules for any blocking rules
 - Verify internal resources are reachable from the VNet
 - Check for any Azure Firewall or route table issues
+- Confirm explicit internet egress and private DNS work from the delegated subnet
 
 ### Cleanup
 
 To delete everything and start fresh:
 
 ```bash
-# First, delete the network configuration in GitHub UI
+# First, stop using the runners and detach/delete the GitHub network configuration.
 
 # Then delete Azure resources
 az resource delete \
@@ -396,7 +375,7 @@ az resource delete \
   --resource-type 'GitHub.Network/networkSettings' \
   --api-version $API_VERSION
 
-# Delete the entire resource group
+# Only for the dedicated demo resource group, never a shared production group.
 az group delete --resource-group $RESOURCE_GROUP_NAME --yes
 ```
 
@@ -408,17 +387,17 @@ Setting up GitHub Actions runners with private VNet integration involves several
 
 1. **Start with runner groups** - they're essential for organizing access control at scale
 2. **Plan your network architecture** - size your subnet with 30% buffer above max concurrency
-3. **Use the official Bicep templates** - don't try to recreate the NSG rules manually
+3. **Use current domain requirements** - retire static-IP templates and refresh allow-lists weekly
 4. **Test thoroughly** - verify internal connectivity before rolling out to production workflows
 5. **Monitor everything** - enable network flow logs and review runner usage regularly
 
 ## Documentation Links
 
 - [About self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)
-- [Managing larger runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/managing-larger-runners)
+- [Managing larger runners](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/manage-larger-runners)
 - [About Azure private networking](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/about-azure-private-networking-for-github-hosted-runners-in-your-enterprise)
 - [Configuring private networking for GitHub-hosted runners](https://docs.github.com/en/enterprise-cloud@latest/admin/configuring-settings/configuring-private-networking-for-hosted-compute-products/configuring-private-networking-for-github-hosted-runners-in-your-enterprise)
-- [Controlling access to larger runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/controlling-access-to-larger-runners)
+- [Controlling access to larger runners](https://docs.github.com/en/actions/how-tos/manage-runners/larger-runners/control-access)
 
 ---
 

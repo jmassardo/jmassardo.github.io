@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AI Is Not a Silver Bullet (And That's Actually Good News)"
-date: 2026-06-24 10:00:00 -0500
+date: 2027-01-28 10:00:00 -0600
 category: Blog
 tags: [ai, engineering, devops, automation, critical-thinking]
 excerpt: "AI is often positioned as a cure-all for engineering complexity. But AI reflects the quality of the systems it operates within. Better systems make better use of intelligence, human or otherwise."
@@ -43,7 +43,7 @@ This isn't replacing human judgment. It's handling the mechanical parts so human
 
 AI can be a great thought partner. "What am I missing?" "What are similar incidents in the past?" "What are possible causes for this behavior?"
 
-The AI doesn't know the answer, but it can help you think through possibilities faster than you would alone.
+The AI may surface a useful answer or hypothesis. Treat it as a starting point and verify it against the system, not as proof of the cause.
 
 ### Lowering Barriers
 
@@ -61,21 +61,21 @@ If your logs are garbage, AI-powered log analysis will give you confident garbag
 
 Garbage in, garbage out. But now with more confidence.
 
-### AI Can't Fix Structural Problems
+### AI Doesn't Own Structural Decisions
 
-If your architecture is a mess, AI won't clean it up. If your processes are broken, AI will automate broken processes. If your organization has communication problems, AI won't fix your org chart.
+AI agents can investigate code, propose architectural changes, implement refactors, and run tests. [GitHub's current Copilot documentation](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github) describes planning, making changes, reviewing pull requests, and automating repository tasks.
 
-AI operates within systems. It doesn't redesign them. The structural problems that make engineering hard are not problems AI can solve.
+Those capabilities can help repair a system. They don't decide which business tradeoffs are acceptable or give a team authority to change priorities. People still own goals, operating constraints, and the consequences of deploying the result.
 
-### AI Doesn't Understand Context (Yet)
+### AI Needs Relevant, Trustworthy Context
 
-AI can process information. It struggles with context. Why does this system exist? What are the organizational constraints? What's the history of this decision?
+AI can use repository instructions, documentation, retrieved information, and tool results to reason about context. But it may not have the current constraints or the history behind a decision, and supplied context can be wrong.
 
-Context is often the most important factor in engineering decisions. AI can help process information, but the contextual judgment remains human.
+Provide the relevant constraints and verify how the agent used them. More context isn't automatically better if it's stale, contradictory, or untrusted.
 
 ### AI Confidence Isn't Accuracy
 
-AI tools are often very confident. They don't say "I'm not sure." They give you an answer that sounds authoritative, whether it's right or wrong.
+AI tools can express uncertainty, but their wording isn't a reliable measure of correctness. An authoritative answer can still be wrong.
 
 This is dangerous in engineering contexts where wrong answers have consequences. "The AI said so" is not a good justification for a production decision.
 
@@ -86,6 +86,8 @@ If your system is already struggling, adding AI can make it struggle faster.
 AI-powered automation that does the wrong thing does it at scale. AI-suggested changes that introduce bugs introduce them confidently. AI recommendations that reflect biased historical data perpetuate those biases.
 
 AI is a force multiplier. It multiplies whatever you already have, including dysfunction.
+
+**Access creates another boundary.** Use approved data sources, keep secrets and sensitive production data out of prompts, and treat retrieved text as untrusted input. Give agents only the tools and permissions their task needs.
 
 ## AI as a Tool, Not a Solution
 
@@ -115,9 +117,9 @@ Narrow, specific use cases where you can evaluate whether the AI is helping.
 
 ### Keeping Humans in the Loop
 
-For anything important, AI should assist human judgment, not replace it. AI suggests, human decides. AI drafts, human reviews. AI surfaces, human investigates.
+Match oversight to risk. Bounded, reversible tasks can run with automated validation. Production access, destructive operations, and high-impact changes need explicit authorization and an accountable human owner.
 
-The human provides the context, judgment, and accountability that AI lacks.
+Review outcomes and maintain a stop-and-recovery path. [NIST's Generative AI Profile](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence) provides a framework for managing risks across design, use, and evaluation.
 
 ### Measuring Actual Impact
 
@@ -133,7 +135,7 @@ AI failures are feedback about your systems. Use them.
 
 ## Where AI Programs Usually Derail
 
-Most AI initiatives don't fail because the model was bad. They fail because the operating model was vague.
+AI initiatives can derail even when the model is capable, because the operating model is vague.
 
 Common derailers:
 
@@ -144,7 +146,7 @@ Common derailers:
 
 If any of those are true, your "AI strategy" is really just tool adoption.
 
-## A 90-Day Model That Produces Real Results
+## A 90-Day Model for Testing Real Value
 
 If you're trying to make AI useful in engineering, run it like a product rollout:
 
@@ -157,7 +159,7 @@ If you're trying to make AI useful in engineering, run it like a product rollout
 ### Days 31-60: Controlled Expansion
 
 - Roll out to selected teams with visible champions
-- Track acceptance rate, defect escape rate, and cycle-time change
+- Track defect escape rate, review effort, and end-to-end cycle time; use suggestion acceptance only as a usage signal
 - Retire use cases that don't produce measurable gains
 
 ### Days 61-90: Standardize What Works
@@ -167,6 +169,8 @@ If you're trying to make AI useful in engineering, run it like a product rollout
 - Report outcomes in business terms, not model terms
 
 This keeps AI grounded in outcomes, not novelty.
+
+For example, pilot AI-drafted tests on one service. Check whether they catch seeded faults and missed regressions, not just whether test count or coverage rises. Keep task difficulty and review effort visible in your comparison.
 
 ## The Good News
 
@@ -181,7 +185,7 @@ AI makes that work potentially more effective. But it doesn't replace it.
 ## TL;DR
 
 - AI is genuinely useful for pattern recognition, reducing toil, augmenting analysis, and lowering barriers
-- But AI reflects your data quality, can't fix structural problems, lacks context, gives confident wrong answers, and can amplify dysfunction
+- Agents can implement changes, but incomplete context, wrong answers, excessive access, and weak operating controls can amplify dysfunction
 - AI is a tool, not a solution. Evaluate it like any tool: good for specific tasks in specific contexts
 - To make AI useful: fix your data first, start with well-defined problems, keep humans in the loop, measure actual impact
 - The good news: engineering fundamentals still matter. AI augments good systems; it doesn't replace the need for them.

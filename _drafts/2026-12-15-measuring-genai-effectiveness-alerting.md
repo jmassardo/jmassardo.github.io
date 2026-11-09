@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 3: Alerting on What Matters"
-date: 2026-06-18 10:00:00 -0500
+date: 2026-12-15 10:00:00 -0600
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Dashboards are great until nobody looks at them. Here's how to build automated alerts that surface declining metrics and wasted spend before they become problems."
@@ -24,12 +24,14 @@ Not everything deserves an alert. Alert fatigue is real, and if everything is "c
 
 | Alert | Why It Matters | Default Threshold |
 |-------|---------------|-------------------|
-| Inactive seats | Money wasted | 30+ days inactive |
-| Never-used seats | Money wasted | Seat assigned, zero activity |
-| Acceptance rate drop | Declining value | 10pp week-over-week |
+| Inactive seats | License review candidates | 30+ days without recorded activity |
+| No recorded activity | Onboarding or telemetry investigation | No recorded activity after a 14-day grace period |
+| Acceptance rate drop | Completion adoption change | 10pp week-over-week |
 | Low active user rate | Poor adoption | Below 50% of seats |
 
-Let's be real about the money: Copilot Business costs $19/seat/month. If you have 200 seats and 40 are unused, that's **$760/month** ($9,120/year) you're lighting on fire. That alone justifies building this system.
+Estimate potential savings from **confirmed reclaimable seats multiplied by your contracted seat rate**. No recorded activity is not proof of wasted spend. Verify telemetry coverage, leave, onboarding, and the billing cancellation rules before reclaiming anything.
+
+**November 3, 2026 update:** alert on normalized current Copilot usage reports, not the retired metrics API. These are daily management signals, not production incidents or a causal scorecard for AI effectiveness.
 
 ### PR Health Alerts (Development Velocity)
 
@@ -51,10 +53,13 @@ A growing issue backlog is a leading indicator of team health problems. Maybe sc
 
 ## The Alert Engine
 
-The alert generator runs as part of the site generation step. It reads the merged historical data and evaluates each condition:
+The alert generator runs as part of site generation. **Check freshness before health**: suppress usage conclusions when collection fails or the report is stale beyond its two-full-UTC-day processing allowance. Raise a separate data-quality alert, never silently replace missing input with zero.
+
+This excerpt shows the seat-review path. Its counts must use disjoint categories, exclude new seats inside the grace period, and come from a fresh billing snapshot:
 
 ```python
 # scripts/generate_site.py
+from datetime import datetime, timezone
 
 def generate_alerts(copilot_history, pr_history, issue_history) -> list[dict]:
     alerts = []
@@ -63,71 +68,72 @@ def generate_alerts(copilot_history, pr_history, issue_history) -> list[dict]:
     # --- Copilot: Unused seats ---
     seats_history = copilot_history.get("seats_history", [])
     if seats_history:
-        latest = seats_history[-1]
-        inactive = latest.get("inactive", 0)
-        never_used = latest.get("never_used", 0)
-        total = latest.get("total", 0)
+        latest = max(seats_history, key=lambda s: s["date"])
+        if any(latest.get(k) is None for k in ("inactive", "never_used", "total")):
+            return [{
+                "severity": "warning", "category": "data",
+                "title": "Seat summary incomplete",
+                "detail": "Do not infer license health from missing counts.",
+                "timestamp": now,
+            }]
+        inactive = latest["inactive"]
+        never_used = latest["never_used"]
+        total = latest["total"]
         waste_count = inactive + never_used
 
         if waste_count > 0:
             alerts.append({
                 "severity": "warning" if waste_count < 10 else "critical",
                 "category": "copilot",
-                "title": "Unused Copilot Seats Detected",
+                "title": "Copilot Seats Need Activity Review",
                 "detail": (
-                    f"{waste_count} of {total} seats are unused "
-                    f"({inactive} inactive 30+ days, {never_used} never used). "
-                    f"Estimated monthly waste: ${waste_count * 19}/mo."
+                    f"{waste_count} of {total} seats need review "
+                    f"({inactive} inactive 30+ days, {never_used} with no recorded activity). "
+                    "Confirm telemetry coverage and actual license need before reclaiming."
                 ),
                 "timestamp": now,
             })
+    return alerts
 ```
 
-Each alert gets a severity (`critical`, `warning`, or `info`), a category, and a human-readable detail string that includes the actual numbers. Nobody wants to see "alert triggered" - they want to see "38 of 200 seats are unused, costing $722/month."
+Each alert gets a severity (`critical`, `warning`, or `info`), a category, and the actual numbers. Use "no recorded activity" for the legacy `never_used` field. A count is evidence to investigate, not permission to cancel seats.
 
 ### Acceptance Rate Trend Detection
 
-This one is interesting because we're not just checking a single value. We're comparing rolling averages:
+This one compares **two contiguous seven-day windows ending on the latest completed report day**, weighted by suggestion volume. Here is a self-contained helper for normalized daily summaries:
 
 ```python
-    # Compare last 7 days to previous 7 days
-    daily = copilot_history.get("daily", {})
-    sorted_days = sorted(daily.keys())
+from datetime import date, timedelta
 
-    if len(sorted_days) >= 14:
-        recent_7 = sorted_days[-7:]
-        prev_7 = sorted_days[-14:-7]
+def acceptance_drop(daily, report_end_day, threshold_pp=10, min_suggestions=100):
+    end = date.fromisoformat(report_end_day)
+    days = [(end - timedelta(days=n)).isoformat() for n in range(14)]
+    if any(
+        d not in daily or
+        any(daily[d].get(k) is None
+            for k in ("total_suggestions", "total_acceptances"))
+        for d in days
+    ):
+        return {"status": "no_data", "reason": "Incomplete 14-day window"}
 
-        recent_rates = [
-            daily[d]["acceptance_rate"]
-            for d in recent_7
-            if daily[d].get("acceptance_rate", 0) > 0
-        ]
-        prev_rates = [
-            daily[d]["acceptance_rate"]
-            for d in prev_7
-            if daily[d].get("acceptance_rate", 0) > 0
-        ]
+    def rate(window):
+        suggestions = sum(daily[d]["total_suggestions"] for d in window)
+        accepted = sum(daily[d]["total_acceptances"] for d in window)
+        return 100 * accepted / suggestions if suggestions >= min_suggestions else None
 
-        if recent_rates and prev_rates:
-            recent_avg = sum(recent_rates) / len(recent_rates)
-            prev_avg = sum(prev_rates) / len(prev_rates)
-            drop = prev_avg - recent_avg
-
-            if drop >= ALERTS["acceptance_rate_drop"]:
-                alerts.append({
-                    "severity": "warning",
-                    "category": "copilot",
-                    "title": "Copilot Acceptance Rate Declining",
-                    "detail": (
-                        f"Acceptance rate dropped {drop:.1f} percentage points "
-                        f"week-over-week (from {prev_avg:.1f}% to {recent_avg:.1f}%)."
-                    ),
-                    "timestamp": now,
-                })
+    recent, previous = rate(days[:7]), rate(days[7:])
+    if recent is None or previous is None:
+        return {"status": "no_data", "reason": "Insufficient suggestion volume"}
+    drop = previous - recent
+    return {
+        "status": "warning" if drop >= threshold_pp else "ok",
+        "drop_pp": drop,
+        "previous_pct": previous,
+        "recent_pct": recent,
+    }
 ```
 
-Why 7-day averages instead of day-to-day? Because daily acceptance rates are noisy. Weekends, holidays, and meeting-heavy days all cause dips. Comparing weekly averages smooths out the noise and catches real trends.
+Zero acceptances are valid data and must stay in the calculation. Missing days are not weekends with zero usage. Weekly windows reduce noise, but shifts in language, feature mix, or telemetry still need investigation.
 
 ### PR and Issue Alerts
 
@@ -135,10 +141,10 @@ Why 7-day averages instead of day-to-day? Because daily acceptance rates are noi
     # PR lifespan
     pr_snapshots = pr_history.get("snapshots", {})
     if pr_snapshots:
-        latest = list(pr_snapshots.values())[-1]
+        latest = pr_snapshots[max(pr_snapshots)]
         median_lifespan = latest.get("median_lifespan_hours")
 
-        if median_lifespan and median_lifespan > ALERTS["pr_lifespan_hours"]:
+        if median_lifespan is not None and median_lifespan > ALERTS["pr_lifespan_hours"]:
             alerts.append({
                 "severity": "warning",
                 "category": "pr",
@@ -153,7 +159,7 @@ Why 7-day averages instead of day-to-day? Because daily acceptance rates are noi
     # Issue backlog growing
     issue_snapshots = issue_history.get("snapshots", {})
     if issue_snapshots:
-        latest = list(issue_snapshots.values())[-1]
+        latest = issue_snapshots[max(issue_snapshots)]
         growing_weeks = latest.get("backlog_growing_weeks", 0)
 
         if growing_weeks >= ALERTS["issue_backlog_growing_weeks"]:
@@ -171,19 +177,22 @@ Why 7-day averages instead of day-to-day? Because daily acceptance rates are noi
 
 Notice the escalation on the backlog alert: 3 weeks is a warning, 5 weeks is critical. Backlogs can creep up slowly, and a 3-week warning gives you time to course correct before it becomes a crisis.
 
+These are additional fragments inside the generator. Require fresh snapshots and sufficient PR samples, and calculate backlog growth from **complete calendar weeks**. A missing week cannot count as growth. Route these to a team review channel, not a pager.
+
 ## Configuring Thresholds
 
 Every threshold is driven by environment variables so you can tune them without touching code:
 
 ```yaml
-# In your GitHub Actions workflow or .env file
-ALERT_SEAT_INACTIVE_DAYS: 30
-ALERT_ACCEPTANCE_RATE_DROP: 10.0
-ALERT_PR_LIFESPAN_HOURS: 48
-ALERT_TIME_TO_FIRST_REVIEW_HOURS: 24
-ALERT_ISSUE_BACKLOG_GROWING_WEEKS: 3
-ALERT_MIN_ACTIVE_USER_PCT: 50.0
-ALERT_NEW_SEAT_INACTIVE_DAYS: 14
+# Under the job's env: mapping in GitHub Actions
+env:
+  ALERT_SEAT_INACTIVE_DAYS: '30'
+  ALERT_ACCEPTANCE_RATE_DROP: '10.0'
+  ALERT_PR_LIFESPAN_HOURS: '48'
+  ALERT_TIME_TO_FIRST_REVIEW_HOURS: '24'
+  ALERT_ISSUE_BACKLOG_GROWING_WEEKS: '3'
+  ALERT_MIN_ACTIVE_USER_PCT: '50.0'
+  ALERT_NEW_SEAT_INACTIVE_DAYS: '14'
 ```
 
 **Start with the defaults.** Seriously. Resist the urge to customize everything on day one. Run with defaults for 2-3 weeks, see what fires, and then adjust. If `ALERT_PR_LIFESPAN_HOURS: 48` triggers constantly because your team's normal is 72 hours, bump it up. If `ALERT_ACCEPTANCE_RATE_DROP: 10.0` never fires, lower it. The right thresholds are the ones that match **your team's** normal cadence.
@@ -196,23 +205,26 @@ Alerts show up as a banner at the top of the dashboard, sorted by severity:
 // site/js/dashboard.js
 
 function renderAlerts(alerts) {
+    const section = document.getElementById('alertsSection');
+    const list = document.getElementById('alertsList');
+    list.replaceChildren();
+    section.classList.toggle('hidden', !alerts || alerts.length === 0);
     if (!alerts || alerts.length === 0) return;
 
-    const section = document.getElementById('alertsSection');
-    section.classList.remove('hidden');
-
-    const list = document.getElementById('alertsList');
     const order = { critical: 0, warning: 1, info: 2 };
-    alerts.sort((a, b) => (order[a.severity] || 3) - (order[b.severity] || 3));
+    const sorted = [...alerts].sort((a, b) =>
+        (order[a.severity] ?? 3) - (order[b.severity] ?? 3));
 
-    for (const alert of alerts) {
+    for (const alert of sorted) {
         const item = document.createElement('div');
-        item.className = `alert-item ${alert.severity}`;
-        item.innerHTML = `
-            <div class="alert-category">${alert.category}</div>
-            <div class="alert-title">${alert.title}</div>
-            <div class="alert-detail">${alert.detail}</div>
-        `;
+        const severity = Object.hasOwn(order, alert.severity) ? alert.severity : 'info';
+        item.className = `alert-item ${severity}`;
+        for (const field of ['category', 'title', 'detail']) {
+            const text = document.createElement('div');
+            text.className = `alert-${field}`;
+            text.textContent = alert[field] ?? '';
+            item.appendChild(text);
+        }
         list.appendChild(item);
     }
 }
@@ -236,22 +248,25 @@ To get these into Slack, add a step after site generation:
 
 ```yaml
 - name: Send Slack alerts
-  if: always()
+  if: success()
   env:
     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
   run: |
+    test -f site/data/alerts.json || { echo "Missing alerts output"; exit 1; }
     ALERTS=$(cat site/data/alerts.json)
     COUNT=$(echo "$ALERTS" | python -c "import sys,json; print(len(json.load(sys.stdin)))")
     if [ "$COUNT" -gt "0" ]; then
       CRITICAL=$(echo "$ALERTS" | python -c "import sys,json; print(len([a for a in json.load(sys.stdin) if a['severity']=='critical']))")
       WARNING=$(echo "$ALERTS" | python -c "import sys,json; print(len([a for a in json.load(sys.stdin) if a['severity']=='warning']))")
-      curl -X POST "$SLACK_WEBHOOK" \
+      curl --fail-with-body --max-time 30 -X POST "$SLACK_WEBHOOK" \
         -H 'Content-type: application/json' \
         -d "{\"text\": \"📊 Copilot Metrics Dashboard: ${COUNT} alerts (${CRITICAL} critical, ${WARNING} warning). <https://jmassardo.github.io/copilot-metrics-dashboard/|View Dashboard>\"}"
     fi
 ```
 
-Since the alerts are saved as a standalone `alerts.json` file, you can integrate with any notification system. Parse the JSON, filter by severity, and send wherever you need.
+Since the alerts are saved as a standalone `alerts.json` file, you can integrate with any notification system. Follow [Slack's incoming webhook documentation](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/) and replace the example dashboard URL.
+
+Send a separate workflow-failure notification when collection fails. In production, deduplicate by alert key and report day, notify on state changes, and define a recovery message. A nightly copy of the same warning is how useful alerts become wallpaper.
 
 ## The Alert Playbook
 
@@ -259,9 +274,9 @@ Alerts are only useful if you know what to do when they fire. Here's a quick ref
 
 | Alert | First Step |
 |-------|-----------|
-| **Unused Copilot Seats** | Export the inactive user list from the billing API. Reach out to managers. Reclaim seats from anyone who's left the team or doesn't need it. |
+| **Seat Activity Review** | Review the restricted billing export, verify telemetry and leave, then confirm need with the owner before reclaiming a seat. |
 | **Acceptance Rate Declining** | Check the language and editor breakdowns. Did a model update roll out? Did the team start working in a language Copilot handles poorly? |
-| **Low Active User Rate** | This is an adoption problem. Check if there are onboarding gaps. Are new hires getting Copilot training? Is there a team that hasn't started using it? |
+| **Low Active User Rate** | Verify coverage and the activity window, then investigate onboarding. Don't divide overlapping organization-wide usage by seats assigned only in a shell organization. |
 | **PR Lifespan Too High** | Look at the P90 vs median spread. If P90 is much worse, you have a few bad PRs dragging things out. If median itself is high, it's a systemic review bottleneck. |
 | **Slow Time to First Review** | Do you have enough reviewers? Are reviews concentrated on a few people? Consider implementing a review rotation or auto-assignment. |
 | **Growing Issue Backlog** | Triage session time. Are issues well-scoped? Is the team closing outdated issues? Sometimes the fix is better issue hygiene, not more velocity. |
@@ -274,6 +289,12 @@ We've got collection, visualization, and alerting. But everything we've built so
 In **[Part 4: Scaling for the Enterprise](/blog/2026/03/10/measuring-genai-effectiveness-scaling/)**, we'll redesign the architecture from pull-based polling to event-driven streaming.
 
 Full source code: [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard)
+
+## Summary and Key Takeaways
+
+- Alert on missing or stale collection separately from usage changes.
+- Use complete windows, weighted rates, grace periods, and meaningful sample sizes.
+- Define an owner and playbook. Adoption alerts are investigation prompts, not proof of AI effectiveness.
 
 ## Closing
 

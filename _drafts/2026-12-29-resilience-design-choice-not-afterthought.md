@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Resilience Is a Design Choice, Not an Afterthought"
-date: 2026-06-11 10:00:00 -0500
+date: 2026-12-29 10:00:00 -0600
 category: Blog
 tags: [engineering, resilience, architecture, reliability, devops]
 excerpt: "Resilience doesn't magically appear during an incident. It's baked in long before failure occurs through intentional architectural decisions, operational habits, and organizational priorities."
@@ -11,7 +11,7 @@ There's a particular kind of optimism in engineering that I find both charming a
 
 Spoiler: later never comes. Or rather, it comes at 3 AM on a Saturday, wearing the disguise of a P1 incident.
 
-Resilience isn't something you add after the architecture is done. It's not a feature you can bolt on or a checkbox you can tick during a compliance audit. Resilience is a design choice, made early and often, or it's not there at all.
+Resilience isn't a checkbox you tick after the architecture is done. You can improve an existing system, but retrofitting recovery paths often costs more than designing them early. Resilience is a design choice, made early and revisited often.
 
 ## What Resilience Actually Means
 
@@ -45,7 +45,7 @@ Let's talk about some common choices that seem reasonable in the moment but crea
 
 Until it does. And then you discover that "never" was doing a lot of heavy lifting in that sentence.
 
-Every unduplicated component, every system with a single owner, every process that only one person understands is a single point of failure waiting for its moment.
+A critical component without a recovery path, or a process only one person understands, creates a dependency worth examining. Duplication helps only if the copies don't share the same failure mode.
 
 ### Tight Coupling
 
@@ -80,10 +80,12 @@ Okay, so how do you actually bake resilience in?
 Not pessimism. Realism. In a distributed system, components will fail. Networks will partition. Latency will spike. Design assuming these things will happen, because they will.
 
 This means:
-- Timeouts on everything
-- Retries with backoff
-- Circuit breakers for external dependencies
-- Fallback behaviors when components are unavailable
+- Connection and request timeouts on remote calls, within an end-to-end deadline
+- Bounded retries with backoff and jitter for transient failures, only when repeating the operation is safe
+- Circuit breakers where they help isolate failing dependencies
+- Fallback behaviors that preserve correctness when components are unavailable
+
+As the [AWS Builders' Library explains](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/), retries can worsen overload. A timeout doesn't prove a write failed. Use idempotency keys where supported and avoid stacking retries at every layer.
 
 ### Limit Blast Radius
 
@@ -106,16 +108,16 @@ You can't respond to problems you can't see. Resilience requires observability:
 
 You don't get good at incident response by reading runbooks. You get good by practicing.
 
-- Chaos engineering (yes, really)
+- Controlled failure experiments with a defined scope, abort criteria, and recovery plan (start outside production)
 - Game days and tabletop exercises
-- Regular oncall rotations so everyone understands the system under stress
+- Supported oncall rotations with training, backup coverage, and sustainable workloads
 - Blameless postmortems that actually lead to improvements
 
 ### Make Recovery Repeatable
 
 When things break, can you fix them consistently?
 
-- Automated rollbacks
+- Tested rollbacks or roll-forward plans, including compatibility with database migrations and persistent state
 - Feature flags to disable problematic code
 - Infrastructure as code so you can rebuild quickly
 - Runbooks that are tested and current
@@ -143,7 +145,7 @@ It's less glamorous than shipping features. It doesn't make good demo material. 
 ## TL;DR
 
 - Resilience is how your system behaves when things go wrong, not just whether it stays up
-- You can't add resilience after the fact; it must be designed in from the start
+- Design resilience early, then improve and test it throughout the system's life
 - Common anti-patterns: single points of failure, tight coupling, missing timeouts, no backpressure, hardcoded assumptions
 - Designing for failure means assuming failure is normal and limiting blast radius
 - Resilience is organizational as well as technical; you need clear ownership, psychological safety, and learning loops

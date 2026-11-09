@@ -1,27 +1,27 @@
 ---
 layout: post
 title: "Complex Systems Fail Quietly Before They Fail Loudly"
-date: 2026-06-16 10:00:00 -0500
+date: 2027-01-14 10:00:00 -0600
 category: Blog
 tags: [engineering, reliability, incidents, systems-thinking, devops]
-excerpt: "Major incidents rarely come out of nowhere. They're preceded by subtle warning signs that get normalized or ignored. Organizations that learn to notice weak signals can prevent catastrophe."
+excerpt: "Major incidents can be preceded by subtle warning signs that get normalized or ignored. Learning to notice weak signals helps teams reduce risk before customer impact grows."
 ---
 
 "We didn't see it coming."
 
-That's what everyone says after a major incident. The system seemed fine. Then suddenly, catastrophically, it wasn't.
+It's a familiar reaction after a major incident. The system seemed fine. Then suddenly, catastrophically, it wasn't.
 
-But here's the thing: major failures almost never come out of nowhere. They're preceded by warning signs. Small anomalies. Near-misses. Things that almost went wrong but didn't quite.
+But here's the thing: some major failures have a history of small anomalies, near-misses, and workarounds. Others emerge abruptly, or from conditions we couldn't reasonably recognize beforehand.
 
-The signs were there. We just weren't looking.
+The useful question isn't "why didn't you see the obvious?" It's "what signals could we recognize and act on next time?"
 
 ## The Myth of the Sudden Failure
 
-Complex systems don't flip instantly from "working" to "catastrophically broken." They degrade. They accumulate stress. They develop hidden weaknesses that compound over time.
+Complex systems can accumulate stress and hidden weaknesses long before an outage. A sudden trigger can expose that fragility, but not every outage follows a visible degradation curve.
 
 What looks like sudden failure is usually the culmination of a slow process. The dam doesn't break because of one crack. It breaks because a hundred small cracks finally connected.
 
-This is documented extensively in safety research. Sidney Dekker, Nancy Leveson, Richard Cook all describe how major accidents emerge from the interaction of multiple small factors, each individually tolerable, collectively catastrophic.
+Richard Cook's [How Complex Systems Fail](https://how.complexsystems.fail/) describes how interacting failures and defenses shape accidents. It also warns against hindsight bias: signals that look obvious afterward may have been ambiguous during normal operations.
 
 Your systems work the same way.
 
@@ -31,7 +31,7 @@ Your systems work the same way.
 
 Something almost went wrong but didn't. Maybe a deploy almost took down production but was caught in staging. Maybe an alert fired and then resolved before anyone looked at it. Maybe a customer reported something weird but it "couldn't be reproduced."
 
-Near-misses are information. They're telling you that the conditions for failure exist. The only difference between a near-miss and an incident is luck.
+Near-misses are information about failure conditions and defenses. Luck may matter, but a staging check or a careful operator may have actively prevented harm. Learn what worked as well as what nearly failed.
 
 Most organizations don't track near-misses. They track incidents. So the warning signs go unrecorded and unanalyzed.
 
@@ -111,7 +111,7 @@ Sometimes you'll discover that success depended on factors you didn't know about
 
 ### Calibrate Alerts
 
-If you have too many alerts, people will ignore them. Aggressively tune your alerting. An alert that doesn't require action shouldn't exist. An alert that everyone ignores is worse than no alert.
+Aggressively tune your alerting. **Pages should require timely action**; lower-urgency signals can become tickets or dashboards. [Google's monitoring guidance](https://sre.google/sre-book/monitoring-distributed-systems/) distinguishes these channels so useful evidence doesn't disappear just because it isn't worth waking someone up.
 
 ### Create Psychological Safety for Raising Concerns
 
@@ -125,19 +125,21 @@ When you do have incidents, analyze them without blame. Ask what the system cond
 
 ## Paying Attention Is Cheaper Than Reacting Late
 
-Here's the economics: fixing a weak signal before it becomes an incident is cheap. Fixing the incident is expensive. Fixing the aftermath is very expensive.
+Investigating a weak signal can cost less than a major incident, but chasing every anomaly isn't free. Prioritize signals by plausible impact, recurrence, and the strength of your existing defenses.
+
+For example, repeated manual restarts deserve a tracked investigation. Record frequency, affected services, and recovery effort, then check whether the fix removes the need to restart.
 
 Organizations that learn to notice weak signals can prevent problems before they become visible. Organizations that only react to loud failures are always behind.
 
-The signs are there. The question is whether you're looking.
+We can't predict every incident. We can make recurring signals easier to surface and safer to investigate.
 
 ## TL;DR
 
-- Major incidents are preceded by warning signs: near-misses, workarounds, increasing effort, unexplained success, normalization of deviance
+- Major incidents can have warning signs: near-misses, workarounds, increasing effort, unexplained success, normalization of deviance
 - We miss these signs because of success bias, outcome bias, alert fatigue, complexity hiding, and the normality of operations
 - To notice weak signals: track near-misses, document workarounds, monitor for effort increase, investigate success, calibrate alerts, create psychological safety
-- Paying attention early is far cheaper than reacting late
-- The signs are there. The question is whether you're looking.
+- Prioritize early investigations by risk rather than treating every anomaly as an impending catastrophe
+- Learn from defenses that worked, and avoid judging ambiguous signals with hindsight
 
 ---
 

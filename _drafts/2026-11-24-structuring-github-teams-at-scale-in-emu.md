@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "Structuring GitHub Teams at Scale in Enterprise Managed Users"
-date: 2026-06-29 10:00:00 -0500
+date: 2026-11-24 10:00:00 -0600
 category: Blog
 tags: [github, devops, enterprise, security, best-practices, emu, automation]
-excerpt: "A practical guide to designing a GitHub team structure that scales cleanly in EMU environments - from IdP group mapping to nested team hierarchies to day-to-day access management."
+excerpt: "A practical guide to designing a GitHub team structure that scales cleanly in EMU environments - from IdP group mapping to flat access teams to day-to-day access management."
 ---
 
 If you've recently deployed or inherited a GitHub Enterprise Managed Users (EMU) environment, you've probably asked some version of "okay, so how are we supposed to set up these teams?" The docs explain the mechanics. What they don't always spell out is the *design philosophy* - the decisions you make upfront that either make your org easy to manage at 200 people or a complete nightmare at 2,000.
@@ -12,6 +12,8 @@ If you've recently deployed or inherited a GitHub Enterprise Managed Users (EMU)
 Let's be real: team structure is one of those things that's very easy to get wrong, and very hard to fix later without disrupting access for real people in production.
 
 This post is your practical guide to getting it right from the start.
+
+**Fact-check anchor: November 3, 2026.** The important constraint: **IdP-connected EMU teams cannot be nested.** Design flat access groups, not an inheritance tree you cannot actually sync.
 
 ## EMU Teams: What's Different
 
@@ -22,8 +24,10 @@ In a standard GitHub organization, you manage team membership manually (or throu
 In an EMU environment:
 - **User accounts are provisioned by your IdP** (Entra ID, Okta, PingFederate) via SCIM
 - **Team membership can be driven by IdP groups** via team synchronization
-- **Users cannot change their own profile** or create accounts outside the enterprise
-- **Visibility is constrained** - EMU members can only see and interact with repos inside your enterprise
+- **Your IdP controls account identity attributes** rather than individual users
+- **Collaboration is constrained** - managed accounts can view public repositories, but cannot contribute outside the enterprise with that account
+
+These restrictions apply to the managed account, not to a person's separate personal account. See [EMU capabilities and restrictions](https://docs.github.com/en/enterprise-cloud@latest/admin/concepts/identity-and-access-management/enterprise-managed-users).
 
 The key implication for team design: **your GitHub team structure and your IdP group structure become tightly coupled.** The design decisions you make here live in two systems simultaneously, so you need a coherent strategy that works in both.
 
@@ -34,11 +38,13 @@ Let's level-set on vocabulary before diving into structure:
 | Concept | What It Controls |
 |---------|-----------------|
 | **Enterprise role** | Enterprise-level access (member, owner, guest collaborator) |
-| **Organization role** | Org-level access (member, owner, billing manager) |
+| **Organization role** | Org-level access (member, owner, and delegated organization roles) |
 | **Team** | Access to specific repositories within an org |
 | **Repository role** | Read, triage, write, maintain, or admin |
 
-In EMU, the enterprise role is assigned via your IdP (mapped to a SCIM attribute). Organization membership is managed by IdP group SCIM provisioning. **Repository access is managed through teams.** This means teams are your primary lever for controlling who can do what to your code.
+In EMU, your IdP's `roles` mapping assigns the provisioned enterprise role. That is **not an organization-owner mapping**. Organization owners manage org roles on GitHub; enterprise teams can also carry delegated roles.
+
+Connecting a team to an IdP group adds its members to the organization. Manual organization membership is also supported. **Teams should be your default repository-access mechanism**, but direct grants and organization base permissions still exist. See [SCIM role assignment](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/configuring-scim-provisioning-for-users#assigning-users-and-groups).
 
 ## Choosing a Team Structure Model
 
@@ -55,37 +61,39 @@ Map teams directly to functional groups in your org:
 **Pro:** Simple, easy to understand, maps well to org chart.  
 **Con:** Doesn't scale well. "Engineering" is too broad to give specific repo access, "platform-engineering" ends up needing write on 80% of repos.
 
-### Model 2: Layered Teams with Parent-Child Nesting (Recommended for Scale)
+### Model 2: Flat, Role-Based Access Teams (Recommended for IdP Sync)
 
-Use GitHub's nested team feature to create a hierarchy where permissions cascade:
+Separate broad shared access from project-specific privileges. Each line below is an independent team with its own IdP group:
 
 ```
-org-members                    (base: read access to shared repos)
-├── engineering                (write access to engineering-owned repos)
-│   ├── platform               (write + admin on infra repos)
-│   ├── frontend               (write on frontend repos)
-│   └── backend                (write on backend repos)
-├── security                   (read everywhere, write on security tooling repos)
-│   └── security-admins        (admin on security repos)
-├── data                       (write on data repos)
-└── contractors                (read-only; specific repos added individually)
+org-members                    (read on selected shared repos)
+platform-write                 (write on infra repos)
+platform-admins                (admin on selected infra repos)
+frontend-write                 (write on frontend repos)
+backend-write                  (write on backend repos)
+security-read                  (read on selected private repos)
+security-admins                (admin on security tooling repos)
+data-write                     (write on data repos)
+project-contractors            (explicit access to one project's repos)
 ```
 
-**How nested teams work:** Child teams inherit all parent permissions. If you grant `engineering` write access to a repo, all of `platform`, `frontend`, and `backend` also get write access automatically. You then add more granular permissions at the child level for repos specific to that sub-team.
+**How access combines:** A person can belong to several teams. GitHub applies the highest effective repository permission from their access paths. Membership in `org-members` does not automatically make someone a member of `platform-write`.
 
-**Pro:** Clean permission inheritance, @mentions work at any level, scales to hundreds of teams without permission sprawl.  
-**Con:** Requires upfront planning to get the hierarchy right. Reorganizing later is non-trivial.
+**Pro:** Compatible with EMU IdP synchronization, explicit grants, predictable access reviews.
+**Con:** Shared permissions must be assigned explicitly rather than inherited.
 
-**The lesson:** For any org with more than a few hundred engineers sorted into actual sub-disciplines, use the nested model.
+GitHub supports parent-child permission inheritance for **unsynced organization teams**, but an IdP-connected team cannot be either a parent or a child. Don't mix those models accidentally. See [EMU team requirements](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/managing-team-memberships-with-identity-provider-groups).
 
 ## Mapping IdP Groups to GitHub Teams
 
 Here's where the rubber meets the road in EMU environments. The key feature is **team synchronization with IdP groups** - this lets your IdP group membership automatically determine GitHub team membership.
 
 The setup flow:
-1. Create teams in GitHub (or let SCIM provision them)
-2. Link each team to one or more IdP groups
-3. As users are added/removed from IdP groups, GitHub team membership updates automatically
+1. Provision users and groups through the EMU application in your IdP
+2. Create a flat team in GitHub and link it to **one** provisioned IdP group
+3. Manage membership in the IdP; GitHub reconciles membership after group updates and runs a daily reconciliation
+
+For an existing team, remove manually assigned members and nested relationships before linking. Entra ID requires **security groups**; Microsoft 365 groups and nested group memberships are not supported. See [GitHub's connection requirements](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/managing-team-memberships-with-identity-provider-groups#requirements-for-connecting-idp-groups-with-teams) and [Microsoft's provisioning tutorial](https://learn.microsoft.com/en-us/entra/identity/saas-apps/github-enterprise-managed-user-provisioning-tutorial).
 
 ```
 Entra ID Group: "github-engineering-platform" 
@@ -104,12 +112,14 @@ There are two approaches:
 - Every team change requires an IdP group change
 - Works best when your IdP admin and GitHub admin are the same person (or closely coordinated)
 
-**Option B: Multiple IdP groups map to one GitHub team (N:1 mapping)**  
-- More flexible - you can map "engineering-fulltime" + "engineering-contractors" to the same GitHub team
-- Useful when you have complex IdP group structures you can't control
-- Requires clear documentation of which groups map where
+**Option B: One IdP group maps to multiple GitHub teams (1:N mapping)**
+- Supported across teams in the enterprise, including different organizations
+- Useful when the same people need a consistent access bundle across orgs
+- Requires documenting every linked team so a group change has a predictable blast radius
 
-The more pragmatic route for most enterprises: **start with 1:1 mapping**, document it clearly, and introduce N:1 patterns only when you have a specific reason.
+The more pragmatic route for most enterprises: **start with 1:1 mapping** and introduce 1:N only for a clear access bundle. If you need a union of populations, maintain one group in your IdP using supported membership rules, not nested Entra groups.
+
+**Keep provisioning credentials separate.** Enterprise SCIM uses a setup-user **personal access token (classic)** with `scim:enterprise`, not a fine-grained PAT or GitHub App installation token. Let the IdP own SCIM writes; don't run competing membership scripts. See [SCIM API prerequisites and write ownership](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/provisioning-users-and-groups-with-scim-using-the-rest-api).
 
 ## Team Naming Conventions
 
@@ -141,11 +151,11 @@ Here's a rule that will save you enormous pain: **never grant individual user ac
 
 Why? Because individual user access:
 - Doesn't sync with your IdP
-- Persists after someone leaves or changes roles
+- Can persist after a role change, bypassing your team-based access model
 - Creates invisible permission sprawl that's hard to audit
 - Breaks the mental model of "if you're in this team, you have this access"
 
-The only exception is outside collaborators for genuine third-party access - and even then, consider whether a dedicated `contractors` team is a better pattern.
+A suspended EMU account loses access, but suspension does not clean up every historical grant. Audit those grants before reinstatement. For genuine third-party access, provision **guest collaborators** through your IdP; EMU does not use personal-account outside collaborators. See [EMU guest collaborators](https://docs.github.com/en/enterprise-cloud@latest/admin/concepts/identity-and-access-management/enterprise-managed-users).
 
 **Access assignment pattern:**
 1. New engineer joins → Added to IdP group → SCIM provisions EMU account → Added to appropriate GitHub teams automatically
@@ -159,7 +169,7 @@ Zero manual GitHub admin work in the steady state. That's the goal.
 Regardless of your specific org structure, most EMU enterprises end up needing these five team archetypes:
 
 **1. `all-members` (or `org-members`)**  
-Everyone in the org. Grants read access to internal shared repos (documentation, runbooks, standards). Often the parent team of your entire hierarchy. Map to your "all engineers" IdP group.
+Everyone who needs shared documentation, runbooks, and standards. Keep this team flat. Internal repositories are already readable by standard enterprise members, so use explicit team grants for selected private shared repositories.
 
 **2. `[discipline]-write`**  
 Teams with write access to their discipline's repos. Most of your engineers live here. Example: `engineering-write`, `data-write`.
@@ -168,10 +178,10 @@ Teams with write access to their discipline's repos. Most of your engineers live
 Small teams with admin access on specific repos for people who manage settings, branch protection, webhooks, etc. Keep these small and audited. Don't over-provision admin.
 
 **4. `security` (read-everywhere)**  
-A cross-cutting team that gets read access to all active repos. Critical for security reviews, incident response, and compliance. Use a nested structure if you need to differentiate between security-readonly and security-write.
+A cross-cutting team with read access to the private repos it needs. Critical for security reviews, incident response, and compliance. Separate `security-read` and `security-write` teams when permissions differ.
 
 **5. `contractors` or `external-collaborators`**  
-A carefully scoped team for non-employees. Read-only by default, with specific write grants added on a per-project basis. **Key:** make this team membership time-limited if your IdP supports conditional access or expiry.
+A carefully scoped team for provisioned non-employees. Teams have no built-in "read-only default"; grant read explicitly and add project-specific write access only when needed. **Key:** use IdP group membership expiry or access reviews, not conditional access alone, to end engagements.
 
 ## Scaling to Multiple Organizations
 
@@ -183,7 +193,11 @@ Large enterprises often carve GitHub into multiple organizations (by business un
 
 **Recommendation:** If you have multiple orgs, keep a consistent naming convention across all of them. `acme-bu1-engineering-platform` and `acme-bu2-engineering-platform` make it clear which org's team you're looking at.
 
-A cross-org "enterprise teams" feature exists for allocating access across orgs from a central enterprise-level view, but at the time of writing it's still maturing. Teams remain primarily an org-level construct.
+**Enterprise teams are now a concrete cross-org option**, not just something to watch. They can sync to an EMU IdP group, join organizations, receive repository access from org administrators, and carry delegated enterprise roles.
+
+As verified November 3, 2026, GitHub documents limits of **2,500 enterprise teams**, **5,000 users per team**, and **1,000 organizations per team**. An IdP group exceeding 5,000 users stops enterprise-team synchronization until it returns below the limit. See [creating enterprise teams](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-accounts-and-repositories/managing-users-in-your-enterprise/create-enterprise-teams).
+
+Removing a user from their last mapped group removes group-derived organization membership, but **manually added members require manual removal**. Check membership origin during offboarding. See [removing organization members](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/managing-team-memberships-with-identity-provider-groups#removing-members-from-organizations).
 
 ## Access Auditing and Ongoing Hygiene
 
@@ -196,22 +210,22 @@ The work doesn't stop after setup. Here's what good EMU team hygiene looks like 
 **Quarterly:**
 - Audit admin team membership - do all these people still need admin?
 - Review contractor team membership - are there expired engagements still in here?
-- Check if any teams have both a parent and unrelated direct repo access (this is usually a mistake)
+- Compare effective repository permissions against the intended IdP access bundles
 
 **On org changes:**
 - When an engineer changes disciplines, update their IdP group membership - GitHub updates automatically
-- When a team is disbanded, archive or remove the GitHub team and its IdP group
+- When a team is disbanded, remove its GitHub grants, disconnect/delete the team, and retire the IdP group
 - When a new product team spins up, provision the IdP group and GitHub team in tandem before anyone joins
 
 ## Common Pitfalls to Avoid
 
 Let's be real about the mistakes everyone makes:
 
-**Too many team maintainers.** Team maintainers can add anyone in the org to a team. In an EMU environment where you want IdP to drive access, having lots of team maintainers undermines that model. Keep maintainers to a minimum.
+**Confusing synced and manual teams.** IdP-connected teams cannot have team maintainers or manual membership edits. Unsynced teams can, so audit them as a separate access path rather than assuming every team is IdP-controlled.
 
 **"Just add them directly."** When access needs to happen fast, the path of least resistance is a direct repo collaborator grant. Resist this. The 5-minute shortcut creates permanent hygiene debt.
 
-**Org owner mismanagement.** Org owner is effectively admin on everything in the org. In EMU environments, org owner should map to a tightly controlled IdP group with very few members. Don't make people org owners just to unblock them - give them the specific access they actually need.
+**Org owner mismanagement.** Org owner is effectively admin on everything in the org. Do not assume an IdP enterprise-role assignment grants this role. Keep GitHub org-owner assignments small and audited; use delegated roles when someone only needs a specific administrative capability.
 
 **One team with all permissions.** Some orgs create a "platform" or "devops" team and just bulk-grant it admin on everything. Easy to manage, terrible for security. Use principle of least privilege - give teams access to the repos they actually need.
 
@@ -223,13 +237,13 @@ Here's your action plan for getting GitHub EMU team structure right:
 
 **Getting started:**
 1. Map your org's functional groups before you create any GitHub teams
-2. Design a nested parent-child hierarchy based on those groups
+2. Design flat, role-based teams compatible with IdP synchronization
 3. Agree on a naming convention (GitHub teams + IdP groups) and write it down
 4. Establish the "never direct user access" rule as a firm policy
 
 **Setting it up:**
 1. Create your base teams and link them to IdP groups via SCIM/team sync
-2. Grant parent-level access to shared repos, child-level access to specific repos
+2. Grant shared-repo and project-specific permissions to separate teams
 3. Set up admin teams as small, audited groups
 4. Provision your contractor team with explicit read-only grants
 
@@ -244,7 +258,6 @@ The bottom line: in EMU, your GitHub access model is only as good as your IdP gr
 
 - [About Enterprise Managed Users](https://docs.github.com/en/enterprise-cloud@latest/admin/concepts/identity-and-access-management/enterprise-managed-users)
 - [About organization teams](https://docs.github.com/en/enterprise-cloud@latest/organizations/organizing-members-into-teams/about-teams)
-- [Synchronizing a team with an identity provider group](https://docs.github.com/en/enterprise-cloud@latest/organizations/organizing-members-into-teams/synchronizing-a-team-with-an-identity-provider-group)
-- [Managing team memberships with identity provider groups](https://docs.github.com/en/enterprise-cloud@latest/admin/identity-and-access-management/using-enterprise-managed-users-for-iam/managing-team-memberships-with-identity-provider-groups)
+- [Managing EMU team memberships with identity provider groups](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/provisioning-user-accounts-with-scim/managing-team-memberships-with-identity-provider-groups)
 - [Repository roles for an organization](https://docs.github.com/en/enterprise-cloud@latest/organizations/managing-user-access-to-your-organizations-repositories/managing-repository-roles/repository-roles-for-an-organization)
-- [Roles in an enterprise](https://docs.github.com/en/enterprise-cloud@latest/admin/user-management/managing-users-in-your-enterprise/roles-in-an-enterprise)
+- [Abilities of enterprise roles](https://docs.github.com/en/enterprise-cloud@latest/admin/managing-accounts-and-repositories/managing-roles-in-your-enterprise/abilities-of-roles)

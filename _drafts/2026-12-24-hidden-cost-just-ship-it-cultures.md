@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Hidden Cost of 'Just Ship It' Cultures"
-date: 2026-06-10 10:00:00 -0500
+date: 2026-12-24 10:00:00 -0600
 category: Blog
 tags: [engineering, culture, leadership, sustainability, devops]
 excerpt: "Speed is the ultimate virtue in many engineering orgs. But relentless urgency quietly accumulates risk, erodes trust, and degrades quality. The costs are real, just deferred."
@@ -39,7 +39,7 @@ Fast shipping often means incomplete shipping. Half-baked features with unclear 
 
 ### Knowledge Gaps
 
-When you move fast, you don't document. When you don't document, knowledge stays in people's heads. When those people leave, transfer teams, or just take a vacation, you're left reverse-engineering your own systems.
+When urgency squeezes out documentation, knowledge stays in people's heads. When those people leave, transfer teams, or just take a vacation, you're left reverse-engineering your own systems.
 
 ### Team Trust
 
@@ -61,7 +61,7 @@ This isn't malicious (usually). It's just how incentive structures work. The peo
 
 Sustainable delivery isn't about going slow. It's about going at a pace you can maintain. There's a difference.
 
-**Sustainable teams ship consistently.** They don't have heroic sprints followed by recovery periods. They don't have "crunch time" because every time is crunch time at a manageable level.
+**Sustainable teams ship consistently.** They don't depend on heroic sprints. Occasional urgency comes with recovery time, not permanent "crunch time" with a friendlier label.
 
 **Sustainable systems handle change gracefully.** New features don't require rewriting the authentication layer. Deployments don't require crossing fingers.
 
@@ -75,7 +75,7 @@ If you're in a "just ship it" culture and want to change it, here's the hard tru
 
 But you can:
 
-- **Make costs visible.** Track incidents by root cause. Show the correlation between rushed releases and outages. Put numbers on the time spent fighting fires instead of building features.
+- **Make costs visible.** Track incidents by contributing factors. Check whether rushed releases are associated with outages rather than assuming the link. Measure time spent fighting fires instead of building features.
 
 - **Propose alternatives.** Instead of just saying "this is too fast," come with a timeline that addresses the concerns. Make the tradeoffs explicit.
 
@@ -89,12 +89,15 @@ If speed is the only number leaders see, speed becomes the only thing teams opti
 
 Track these together:
 
-- **Deployment frequency** with **change failure rate**
-- **Lead time** with **MTTR**
+- **Deployment frequency** with **change fail rate**
+- **Change lead time** with **failed deployment recovery time**
+- **Deployment rework rate** to show unplanned deployments caused by production incidents
 - **Feature throughput** with **incident volume tied to recent releases**
 - **Sprint completion** with **after-hours operational load**
 
-When these are reviewed side by side, "just ship it" loses its illusion of being free.
+[DORA's current guidance](https://dora.dev/guides/dora-metrics/) uses five delivery metrics, including deployment rework rate. Failed deployment recovery time covers failed deployments, not recovery from every kind of outage.
+
+Review trends for the same service, not league tables across unrelated teams. Fast delivery and stability can improve together. The problem is skipping safeguards, not speed itself.
 
 ## Leadership Guardrails for Sustainable Pace
 

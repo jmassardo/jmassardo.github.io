@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 2: Building the Dashboard"
-date: 2026-06-19 10:00:00 -0500
+date: 2026-12-10 10:00:00 -0600
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Raw data is useless if nobody looks at it. Here's how to build a static GitHub Pages dashboard that turns your metrics into actionable trends."
@@ -17,6 +17,10 @@ Raw data sitting in JSON files helps nobody. In this post, we'll turn that data 
 - **Works on any screen** with a responsive dark theme
 
 The result is a single-page dashboard your team can bookmark and check anytime. No Grafana instance to manage, no database to maintain.
+
+**November 3, 2026 update:** feed this dashboard normalized current Copilot usage reports from Part 1, not the retired metrics endpoint. Treat companion snippets as implementation patterns until your fork's migration is verified.
+
+**Static does not mean private.** A private repository does not automatically make its Pages site private. Confirm [Pages access control](https://docs.github.com/en/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site) before deploying internal metrics. Publish only approved aggregates, never seat identities or raw private-repository records.
 
 ## The Data Pipeline
 
@@ -37,7 +41,7 @@ flowchart LR
 
 ### Merging Historical Data
 
-The site generator reads every daily snapshot, deduplicates by date, and trims to the dashboard window (default: 90 days):
+The site generator reads every daily snapshot, deduplicates by **report day**, and trims to the dashboard window (default: 90 days). Download time is not activity time. The latest report only covers 28 days; a wider chart needs retained history or backfill.
 
 ```python
 # scripts/generate_site.py
@@ -59,13 +63,19 @@ def merge_copilot_history() -> dict:
                 "date": summary.get("collected_at", "")[:10],
                 **summary["seats"],
             }
-            existing_dates = [s["date"] for s in history["seats_history"]]
-            if seats_entry["date"] not in existing_dates:
-                history["seats_history"].append(seats_entry)
+            history["seats_history"] = [
+                s for s in history["seats_history"]
+                if s["date"] != seats_entry["date"]
+            ]
+            history["seats_history"].append(seats_entry)
 
     # Trim to dashboard window
     cutoff = (datetime.now(timezone.utc) - timedelta(days=DASHBOARD_DAYS)).strftime("%Y-%m-%d")
     history["daily"] = {k: v for k, v in history["daily"].items() if k >= cutoff}
+    history["seats_history"] = sorted(
+        (s for s in history["seats_history"] if s["date"] >= cutoff),
+        key=lambda s: s["date"],
+    )
 
     return history
 ```
@@ -74,34 +84,36 @@ The same pattern applies for PR and issue data. Each gets merged into a rolling 
 
 ### The Dashboard Data Structure
 
-The generated `dashboard.json` has three top-level sections:
+The generated `dashboard.json` has three top-level sections. This is a synthetic, one-day example, not a GitHub API response:
 
 ```json
 {
   "summary": {
     "generated_at": "2026-03-10T05:00:00Z",
-    "copilot": { "acceptance_rate": 28.5, "active_users": 142 },
-    "seats": { "total": 200, "active": 142, "inactive": 38, "never_used": 20 },
+    "copilot": { "acceptance_rate": 28.5, "active_users": 142, "report_end_day": "2026-03-07" },
+    "seats": { "total": 200, "active": 142, "inactive": 38, "never_used": 20, "utilization_pct": 71 },
     "prs": { "median_lifespan_hours": 18.3, "median_ttfr_hours": 4.2, "merge_rate_pct": 91.2 },
     "issues": { "open": 87, "stale": 12, "median_lifespan_hours": 72.1 }
   },
-  "alerts": [ ... ],
+  "alerts": [],
   "charts": {
-    "copilot": { "dates": [...], "acceptance_rate": [...], "active_users": [...] },
-    "seats": { "dates": [...], "total": [...], "active": [...] },
-    "prs": { "dates": [...], "median_lifespan": [...], "median_ttfr": [...] },
-    "issues": { "dates": [...], "open_issues": [...], "stale_issues": [...] },
-    "pr_throughput": { "weeks": [...], "merged": [...] },
-    "issue_throughput": { "weeks": [...], "opened": [...], "closed": [...] }
+    "copilot": { "dates": ["2026-03-07"], "acceptance_rate": [28.5], "active_users": [142] },
+    "seats": { "dates": ["2026-03-10"], "total": [200], "active": [142] },
+    "prs": { "dates": ["2026-03-10"], "median_lifespan": [18.3], "median_ttfr": [4.2] },
+    "issues": { "dates": ["2026-03-10"], "open_issues": [87], "stale_issues": [12] },
+    "pr_throughput": { "weeks": [], "merged": [] },
+    "issue_throughput": { "weeks": [], "opened": [], "closed": [] }
   }
 }
 ```
 
 The `summary` object powers the top-level cards. The `charts` object provides time series arrays that map directly to Chart.js datasets. This keeps the JavaScript dead simple - just fetch, map, and render.
 
+Store missing metrics as `null`, not zero. Include collection freshness, report end date, repository coverage, and PR sample sizes. The legacy `never_used` key means **no recorded activity**, not established non-use. Daily active users and seat activity over 30 days are different populations.
+
 ## The Static Dashboard
 
-We're using plain HTML + CSS + JavaScript with Chart.js loaded from a CDN. Zero build tools. Zero npm packages. Zero bundlers. You can understand the entire frontend by reading three files.
+We're using plain HTML + CSS + JavaScript with [Chart.js](https://www.chartjs.org/docs/latest/) loaded from a version-pinned CDN URL or hosted locally. Zero build tools. Zero npm packages. Zero bundlers. You can understand the entire frontend by reading three files.
 
 ### Summary Cards
 
@@ -115,8 +127,9 @@ function renderSummaryCards(summary) {
     if (summary.copilot) {
         const rate = summary.copilot.acceptance_rate;
         const el = document.getElementById('valAcceptanceRate');
-        el.textContent = `${rate}%`;
-        el.className = 'card-value ' + (rate >= 25 ? 'good' : rate >= 15 ? 'warning' : 'bad');
+        el.textContent = Number.isFinite(rate) ? `${rate}%` : 'No data';
+        el.className = 'card-value ' + (!Number.isFinite(rate) ? '' :
+            rate >= 25 ? 'good' : rate >= 15 ? 'warning' : 'bad');
     }
 
     // Seat utilization
@@ -131,14 +144,18 @@ function renderSummaryCards(summary) {
     if (summary.prs) {
         const hours = summary.prs.median_lifespan_hours;
         const el = document.getElementById('valPRLifespan');
-        el.textContent = hours < 24 ? `${hours.toFixed(1)}h` : `${(hours / 24).toFixed(1)}d`;
-        el.className = 'card-value ' + (hours <= 24 ? 'good' : hours <= 48 ? 'warning' : 'bad');
+        el.textContent = !Number.isFinite(hours) ? 'No data' :
+            hours < 24 ? `${hours.toFixed(1)}h` : `${(hours / 24).toFixed(1)}d`;
+        el.className = 'card-value ' + (!Number.isFinite(hours) ? '' :
+            hours <= 24 ? 'good' : hours <= 48 ? 'warning' : 'bad');
     }
     // ... more cards
 }
 ```
 
 Six cards across the top: Acceptance Rate, Active Users, PR Lifespan, Time to Review, Merge Rate, and Open Issues. Each one turns green/yellow/red based on health thresholds. A quick glance tells you if something needs attention.
+
+These thresholds are **starter settings**, not universal productivity standards. Show status text as well as color. Compare acceptance only within the same completion definition, and calculate period rates from summed acceptances divided by summed suggestions.
 
 ### Chart Rendering
 
@@ -191,7 +208,7 @@ The dashboard has four major sections, each with a 2-column responsive grid:
 
 **Copilot Usage**
 - Acceptance Rate Trend (line)
-- Active & Engaged Users (dual line)
+- Daily Active Users (line, with separate CLI or agent series where available)
 - Suggestions & Acceptances (grouped bar)
 - Chat Activity (line)
 
@@ -228,26 +245,18 @@ We're using GitHub's dark theme colors for a clean look:
 }
 ```
 
-The grid is responsive with `grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))`, so it stacks to single column on mobile without any media query hacks. Cards use a 6-across grid that drops to 2 on tablets and 1 on phones.
+Use `grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr))` so the grid can shrink below 400px on phones. Cards use a 6-across grid that drops to 2 on tablets and 1 on phones.
 
 ## Deploying to GitHub Pages
 
-The GitHub Actions workflow (from Part 1) handles deployment automatically:
+Add these **steps inside a deployment job** after collection and restricted history retrieval. The job needs `pages: write`, `id-token: write`, `contents: read`, a `github-pages` environment, and concurrency control. Follow the [official custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages):
 
 ```yaml
 - name: Generate dashboard data
   run: python scripts/generate_site.py
 
-- name: Commit data updates
-  run: |
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add data/ site/data/
-    git diff --cached --quiet || git commit -m "chore: update metrics data $(date -u +%Y-%m-%d)"
-    git push
-
 - name: Deploy to GitHub Pages
-  uses: actions/upload-pages-artifact@v3
+  uses: actions/upload-pages-artifact@v4
   with:
     path: site/
 
@@ -258,8 +267,8 @@ The GitHub Actions workflow (from Part 1) handles deployment automatically:
 After each nightly collection run, the workflow:
 
 1. Generates fresh `dashboard.json` from all accumulated data
-2. Commits the updated data files back to the repo (preserving history)
-3. Deploys the `site/` directory to GitHub Pages
+2. Saves raw history to restricted storage and checks that `site/` contains only approved aggregates
+3. Uploads and deploys only the sanitized `site/` directory to GitHub Pages
 
 One prerequisite: go to **Settings > Pages** in your repo and set the source to **GitHub Actions**.
 
@@ -267,15 +276,21 @@ One prerequisite: go to **Settings > Pages** in your repo and set the source to 
 
 Let's talk about what "good" looks like on each section:
 
-**Copilot Usage:** You want a **stable or rising** acceptance rate and user count. A sudden drop in acceptance rate might mean a model change, or it might mean people are getting less useful suggestions (check the language breakdown for clues).
+**Copilot Usage:** Investigate changes in acceptance and user counts against feature mix, telemetry coverage, editor versions, and report freshness. More agent use can reduce inline completions without reducing value.
 
-**Seat Utilization:** The "never used" and "inactive" lines should be as close to zero as possible. Anything else is waste. At $19/seat/month for Copilot Business, 20 unused seats = $380/month = $4,560/year walking out the door.
+**Seat Utilization:** Investigate "no recorded activity" and "inactive" seats before calling them waste. Leave, onboarding, telemetry gaps, and legitimate infrequent use matter. Estimate recoverable spend from confirmed reclaimable seats and your actual contracted seat rate, not a hardcoded list price.
 
-**PR Health:** Median lifespan trending **down** is great - code is shipping faster. But watch the P90 too. If the median is fine but the P90 is spiking, you have a few monster PRs dragging the tail. Time to first review is your review culture health check.
+**PR Health:** A falling **time to merge** can indicate faster flow; faster closure can also mean rejected PRs. Watch merge rate, PR size, sample counts, and the P90. Time to first human review helps surface review bottlenecks.
 
 **Issue Health:** The throughput chart is the key one here. If the "opened" bars are consistently taller than "closed", your backlog is growing. The stale issue count climbing means things are falling through the cracks.
 
-**The composite view:** The real insight comes from correlations. Is Copilot acceptance rate climbing while PR lifespan drops? That's the dream. Is acceptance rate climbing while issue quality (lifespan, backlog) gets worse? You might be shipping faster but shipping bugs.
+**The composite view:** Correlations help you choose the next investigation. Acceptance rising alongside faster merges does not prove Copilot caused the change. Backlog growth does not prove you're shipping bugs. Pair comparable cohorts with rework, defect data, and developer feedback.
+
+## Summary and Key Takeaways
+
+- Show report freshness and coverage next to the attractive charts.
+- Preserve missing values and label starter thresholds.
+- Publish aggregates only, verify site visibility, and use trends to ask better questions.
 
 ## What's Next
 

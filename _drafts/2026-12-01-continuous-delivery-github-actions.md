@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Continuous Delivery with GitHub Actions: From Green Build to Production"
-date: 2026-07-02 10:00:00 -0500
+date: 2026-12-01 10:00:00 -0600
 category: Blog
 tags: [github, github-actions, ci-cd, devops, automation, best-practices]
 excerpt: "Your CI pipeline builds and tests your code. Now what? Here's how to build reliable, safe continuous delivery workflows with GitHub Actions."
@@ -12,6 +12,10 @@ You've got CI nailed. Your tests run, your builds pass, your artifacts get packa
 Now comes the hard part: getting that code to production safely, consistently, and without someone manually clicking buttons at 3 PM on a Friday. Because nothing kills momentum like a merge-to-main-to-Slack-DM-to-manual-SSH-to-fingers-crossed deployment process.
 
 This post covers how to build continuous delivery (CD) pipelines with GitHub Actions. We're not starting from scratch - we're picking up where your CI pipeline ends and carrying that artifact all the way to production. If you already have workflows that test, build, and package your code, you're in the right place.
+
+**Fact-check anchor: November 3, 2026.** Examples target GitHub.com/GitHub Enterprise Cloud. The artifact actions below are not supported on GitHub Enterprise Server. Versions were checked against official releases: [checkout 7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1), [setup-node 7.1.0](https://github.com/actions/setup-node/releases/tag/v7.1.0), [upload-artifact 7.0.2](https://github.com/actions/upload-artifact/releases/tag/v7.0.2), and [download-artifact 8.0.2](https://github.com/actions/download-artifact/releases/tag/v8.0.2).
+
+Use verified full commit SHAs where your policy requires immutable action pins. Exact version tags here make the reviewed versions explicit; maintain them through reviewed update PRs.
 
 ## CI vs. CD: Where One Ends and the Other Begins
 
@@ -49,30 +53,46 @@ on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
       - name: Build and test
         run: |
           npm ci
           npm test
           npm run build
       - name: Upload artifact
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: app-${{ github.sha }}
           path: dist/
+          if-no-files-found: error
           retention-days: 30
 ```
 {% endraw %}
 
 That uploaded artifact is now the single source of truth for this commit. Every deployment downstream pulls this exact artifact - no rebuilding, no "works on my machine" surprises. The `retention-days: 30` gives you a window to redeploy or roll back to any recent build without re-running CI.
 
-For container-based deployments, the equivalent is pushing a Docker image tagged with the commit SHA to a registry. Same principle - build once, tag immutably, pull that exact image in every environment.
+This assumes your repo has a committed lockfile, `.nvmrc`, and working `test`/`build` npm scripts that produce `dist/`. Retention is subject to repository policy and deletion, so keep critical rollback releases in durable release storage.
+
+**Integrity is not provenance.** Downloading from an exact CI run binds the artifact to that run. The [current downloader](https://github.com/actions/download-artifact/tree/v8.0.2#inputs) supports `digest-mismatch: error`, which fails instead of proceeding on a digest mismatch. That does not make an artifact from an untrusted PR safe. Use [artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) when you need independent build-provenance verification, and verify them against your approved repository, workflow, event, and commit policy.
+
+For container deployments, promote the **image digest** (`registry/app@sha256:...`), not just a commit-SHA tag. Tags can be overwritten unless the registry enforces immutability.
 
 ## Structuring Your Deployment Workflow
 
@@ -82,7 +102,11 @@ Now for the actual deployment workflow. You have two main approaches here, and w
 
 For simpler setups (two or three environments in a linear promotion path), chain deployments in a single workflow using GitHub Environments. Each job targets a different environment and depends on the previous one succeeding.
 
-The `workflow_run` trigger connects this to your CI pipeline - it fires when your CI workflow completes on the `main` branch. The `if` condition ensures you only deploy when CI actually passed (not on failures or cancellations).
+The `workflow_run` trigger connects this to your CI pipeline. **A branch filter and green conclusion alone are not sufficient**: require a successful `push` run from this repository's protected `main`, not a PR or fork run.
+
+The deploy workflow must exist on the default branch. `workflow_run` can receive secrets and write tokens even when CI could not, so it is a privilege boundary. See [GitHub's event and security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
+
+Before copying the deployment examples, protect `main` against unreviewed changes, especially CI and deployment scripts. The examples assume existing executable `scripts/deploy.sh ENV ARTIFACT_DIR` and `scripts/smoke-test.sh URL`. Those scripts are application-specific adapters, not built-in GitHub functionality.
 
 {% raw %}
 ```yaml
@@ -94,50 +118,91 @@ on:
     branches: [main]
     types: [completed]
 
+permissions: {}
+concurrency:
+  group: delivery-main
+  queue: max
+  cancel-in-progress: false
+
 jobs:
   deploy-staging:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
     environment: staging
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.2
         with:
           name: app-${{ github.event.workflow_run.head_sha }}
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release/
+          digest-mismatch: error
       - name: Deploy to staging
-        run: ./scripts/deploy.sh staging
+        run: ./scripts/deploy.sh staging release/
         env:
-          DEPLOY_KEY: ${{ secrets.STAGING_DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
   smoke-test-staging:
     needs: deploy-staging
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
       - name: Run smoke tests
         run: ./scripts/smoke-test.sh https://staging.example.com
 
   deploy-production:
     needs: smoke-test-staging
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
     environment: production
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.2
         with:
           name: app-${{ github.event.workflow_run.head_sha }}
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release/
+          digest-mismatch: error
       - name: Deploy to production
-        run: ./scripts/deploy.sh production
+        run: ./scripts/deploy.sh production release/
         env:
-          DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 ```
 {% endraw %}
 
 Notice the flow: deploy to staging, run smoke tests against staging, and only then proceed to production. The `needs` keyword creates the dependency chain. If smoke tests fail, the production deployment never starts.
+
+Both deploy jobs download from the **same originating run**, with `actions: read` for cross-run access. Checkout uses that trusted run's SHA for scripts; the artifact stays under `release/` and cannot overwrite them. Define `DEPLOY_KEY` separately in staging and production environments.
+
+Concurrency prevents overlapping delivery runs. The current `queue: max` option retains up to **100 pending runs** instead of replacing the single pending run. It orders by when runs start waiting, not commit chronology. Add a release-order check in your deployment service if deploying an older commit after a newer one would be unsafe. See [concurrency behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
 
 The `environment: production` key on the production job is doing heavy lifting here. It gates the deployment behind whatever protection rules you've configured (required reviewers, wait timers, branch restrictions). We'll cover that in detail in the next section.
 
@@ -148,6 +213,8 @@ This approach works well when your deployment logic is similar across environmen
 For more complex setups, or when you want guaranteed consistency across environments, create a reusable deployment workflow and call it per environment. This uses `workflow_call`, which lets one workflow act as a callable function for others.
 
 First, define the reusable workflow with inputs for everything that varies between environments:
+
+The reusable workflow validates the source run through GitHub's API before starting any environment job. Inputs select the release; they do not establish trust.
 
 {% raw %}
 ```yaml
@@ -162,41 +229,89 @@ on:
       artifact-name:
         required: true
         type: string
+      source-run-id:
+        required: true
+        type: number
+      source-sha:
+        required: true
+        type: string
       url:
         required: true
         type: string
-    secrets:
-      deploy-key:
-        required: true
+
+permissions: {}
 
 jobs:
-  deploy:
+  validate-source:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    steps:
+      - name: Validate originating CI run before using environment credentials
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_RUN_ID: ${{ inputs.source-run-id }}
+          SOURCE_SHA: ${{ inputs.source-sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" |
+            jq -e --arg repo "$GITHUB_REPOSITORY" --arg sha "$SOURCE_SHA" '
+              .conclusion == "success" and
+              .path == ".github/workflows/ci.yml" and
+              .event == "push" and .head_branch == "main" and
+              .head_repository.full_name == $repo and .head_sha == $sha
+            '
+  deploy:
+    needs: validate-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
     environment:
       name: ${{ inputs.environment }}
       url: ${{ inputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.source-sha }}
+          persist-credentials: false
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.2
         with:
           name: ${{ inputs.artifact-name }}
+          run-id: ${{ inputs.source-run-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release/
+          digest-mismatch: error
       - name: Deploy
-        run: ./scripts/deploy.sh ${{ inputs.environment }}
+        run: ./scripts/deploy.sh "$TARGET_ENV" release/
         env:
-          DEPLOY_KEY: ${{ secrets.deploy-key }}
+          TARGET_ENV: ${{ inputs.environment }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
   smoke-test:
     needs: deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.source-sha }}
+          persist-credentials: false
       - name: Run smoke tests
-        run: ./scripts/smoke-test.sh ${{ inputs.url }}
+        run: ./scripts/smoke-test.sh "$TARGET_URL"
+        env:
+          TARGET_URL: ${{ inputs.url }}
 ```
 {% endraw %}
 
-Then your orchestration workflow becomes clean and readable. It calls the same reusable workflow for each environment, just passing different inputs and secrets:
+Then your orchestration workflow becomes clean and readable. It passes the originating run and SHA explicitly. The called job reads `DEPLOY_KEY` from its selected environment; environment secrets are **not** passed through `workflow_call`. See [reusable workflow secret behavior](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#using-inputs-and-secrets-in-a-reusable-workflow).
 
 {% raw %}
 ```yaml
@@ -208,16 +323,29 @@ on:
     branches: [main]
     types: [completed]
 
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: delivery-main
+  queue: max
+  cancel-in-progress: false
+
 jobs:
   staging:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
     uses: ./.github/workflows/deploy-to-env.yml
     with:
       environment: staging
       artifact-name: app-${{ github.event.workflow_run.head_sha }}
+      source-run-id: ${{ github.event.workflow_run.id }}
+      source-sha: ${{ github.event.workflow_run.head_sha }}
       url: https://staging.example.com
-    secrets:
-      deploy-key: ${{ secrets.STAGING_DEPLOY_KEY }}
 
   production:
     needs: staging
@@ -225,9 +353,9 @@ jobs:
     with:
       environment: production
       artifact-name: app-${{ github.event.workflow_run.head_sha }}
+      source-run-id: ${{ github.event.workflow_run.id }}
+      source-sha: ${{ github.event.workflow_run.head_sha }}
       url: https://example.com
-    secrets:
-      deploy-key: ${{ secrets.PROD_DEPLOY_KEY }}
 ```
 {% endraw %}
 
@@ -235,7 +363,7 @@ The reusable workflow approach has a few advantages worth calling out. First, yo
 
 ## GitHub Environments: Your Deployment Safety Net
 
-[GitHub Environments](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment) are the backbone of CD in Actions. They give you protection rules, scoped secrets, and deployment history - all without third-party tools.
+[GitHub Environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments) are the backbone of CD in Actions. They give you protection rules, scoped secrets, and deployment history - all without third-party tools.
 
 If you're not using environments yet, you're missing out on the most powerful CD feature Actions has. An environment is essentially a named deployment target with configurable guardrails. When a job references an environment, GitHub enforces whatever rules you've configured before the job is allowed to run.
 
@@ -243,11 +371,15 @@ If you're not using environments yet, you're missing out on the most powerful CD
 
 Go to **Settings > Environments** in your repo and create environments for each deployment target (staging, production, etc.). Then configure protection rules. Here's what each rule does and when to use it:
 
-**Required reviewers:** Specify team members who must approve before a deployment proceeds. When the workflow hits a job targeting this environment, it pauses and sends a notification to the reviewers. The job won't start until someone approves it. Use this for production. Skip it for dev/staging if your automated tests are solid - you don't want humans blocking every staging deploy when the whole point is fast feedback.
+**Required reviewers:** Select up to six users or teams with at least read access. **Only one** listed reviewer must approve; this is not a multi-reviewer quorum. Enable **Prevent self-review** and disable administrator bypass if your production policy requires independent approval.
 
-**Wait timer:** Add a delay between approval and deployment. This sounds weird, but it's useful for production deployments during business hours. Someone approves the deploy, then there's a 5-minute window where anyone on the team can see the notification and raise a concern. Think of it as a "speak now or forever hold your peace" buffer.
+**Wait timer:** Delay the job from when it is initially triggered, not from reviewer approval. It accepts 1-43,200 minutes and does not count as billable runner time. It is a delay, not a business-hours scheduler.
 
-**Deployment branches and tags:** Restrict which branches can deploy to an environment. This is your last line of defense against accidents. Production should only accept `main` (or your release branch). Staging might accept `main` and `release/*`. A rogue feature branch should never be able to target production, no matter what the workflow file says.
+**Deployment branches and tags:** Restrict the deploying workflow's ref, using separate branch/tag patterns. Production should accept only approved release refs. Prefer an explicit `main` rule over "Protected branches only", which allows all branches when no branch protection rules exist.
+
+**For `workflow_run`, the deploying workflow's ref is the default branch**, not the upstream artifact's source branch. Environment branch restrictions therefore do not verify artifact provenance. Keep the upstream event/repository/branch checks shown above.
+
+On Free, Pro, and Team plans, required reviewers and wait timers are available only for **public repositories**. Private/internal approval gates require Enterprise. Verify your plan before designing the process around unavailable controls. See [environment protection rules](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
 
 Here's what a well-configured production environment looks like:
 
@@ -256,22 +388,28 @@ Production environment rules:
   ├── Required reviewers: @platform-team (1 required)
   ├── Wait timer: 5 minutes
   ├── Branch policy: main only
-  └── Secrets: PROD_DEPLOY_KEY, PROD_DB_URL
+  ├── Prevent self-review: enabled
+  ├── Administrator bypass: disabled
+  └── Secrets: DEPLOY_KEY (production value), PROD_DB_URL
 ```
 
 ### Environment Secrets
 
-Each environment gets its own secrets, and this is a big deal for security. Your staging deploy key is only available to jobs targeting the staging environment. A compromised dev workflow, a malicious PR, or a misconfigured action can't access production credentials because those secrets simply don't exist outside the production environment context.
+Each environment gets its own secrets. Your staging deploy key is only available to jobs targeting staging. **Any workflow can attempt to target production**, so branch restrictions, approvals, and trusted workflow code are what stop that attempt from becoming credential access.
 
 This is a meaningful step up from repo-level secrets, where any workflow job can access any secret. With environment-scoped secrets, the blast radius of a compromised secret is limited to that one environment.
 
 {% raw %}
 ```yaml
-# This job can ONLY access staging secrets
+# Secret-scoping fragment only; the full workflow above supplies the release
 deploy-staging:
+  runs-on: ubuntu-latest
   environment: staging  # <-- scopes the available secrets
   steps:
-    - run: ./deploy.sh
+    - uses: actions/checkout@v7.0.1
+      with:
+        persist-credentials: false
+    - run: ./scripts/deploy.sh staging release/
       env:
         # Only available because environment is 'staging'
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
@@ -293,13 +431,16 @@ The trade-off is straightforward: during the rollout, both old and new versions 
 - name: Deploy (rolling)
   run: |
     kubectl set image deployment/app \
-      app=${{ env.IMAGE }}:${{ github.sha }} \
-      --record
+      "app=$DEPLOY_IMAGE"
     kubectl rollout status deployment/app --timeout=300s
+  env:
+    DEPLOY_IMAGE: ${{ env.VERIFIED_IMAGE_DIGEST }}
 ```
 {% endraw %}
 
 Good for: services with graceful shutdown handling, stateless apps, teams that want simplicity.
+
+The strategy snippets are **step fragments**, not full workflows. They assume an authenticated deployment target, checked-out trusted adapters, and the already verified release. For containers, set `VERIFIED_IMAGE_DIGEST` to a full immutable image reference from CI; do not substitute the CD workflow's `github.sha`.
 
 The `kubectl rollout status` command is doing important work here - it waits for the rollout to complete and exits with a non-zero code if it fails. That means your workflow step will fail if the rollout fails, which you can catch in subsequent steps to trigger a rollback.
 
@@ -316,15 +457,18 @@ The downside is cost: you're paying for two full environments at all times. For 
 - name: Determine target slot
   id: slot
   run: |
-    ACTIVE=$(curl -s https://example.com/health | jq -r '.slot')
-    if [ "$ACTIVE" = "blue" ]; then
-      echo "target=green" >> "$GITHUB_OUTPUT"
-    else
-      echo "target=blue" >> "$GITHUB_OUTPUT"
-    fi
+    ACTIVE=$(curl --fail --silent --show-error --max-time 30 \
+      https://example.com/health | jq -er '.slot')
+    case "$ACTIVE" in
+      blue) echo "target=green" >> "$GITHUB_OUTPUT" ;;
+      green) echo "target=blue" >> "$GITHUB_OUTPUT" ;;
+      *) echo "::error::Unknown active slot"; exit 1 ;;
+    esac
 
 - name: Deploy to inactive slot
-  run: ./scripts/deploy.sh ${{ steps.slot.outputs.target }}
+  run: ./scripts/deploy.sh "$TARGET_SLOT" release/
+  env:
+    TARGET_SLOT: ${{ steps.slot.outputs.target }}
 
 - name: Smoke test inactive slot
   run: ./scripts/smoke-test.sh https://${{ steps.slot.outputs.target }}.example.com
@@ -348,7 +492,9 @@ This gives you real production data about the new version's behavior before comm
 ```yaml
 - name: Deploy canary (10% traffic)
   run: |
-    ./scripts/deploy-canary.sh --version ${{ github.sha }} --weight 10
+    ./scripts/deploy-canary.sh --artifact release/ --version "$DEPLOY_SHA" --weight 10
+  env:
+    DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
 
 - name: Monitor canary (5 minutes)
   run: |
@@ -359,7 +505,9 @@ This gives you real production data about the new version's behavior before comm
 
 - name: Promote or rollback
   if: success()
-  run: ./scripts/promote-canary.sh --version ${{ github.sha }}
+  run: ./scripts/promote-canary.sh --version "$DEPLOY_SHA"
+  env:
+    DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
 
 - name: Rollback canary
   if: failure()
@@ -394,13 +542,14 @@ The trick here is the retry loop. A single failed health check might just mean t
 ```yaml
 - name: Deploy
   id: deploy
-  run: ./scripts/deploy.sh production
+  run: ./scripts/deploy.sh production release/
 
 - name: Verify deployment health
   id: health
   run: |
     for i in $(seq 1 10); do
-      STATUS=$(curl -s -o /dev/null -w '%{http_code}' https://example.com/health)
+      STATUS=$(curl --silent --show-error --connect-timeout 5 --max-time 10 \
+        -o /dev/null -w '%{http_code}' https://example.com/health || true)
       if [ "$STATUS" != "200" ]; then
         echo "Health check failed (attempt $i/10)"
         sleep 10
@@ -413,13 +562,13 @@ The trick here is the retry loop. A single failed health check might just mean t
     exit 1
 
 - name: Rollback on failure
-  if: failure() && steps.deploy.outcome == 'success'
+  if: failure() && (steps.deploy.outcome == 'success' || steps.deploy.outcome == 'failure')
   run: |
-    echo "::error::Deployment health check failed - rolling back"
+    echo "::error::Deployment or health verification failed - attempting recovery"
     ./scripts/rollback.sh production
 ```
 
-The `if: failure() && steps.deploy.outcome == 'success'` condition is important. You only want to roll back if the deployment itself succeeded but the health check failed. If the deployment step itself failed (maybe the deploy script errored), there's nothing to roll back because the new version never went live.
+A failed deploy command can leave a **partially updated environment**. The recovery condition covers both a successful deploy followed by a failed health check and a deploy that failed midway. Your adapter must record previous state and make recovery safe when no change occurred. Database changes may require a forward fix rather than an automatic rollback.
 
 ### Keep Track of What to Roll Back To
 
@@ -435,11 +584,19 @@ For Kubernetes deployments, you can query the current image before overwriting i
     echo "image=$CURRENT" >> "$GITHUB_OUTPUT"
 
 - name: Deploy new version
-  run: kubectl set image deployment/app app=${{ env.IMAGE }}:${{ github.sha }}
+  run: |
+    kubectl set image deployment/app "app=$DEPLOY_IMAGE"
+    kubectl rollout status deployment/app --timeout=300s
+  env:
+    DEPLOY_IMAGE: ${{ env.VERIFIED_IMAGE_DIGEST }}
 
 - name: Rollback if needed
-  if: failure()
-  run: kubectl set image deployment/app app=${{ steps.previous.outputs.image }}
+  if: failure() && steps.previous.outcome == 'success'
+  run: |
+    kubectl set image deployment/app "app=$PREVIOUS_IMAGE"
+    kubectl rollout status deployment/app --timeout=300s
+  env:
+    PREVIOUS_IMAGE: ${{ steps.previous.outputs.image }}
 ```
 {% endraw %}
 
@@ -453,25 +610,28 @@ Your CD pipeline needs credentials to deploy - cloud provider access, database U
 
 Stop storing long-lived cloud credentials as GitHub secrets. Seriously. Long-lived access keys are a liability - they can be leaked, they don't expire, and revoking them is a fire drill.
 
-Instead, use [OpenID Connect (OIDC)](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect) to get short-lived tokens. GitHub Actions acts as an identity provider, and your cloud provider trusts it to issue tokens scoped to specific repos, branches, and environments. The tokens last for the duration of the job and expire automatically.
+Instead, use [OpenID Connect (OIDC)](https://docs.github.com/en/actions/concepts/security/openid-connect) to exchange a GitHub identity token for short-lived cloud credentials. **The cloud trust policy decides who may exchange it**, and the cloud session's expiration is provider-configured, not automatically the job's lifetime.
 
 ```yaml
+# Add to the trusted deployment job, not the PR build:
 permissions:
-  id-token: write
   contents: read
+  actions: read
+  id-token: write
 
+# Step fragment within that job:
 steps:
   - name: Authenticate to AWS
-    uses: aws-actions/configure-aws-credentials@v4
+    uses: aws-actions/configure-aws-credentials@v6.3.0
     with:
-      role-to-assume: arn:aws:iam::123456789:role/github-deploy
+      role-to-assume: arn:aws:iam::123456789012:role/github-deploy
       aws-region: us-east-1
 ```
 
 {% raw %}
 ```yaml
   - name: Authenticate to Azure
-    uses: azure/login@v2
+    uses: azure/login@v3.1.0
     with:
       client-id: ${{ secrets.AZURE_CLIENT_ID }}
       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -479,7 +639,13 @@ steps:
 ```
 {% endraw %}
 
-No static keys to rotate. Tokens expire after the job completes. The OIDC trust policy on the cloud side restricts which repos, branches, and environments can assume the role - so even if someone forks your repo, they can't use your cloud credentials.
+The cloud session expires according to its configured lifetime; ending the job does not instantly revoke it. Match the issuer, audience, and exact subject in your cloud trust. Use `sts.amazonaws.com` for AWS and `api://AzureADTokenExchange` for Azure. Grant only the deployment role's necessary resource access.
+
+**Check the subject format before copying a trust policy.** GitHub repositories created after July 15, 2026, and repositories renamed/transferred after that date, use default subjects containing immutable owner/repository IDs. Older repositories keep the legacy format unless opted in. An environment job's subject includes the environment, not the branch: for example, legacy `repo:acme/app:environment:production`, or ID-qualified `repo:acme@123/app@456:environment:production`.
+
+Match the subject your repository actually emits, including case and any customization. Do not wildcard all repos or all environments to fix a mismatch. Environment branch controls still guard the deployment workflow ref, while the upstream run checks guard artifact origin.
+
+See [current OIDC subject formats](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims), [AWS setup](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws), and [Azure setup](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure). Authentication action versions were verified against [AWS 6.3.0](https://github.com/aws-actions/configure-aws-credentials/releases/tag/v6.3.0) and [Azure Login 3.1.0](https://github.com/Azure/login/releases/tag/v3.1.0).
 
 Setting up OIDC requires a one-time configuration on both sides (creating an identity provider in your cloud account and a trust policy), but after that, your workflows are simpler and more secure.
 
@@ -491,9 +657,11 @@ Here's how secret scoping works in practice:
 
 | Secret level | Available to | Use for |
 |-------------|-------------|---------|
-| Repository | All jobs | Non-sensitive shared config |
+| Repository | Jobs in eligible repository workflows | Shared sensitive values that are not production-only |
 | Environment | Jobs targeting that environment only | Deploy keys, database URLs, API tokens |
-| Organization | All repos in org (if granted) | Shared infrastructure credentials |
+| Organization | Eligible jobs in repositories permitted by the secret's access policy | Scoped shared infrastructure credentials |
+
+Use [configuration variables](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables), not secrets, for genuinely non-sensitive configuration. Fork PRs and Dependabot events have additional secret restrictions; environment scoping does not override those rules.
 
 The principle is simple: production credentials should only be accessible to jobs that are actually deploying to production. Environment scoping enforces this structurally rather than relying on people to be careful.
 
@@ -505,7 +673,7 @@ How your CD pipeline gets kicked off sets the tone for your entire deployment cu
 
 ### Automatic: Deploy on Merge to Main
 
-The holy grail of CD: every merge to main automatically deploys (after CI passes). This is what "continuous" in continuous delivery actually means. No manual steps, no deploy meetings, no "who's going to push the button?"
+Every merge to main can automatically deploy after CI passes. Strictly speaking, **continuous delivery** keeps changes deployable and can retain a production approval. **Continuous deployment** automatically releases every eligible change. Choose the operational policy that fits your service.
 
 This works because of a key assumption: your CI pipeline is thorough enough that a green build genuinely means the code is safe to deploy. If you don't trust your tests, you shouldn't be doing automatic deployments - invest in your test suite first.
 
@@ -517,7 +685,7 @@ on:
     types: [completed]
 ```
 
-The `workflow_run` trigger with `types: [completed]` is doing the heavy lifting here. It only fires after your CI workflow finishes (not when it starts), and you add the `if: conclusion == 'success'` check in the job to ensure you only deploy on green builds. This creates a clean handoff between CI and CD without coupling them into the same workflow file.
+This trigger is only the event subscription. Apply the full success, `push`, source-repository, and `main` guard from the earlier workflow before accessing deployment credentials. A green PR build or an absent artifact must never become a production release.
 
 Best for: teams with strong CI coverage, low-risk services, high deployment frequency.
 
@@ -532,7 +700,7 @@ on:
       - 'v*'
 ```
 
-The `v*` pattern matches any tag starting with "v" (like `v1.0.0`, `v2.3.1-beta`). When someone pushes a tag matching this pattern, the workflow fires. This gives you a clear, auditable release history in your git log - every deployment corresponds to a tag that you can see, compare, and reference later.
+The `v*` pattern matches release and prerelease tags. Protect tag creation and updates with rulesets. Resolve the tag to a commit and select an already verified artifact or image digest for it. A tag is a release selector, not proof that CI passed, and tags must not trigger a rebuild that bypasses your promotion checks.
 
 Best for: libraries, versioned APIs, regulated environments, teams that want explicit release control.
 
@@ -553,13 +721,15 @@ on:
         options:
           - staging
           - production
-      ref:
-        description: 'Git ref to deploy (branch, tag, or SHA)'
+      source-run-id:
+        description: 'Successful protected-main CI run containing the release'
         required: true
-        default: 'main'
+        type: string
 ```
 
 Best for: hotfixes, rollbacks, deploying specific versions outside the normal flow, one-off environments.
+
+Treat the run ID as a selector, not authority. Fetch it through the [workflow runs API](https://docs.github.com/en/rest/actions/workflow-runs#get-a-workflow-run), validate the expected CI workflow, successful conclusion, `push` event, source repository, and protected branch, then select its artifact. Do not check out an arbitrary input branch and build it with production credentials.
 
 ### Combining Triggers
 
@@ -576,11 +746,16 @@ on:
   workflow_dispatch:
     inputs:
       environment:
+        required: true
         type: choice
         options: [staging, production]
+      source-run-id:
+        description: 'Verified CI run for a manual promotion'
+        required: true
+        type: string
 ```
 
-This gives you the speed of automatic deployments for staging (where you want fast feedback) with the safety of human oversight for production (where you want someone to consciously decide "yes, this is ready"). As your confidence in the pipeline grows, you can remove the manual gate and go fully automatic.
+This trigger fragment does not route jobs by itself. Explicitly separate automatic staging from validated manual promotion, normalize the selected run/SHA, and apply the same artifact checks to both paths. Keep production's environment protections enabled; a dispatch button is not an approval policy.
 
 ## Deployment Visibility
 
@@ -588,7 +763,7 @@ A deployment that nobody knows about is a deployment that nobody can troubleshoo
 
 ### Deployment Status in PRs
 
-When you use the `environment` key on a job, GitHub automatically creates deployment records that show up in multiple places: the PR timeline, commit statuses, and the Environments page in your repo settings.
+When you use `environment`, GitHub creates deployment records and statuses for that job's workflow ref. For `workflow_run`, that ref is the default branch, which can differ from the deployed artifact's SHA. Log the **source CI run ID, artifact ID/digest, and source SHA** explicitly in the deployment summary and your deployment service.
 
 To get the most out of this, include the `url` field so the deployment record links directly to the deployed environment:
 
@@ -608,22 +783,22 @@ Don't make people watch the Actions tab. Push deployment status to wherever your
 ```yaml
 - name: Notify on deployment
   if: always()
-  uses: slackapi/slack-github-action@v2
+  uses: slackapi/slack-github-action@v4.0.0
   with:
     webhook: ${{ secrets.SLACK_WEBHOOK }}
     webhook-type: incoming-webhook
     payload: |
-      {
-        "text": "Deploy to ${{ inputs.environment }}: ${{ job.status }}\nCommit: ${{ github.sha }}\nActor: ${{ github.actor }}"
-      }
+      text: ${{ toJSON(format('Deployment result: {0}; source commit: {1}; actor: {2}', job.status, github.event.workflow_run.head_sha, github.actor)) }}
 ```
 {% endraw %}
 
 Use `if: always()` here so the notification fires on both success and failure. A silent failure is worse than a loud one.
 
+The example uses the verified [Slack action 4.0.0 release](https://github.com/slackapi/slack-github-action/releases/tag/v4.0.0). For manual promotion, substitute your validated source SHA rather than reading the absent `workflow_run` payload.
+
 ### Deployment Log
 
-Keep a record of what was deployed, when, and by whom. The good news is that GitHub's deployment history (visible in **Settings > Environments**) handles this automatically when you use the `environment` key in your jobs. You get a timeline of every deployment with the commit, actor, and status.
+Keep a record of what was deployed, when, and by whom. The good news is that GitHub's deployment history (visible in **Settings > Environments**) handles this automatically when you use the `environment` key in your jobs. You get the workflow commit, actor, and deployment status. Preserve artifact-origin metadata separately when the workflow commit and release commit differ.
 
 For teams that need more than what GitHub provides natively (like linking deployments to incident tickets or tracking deployment frequency metrics), consider forwarding deployment events to your observability platform.
 
@@ -639,7 +814,9 @@ After helping teams set up CD pipelines, these are the mistakes I see most often
 | No smoke tests after deployment | Run basic validation after every deploy |
 | Manual deployments as the only option | Automate the default path, keep manual as escape hatch |
 | Long-lived cloud credentials in secrets | Use OIDC for short-lived tokens |
-| No deployment branch restrictions | Restrict production deployments to `main` only |
+| No deployment branch restrictions | Restrict deploying refs and independently verify artifact origin |
+| Trusting any successful upstream run | Require the expected protected-main push workflow and repository |
+| Ignoring artifact digest mismatches | Set `digest-mismatch: error` and promote the verified artifact |
 | Deploying without approval gates | Use required reviewers on production environments |
 | No visibility into what's deployed | Use GitHub Environments for deployment history and status |
 
@@ -652,6 +829,7 @@ Here's a condensed version of everything above. Use this as a starting point - n
 **Foundation:**
 
 - [ ] Build artifacts once in CI, store with `upload-artifact`
+- [ ] Verify source workflow/run/SHA and fail closed on artifact digest mismatch
 - [ ] Create GitHub Environments for each deployment target
 - [ ] Set up environment-scoped secrets (not repo-level for sensitive credentials)
 - [ ] Configure deployment branch restrictions
@@ -678,9 +856,9 @@ Continuous delivery isn't about deploying recklessly fast. It's about making dep
 
 The bottom line:
 
-- **Build once, deploy everywhere.** The artifact you tested is the artifact you ship. No exceptions. Rebuilding per environment is the #1 source of "but it worked in staging" problems.
+- **Build once, deploy everywhere.** The artifact you tested is the artifact you ship. Verify its origin and integrity, then promote it without rebuilding.
 - **GitHub Environments are your control plane.** Approval gates, scoped secrets, branch restrictions, and deployment history - all built in. Use them before reaching for third-party tools.
-- **Automate the happy path, plan for failure.** Health checks and automated rollbacks are not optional for production pipelines. The deploy that breaks things at 2 AM needs to fix itself without waking someone up.
+- **Automate the happy path, plan for failure.** Include health checks and tested recovery, including partial deploys. Automate rollback where safe; use a forward-fix plan for irreversible changes.
 - **Start simple.** A linear staging-then-production pipeline with approval gates covers most teams. Add canary deployments and traffic splitting when your scale demands it - not before.
 - **Use OIDC for cloud auth.** Stop storing long-lived credentials. Short-lived tokens scoped to specific repos and environments are the standard now. They're more secure and simpler to manage once set up.
 - **Make deployments visible.** If the team doesn't know a deployment happened, they can't connect it to the problem they're debugging. Notifications and deployment records are cheap insurance.

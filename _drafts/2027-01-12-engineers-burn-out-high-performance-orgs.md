@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Why Engineers Burn Out in 'High-Performance' Organizations"
-date: 2026-06-15 10:00:00 -0500
+date: 2027-01-12 10:00:00 -0600
 category: Blog
 tags: [engineering, burnout, leadership, culture, wellness]
 excerpt: "Burnout is often misdiagnosed as a personal resilience issue. It's actually a systemic failure driven by chronic overload, ambiguity, and lack of recovery. Sustainable performance requires designing for human limits."
@@ -19,15 +19,15 @@ It's almost like "high-performance culture" is doing something different than wh
 
 Let's start with the most important reframe: burnout is not a character flaw. It's not a lack of resilience. It's not something that happens to people who can't "handle the pressure."
 
-Burnout is the predictable outcome of sustained demands exceeding sustained resources. It's a systemic failure, not an individual one.
+Sustained demands exceeding available resources increase burnout risk. That makes working conditions a leadership responsibility, not a test of individual toughness.
 
-The World Health Organization defines burnout as a syndrome resulting from chronic workplace stress that has not been successfully managed. Note the phrase "not been successfully managed." The management failure isn't on the individual. It's on the conditions.
+The [World Health Organization defines burnout](https://www.who.int/news/item/28-05-2019-burn-out-an-occupational-phenomenon-international-classification-of-diseases) as a syndrome resulting from chronic workplace stress that has not been successfully managed. ICD-11 classifies it as an **occupational phenomenon**, not a medical condition. That definition doesn't assign blame, but it directs our attention to workplace conditions.
 
 ## The High-Performance Paradox
 
 Here's the paradox: organizations that explicitly value "high performance" often create conditions that undermine it.
 
-Why? Because "high-performance culture" usually means:
+The risk grows when "high-performance culture" becomes shorthand for:
 - Aggressive goals
 - Minimal slack
 - Constant urgency
@@ -51,23 +51,23 @@ Burnout isn't just "tired." It's a specific syndrome with specific components:
 
 The most obvious one. Physical and emotional depletion. Not the "tired after a hard day" kind. The "tired before the day starts, tired after sleeping, tired of being tired" kind.
 
-Exhaustion accumulates. It doesn't reset on weekends. It builds over weeks and months until recovery requires more than a vacation.
+Exhaustion can accumulate and persist beyond weekends or a vacation. Recovery needs vary; a manager shouldn't treat these descriptions as a diagnostic checklist.
 
 ### Cynicism
 
 Burnout creates psychological distance. People stop caring. They become detached from their work, their colleagues, their organization. "Whatever, it doesn't matter" becomes the default response.
 
-This isn't attitude. It's a defense mechanism. When demands exceed capacity, the mind protects itself by caring less.
+This isn't necessarily a bad attitude. Detachment can accompany chronic workplace stress. Respond with support and a conversation about conditions, not a lecture about enthusiasm.
 
 ### Reduced Efficacy
 
 Burnout impairs performance. People become less effective, make more mistakes, and produce lower quality work. Which often leads to working harder, which makes the burnout worse.
 
-This is the cruel irony: burnout makes you bad at the job, and trying harder makes the burnout worse.
+This is the cruel irony: depleted people may struggle to work effectively, and simply demanding more effort can deepen the strain.
 
 ## The Organizational Patterns That Cause Burnout
 
-Let's name specific patterns. If you see these in your organization, burnout is a predictable outcome:
+Let's name specific patterns that can increase burnout risk. They don't affect every person in the same way:
 
 ### Chronic Overload
 
@@ -103,7 +103,7 @@ The fix isn't "hire more resilient people." The fix is designing systems that do
 
 ### Right-Size Workloads
 
-This seems obvious but it's surprisingly rare. Actually match capacity to demand. Leave slack for unexpected work. Treat 80% utilization as the target, not 100%.
+This seems obvious but it's surprisingly rare. Actually match capacity to demand. Leave slack for unexpected work. Set the buffer using observed interruptions and oncall load, not a universal utilization percentage.
 
 ### Clarify Priorities
 
@@ -123,7 +123,9 @@ Make it safe to say "I'm overwhelmed." Make it safe to push back on unrealistic 
 
 ### Measure What Matters
 
-Track not just output but sustainability. How's oncall looking? How much unplanned work? How are people feeling? (Yes, ask them.) Make burnout risk visible before it becomes burnout reality.
+Track not just output but sustainability. How's oncall looking? How much unplanned work? How are people feeling? (Yes, ask them.) Use voluntary feedback and aggregate workload trends, not individual burnout scores in performance reviews.
+
+For example, after reducing overnight pages, check whether protected recovery time actually increased. If someone reports persistent distress, offer confidential support and access to qualified care rather than trying to diagnose them.
 
 ## The Leadership Responsibility
 

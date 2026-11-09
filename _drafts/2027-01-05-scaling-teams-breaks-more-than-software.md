@@ -1,10 +1,10 @@
 ---
 layout: post
 title: "Scaling Teams Breaks More Often Than Scaling Software"
-date: 2026-06-13 10:00:00 -0500
+date: 2027-01-05 10:00:00 -0600
 category: Blog
 tags: [engineering, scaling, leadership, teams, conways-law]
-excerpt: "Software systems scale more predictably than human systems. Communication paths, ownership boundaries, and decision latency degrade as teams grow. Scaling teams requires as much intentional architecture as scaling code."
+excerpt: "Team growth can strain communication paths, ownership boundaries, and decision latency. Scaling teams requires as much intentional architecture as scaling code."
 ---
 
 Here's an uncomfortable truth: most engineering organizations are better at scaling their software than scaling their teams.
@@ -17,19 +17,19 @@ Software scales. Teams... teams are harder.
 
 ## Why Human Systems Are Different
 
-Distributed software systems have a property that human systems don't: determinism. A load balancer routes requests the same way every time. A cache either has the data or it doesn't. A database query returns a predictable result.
+Software gives us mechanisms we can specify and test, but distributed systems aren't automatically deterministic. Timing, concurrent writes, partial failures, and stale caches can all produce surprising behavior.
 
 Human systems are messy. Communication is lossy. Context is incomplete. People have bad days. People have different priorities. People interpret the same message in different ways.
 
-When software systems scale, you add capacity and tune parameters. When human systems scale, you add complexity in ways that don't follow predictable curves.
+Both kinds of scaling need more than added capacity. Human systems also require shared context, negotiated priorities, and decision rights that don't come with an autoscaling policy.
 
 ## The Communication Path Problem
 
 Here's the classic math: a team of n people has n(n-1)/2 potential communication paths. A team of 5 has 10 paths. A team of 10 has 45. A team of 20 has 190.
 
-Communication paths grow quadratically while team size grows linearly. This is why adding people to a late project makes it later, and why "just hire more engineers" rarely solves velocity problems.
+**Potential** pairwise paths grow quadratically while team size grows linearly. That doesn't mean every pair needs to communicate, or that coordination cost follows the same curve. Hiring can help, but onboarding and dependencies can delay the payoff.
 
-Beyond raw numbers, communication quality degrades with scale:
+Without deliberate structures, communication quality can degrade with scale:
 
 - **More misunderstandings.** More people means more chances for messages to be misinterpreted.
 - **More coordination overhead.** Syncing up becomes a larger percentage of everyone's time.
@@ -38,11 +38,11 @@ Beyond raw numbers, communication quality degrades with scale:
 
 ## Conway's Law as Lived Reality
 
-You've probably heard Conway's Law: organizations design systems that mirror their communication structure.
+You've probably heard [Conway's Law](https://www.melconway.com/Home/Committees_Paper.html): organizations' communication structures constrain the systems they design.
 
 This is usually treated as a fun observation, a kind of "huh, isn't that interesting" fact for architecture discussions. But it's actually a warning.
 
-If your teams are organized poorly, your system will be organized poorly. If communication between Team A and Team B is difficult, the interface between System A and System B will be awkward. If ownership is unclear in the org, ownership will be unclear in the architecture.
+If communication between Team A and Team B is difficult, their system interface is more likely to suffer. Unclear organizational ownership can also leave architectural responsibilities ambiguous. These are risks to design around, not mechanical laws of failure.
 
 And the reverse: when you change your architecture, you often need to change your org structure to match. If you don't, the mismatch creates constant friction.
 
@@ -134,15 +134,15 @@ This isn't about enforcing conformity. It's about being intentional about values
 
 Here's a power move: instead of letting your org structure drive your architecture, design your architecture and then restructure your org to match.
 
-Want a microservices architecture? Organize into small teams with clear service ownership. Want a monolith? Organize for tighter collaboration.
+For independently deployed services, give teams clear ownership and workable interface contracts. A modular monolith can also support multiple teams with explicit module boundaries. Don't choose microservices just to justify a reorg.
 
-This is hard. Reorgs are painful. But fighting against Conway's Law is even more painful in the long run.
+Before reaching for a reorg, pilot one boundary change. Check whether decision latency, blocked work, and integration failures improve. Sometimes clearer interfaces solve more than moving boxes on an org chart.
 
 ## TL;DR
 
 - Human systems don't scale as predictably as software systems
-- Communication paths grow quadratically; coordination overhead increases faster than team size
-- Conway's Law is a warning: your system will mirror your org structure, for better or worse
+- Potential pairwise communication paths grow quadratically; actual coordination costs depend on how you organize work
+- Conway's Law is a warning about communication constraints, not a guarantee that architecture copies the org chart
 - Common failure modes: coordination tax, ownership vacuum, knowledge silos, decision bottlenecks, culture drift
 - Scaling teams requires intentional architecture: team boundaries, communication structures, decision rights, knowledge management, and cultural transmission
 - Consider the inverse Conway maneuver: design your target architecture, then restructure your org to support it

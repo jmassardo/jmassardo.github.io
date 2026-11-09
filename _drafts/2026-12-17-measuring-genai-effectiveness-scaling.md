@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 4: Scaling for the Enterprise"
-date: 2026-06-21 10:00:00 -0500
+date: 2026-12-17 10:00:00 -0600
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices, enterprise]
 excerpt: "Our polling-based dashboard works great for a single org. Here's how to redesign the architecture when you have 100,000 repos across 100 orgs."
@@ -28,13 +28,13 @@ Assume a modest average of 10 PRs per repo per collection window:
 100,000 repos x (2 + 10) API calls = 1,200,000 API calls
 ```
 
-GitHub's REST API rate limit is **5,000 requests per hour** for authenticated users (or 15,000 for GitHub App installations). Even at the generous rate:
+GitHub's [REST primary limit](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api) is generally **5,000 requests per hour** for authenticated users. App installations on Enterprise Cloud organizations get 15,000; not every installation does. Secondary limits also apply. Even at the generous rate:
 
 ```
 1,200,000 / 15,000 = 80 hours
 ```
 
-Your "nightly" job would take **3.3 days** to complete. And that's just PRs. Add issues and you're looking at a week-long collection run that never actually finishes before the next one starts.
+Your "nightly" job would need **at least 3.3 days** under this single-budget assumption. PR detail calls and pagination make this lower-bound estimate worse. Multiple installations have separate budgets, but that doesn't make unrestricted concurrency a good plan.
 
 ### The Data Volume Problem
 
@@ -46,7 +46,7 @@ One bad token rotation, one API outage, one repo with 10,000 open PRs - and your
 
 ## The Paradigm Shift: Pull to Push
 
-The fix isn't "poll faster." It's **stop polling.**
+The fix isn't "poll faster." It's **stop doing full repository scans every night**. Keep bounded polling for daily Copilot reports and reconciliation; use events for PR and issue changes.
 
 Instead of asking GitHub "what happened?" every night, we need GitHub to **tell us** when things happen. This is the shift from pull-based to push-based (event-driven) architecture.
 
@@ -58,7 +58,6 @@ flowchart TB
         CopilotAPI["Copilot Metrics API\n(Enterprise)"]
         Webhooks["Org Webhooks (per org)\npull_request · issues · review events"]
         AuditLog["Audit Log Streaming"]
-        CopilotAPI --> AuditLog
     end
 
     subgraph Ingestion["Event Ingestion"]
@@ -75,6 +74,8 @@ flowchart TB
 
     Webhooks --> Receiver
     AuditLog --> Queue
+    CopilotAPI --> ReportJob["Scheduled report downloader"]
+    ReportJob --> DB
     Queue --> Processor
     DB --> Dashboard["Dashboard /\nGrafana / Superset"]
 ```
@@ -88,12 +89,16 @@ Let's break this down layer by layer.
 Good news: Copilot metrics **already aggregate at the enterprise level**:
 
 ```
-GET /enterprises/{enterprise}/copilot/metrics
+GET /enterprises/{enterprise}/copilot/metrics/reports/enterprise-28-day/latest
 ```
 
-This returns the same daily metrics as the org-level endpoint, but rolled up across all orgs. One API call instead of 100. This endpoint is your friend at scale.
+**November 3, 2026 correction:** the legacy `/copilot/metrics` API sunset April 2. The [current report API](https://docs.github.com/en/rest/copilot/copilot-usage-metrics) returns signed `download_links` and reporting-window metadata. Download all NDJSON files, then normalize `day_totals`. This is one metadata request plus report downloads, not one inline metrics response.
 
-For seat-level data, you'll still need to hit each org's billing endpoint, but seats change infrequently. A weekly cadence with staggered timing across orgs is fine:
+Enterprise totals deduplicate users. Organization usage follows membership, so users can appear in multiple organizations; don't sum organization reports to reconstruct enterprise totals. Reports can lag two full UTC days. Enterprise history starts October 10, 2025, with up to one year accessible; organization history begins December 12, 2025.
+
+For team analysis, [join daily user reports with same-day user-teams reports](https://docs.github.com/en/copilot/reference/copilot-usage-metrics/team-level-metrics). Sub-five-seat teams are excluded from the membership report, and overlapping memberships still require deduplication. Keep identities restricted, suppress small groups in shared dashboards, and never export individual activity as a developer performance ranking.
+
+For seats, use the [user-management API](https://docs.github.com/en/rest/copilot/copilot-user-management), including enterprise seat endpoints where available and authorized. If you collect org seats, stagger them and deduplicate by stable user ID. Weekly collection may suit license reviews, but choose a cadence that fits your provisioning changes:
 
 ```python
 # Stagger org-level seat collection across the week
@@ -114,7 +119,7 @@ POST https://your-webhook-receiver.example.com/github/events
 ```
 
 Configure each org webhook to send:
-- `pull_request` events (opened, closed, merged, reopened)
+- `pull_request` events (opened, closed, reopened; a merge is a `closed` action with `merged` set)
 - `pull_request_review` events (submitted)
 - `issues` events (opened, closed, reopened)
 - `issue_comment` events (created)
@@ -130,12 +135,12 @@ gh api orgs/{org}/hooks \
   -f name=web \
   -f 'config[url]=https://your-receiver.example.com/github/events' \
   -f 'config[content_type]=json' \
-  -f 'config[secret]=your-webhook-secret' \
+  -f "config[secret]=${WEBHOOK_SECRET}" \
   -f 'events[]=pull_request' \
   -f 'events[]=pull_request_review' \
   -f 'events[]=issues' \
   -f 'events[]=issue_comment' \
-  -f active=true
+  -F active=true
 ```
 
 ### Audit Log Streaming
@@ -148,7 +153,9 @@ For enterprises that want even broader visibility, GHEC supports **audit log str
 - Google Cloud Storage
 - Splunk
 
-Audit log streaming captures events that webhooks miss (security events, admin actions, authentication events) and provides a compliance-grade event trail. It's overkill for just developer metrics, but if your security team already has this set up, you can tap into it.
+The [audit stream](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise) supplies administrative and security context. **It does not stream Copilot usage reports** or replace PR and issue webhooks. Use it where the extra governance context is useful.
+
+Copilot agent-session activity streaming is also documented in public preview. Session events are a separate audit signal, not a substitute for daily adoption and completion metrics.
 
 ## Layer 2: Event Ingestion
 
@@ -156,17 +163,20 @@ Audit log streaming captures events that webhooks miss (security events, admin a
 
 You need something to receive and queue webhook payloads. Keep this layer thin - validate the signature, drop the event on a queue, return 200. Don't process inline.
 
-**AWS Lambda example:**
+**AWS Lambda example ([API Gateway proxy integration](https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html)):**
 
 ```python
 import json
 import hmac
 import hashlib
 import boto3
+import base64
+import os
+from datetime import datetime, timezone
 
 sqs = boto3.client('sqs')
-QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/123456789/github-events"
-WEBHOOK_SECRET = "your-secret"
+QUEUE_URL = os.environ["QUEUE_URL"]  # Existing standard SQS queue
+WEBHOOK_SECRET = os.environ["WEBHOOK_SECRET"]  # Runtime secret injection
 
 
 def verify_signature(payload: bytes, signature: str) -> bool:
@@ -177,15 +187,20 @@ def verify_signature(payload: bytes, signature: str) -> bool:
 
 
 def handler(event, context):
-    body = event.get("body", "")
-    signature = event["headers"].get("x-hub-signature-256", "")
+    raw = event.get("body") or ""
+    body = base64.b64decode(raw) if event.get("isBase64Encoded") else raw.encode()
+    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    signature = headers.get("x-hub-signature-256", "")
 
-    if not verify_signature(body.encode(), signature):
+    if not verify_signature(body, signature):
         return {"statusCode": 401, "body": "Invalid signature"}
 
     # Parse just enough to route the event
-    payload = json.loads(body)
-    event_type = event["headers"].get("x-github-event", "unknown")
+    try:
+        payload = json.loads(body)
+    except (ValueError, UnicodeDecodeError):
+        return {"statusCode": 400, "body": "Invalid JSON"}
+    event_type = headers.get("x-github-event", "unknown")
 
     # Drop onto SQS for async processing
     sqs.send_message(
@@ -194,28 +209,34 @@ def handler(event, context):
             "event_type": event_type,
             "action": payload.get("action", ""),
             "payload": payload,
-            "received_at": context.get_remaining_time_in_millis(),
+            "delivery_id": headers.get("x-github-delivery", ""),
+            "received_at": datetime.now(timezone.utc).isoformat(),
         }),
     )
 
     return {"statusCode": 200, "body": "OK"}
 ```
 
-**Azure Functions equivalent:**
+This handler assumes API Gateway forwards the original request body unchanged. HMAC validates those bytes, not reserialized JSON. A queue failure must fail the request, not return success. Set short SDK timeouts so acknowledgement stays within GitHub's 10-second delivery window.
+
+**Azure Functions equivalent (Python v1 programming model, using the [Service Bus Python SDK](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-python-how-to-use-queues)):**
 
 ```python
 import azure.functions as func
-from azure.servicebus import ServiceBusClient
+import json
+import os
+from azure.servicebus import ServiceBusClient, ServiceBusMessage
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    # Verify signature (same HMAC logic)
-    # ...
+    # Reuse verify_signature and WEBHOOK_SECRET from the example above.
+    if not verify_signature(req.get_body(), req.headers.get("x-hub-signature-256", "")):
+        return func.HttpResponse("Invalid signature", status_code=401)
 
     event_type = req.headers.get("x-github-event", "unknown")
     payload = req.get_json()
 
     # Send to Service Bus queue
-    with ServiceBusClient.from_connection_string(conn_str) as client:
+    with ServiceBusClient.from_connection_string(os.environ["SERVICE_BUS_CONNECTION"]) as client:
         sender = client.get_queue_sender(queue_name="github-events")
         sender.send_messages(
             ServiceBusMessage(body=json.dumps({
@@ -224,6 +245,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "payload": payload,
             }))
         )
+        sender.close()
 
     return func.HttpResponse("OK", status_code=200)
 ```
@@ -232,10 +254,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 Webhooks can burst. When a CI system merges 50 PRs in rapid succession, you'll get 50 webhook deliveries in seconds. A queue decouples ingestion from processing:
 
-- **No dropped events** - The queue buffers bursts
+- **Burst buffering** - Durable queue acceptance reduces loss; it cannot recover undelivered webhooks
 - **Retry built in** - Failed processing gets retried automatically
 - **Backpressure** - Processors consume at their own pace
 - **Dead letter queue** - Poison messages go somewhere you can inspect them
+
+Enforce queue payload limits. Large webhook bodies need restricted object storage plus a queue pointer, not blind inline submission. [SQS message quotas](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) also limit retention; a queue is not your historical archive.
 
 ## Layer 3: Event Processing
 
@@ -243,9 +267,10 @@ A queue consumer reads events and writes derived metrics to your database:
 
 ```python
 # Simplified event processor
+from datetime import datetime
 
 def process_pr_event(event: dict):
-    action = event["action"]  # opened, closed, merged, reopened
+    action = event["action"]  # opened, closed, reopened
     pr = event["payload"]["pull_request"]
     repo = event["payload"]["repository"]["full_name"]
 
@@ -273,14 +298,14 @@ def process_review_event(event: dict):
 
     # Record the review timestamp for TTFR calculation
     db.execute("""
-        INSERT INTO pr_reviews (repo, pr_number, reviewer, state, submitted_at)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO pr_reviews (review_id, repo, pr_number, reviewer, state, submitted_at)
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT DO NOTHING
-    """, (repo, pr["number"], review["user"]["login"],
+    """, (review["id"], repo, pr["number"], review["user"]["login"],
           review["state"], review["submitted_at"]))
 ```
 
-The processor is stateless. It reads an event, writes to the database, and moves on. If it crashes, the queue redelivers the message.
+These processor fragments assume a configured transactional database connection. Commit the write and delivery-id deduplication together, then acknowledge the queue message. Filter review actions and exclude bots and PR authors when computing human TTFR. Handle reordered events and reopening, not just the happy-path merge.
 
 ## Layer 4: Storage
 
@@ -328,12 +353,21 @@ CREATE TABLE copilot_daily (
     date DATE NOT NULL,
     org TEXT NOT NULL,
     active_users INTEGER,
-    engaged_users INTEGER,
     acceptance_rate NUMERIC,
     total_suggestions INTEGER,
     total_acceptances INTEGER,
-    chat_turns INTEGER,
+    user_initiated_interactions INTEGER,
+    report_collected_at TIMESTAMPTZ,
     PRIMARY KEY (date, org)
+);
+
+CREATE TABLE pr_reviews (
+    review_id BIGINT PRIMARY KEY,
+    repo TEXT NOT NULL,
+    pr_number INTEGER NOT NULL,
+    reviewer TEXT,
+    state TEXT,
+    submitted_at TIMESTAMPTZ
 );
 
 -- Materialized view for dashboard queries
@@ -349,7 +383,7 @@ WHERE merged_at IS NOT NULL
 GROUP BY 1;
 ```
 
-Materialized views precompute the aggregations your dashboard needs, so queries stay fast even as the data grows.
+This is an application schema, not the API response. Map completion counts from the `code_completion` feature and preserve missing fields as null. Keep enterprise and org scopes separate. Materialized views require an explicit refresh; schedule `REFRESH MATERIALIZED VIEW weekly_pr_stats` after ingestion.
 
 ## GraphQL: The Middle Ground
 
@@ -358,7 +392,7 @@ If you're not ready for the full webhook architecture but polling is too slow, t
 ```graphql
 query RecentPRs($org: String!, $repo: String!) {
   repository(owner: $org, name: $repo) {
-    pullRequests(last: 50, states: [MERGED, CLOSED], orderBy: {field: UPDATED_AT, direction: DESC}) {
+    pullRequests(first: 50, states: [MERGED, CLOSED], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
         number
         title
@@ -367,19 +401,22 @@ query RecentPRs($org: String!, $repo: String!) {
         closedAt
         additions
         deletions
-        reviews(first: 1) {
+        reviews(first: 100) {
           nodes {
             submittedAt
             state
+            author { login }
           }
+          pageInfo { hasNextPage endCursor }
         }
+        pageInfo { hasNextPage endCursor }
       }
     }
   }
 }
 ```
 
-One GraphQL query here replaces what would be 50+ REST calls (list PRs + fetch reviews for each). The GraphQL API has its own rate limit (5,000 points/hour), but complex queries cost more points. It's better than REST at scale but still won't handle 100k repos.
+This query can reduce REST round trips, but paginate **both** PRs and reviews. Select the earliest qualifying human review after fetching the relevant reviews; `first: 1` is not automatically first human review. [GraphQL limits](https://docs.github.com/en/graphql/overview/rate-limits-and-query-limits-for-the-graphql-api) use points and include node limits. Measure cost instead of assuming fewer requests always means less load.
 
 **When to use each approach:**
 
@@ -394,12 +431,62 @@ One GraphQL query here replaces what would be 50+ REST calls (list PRs + fetch r
 
 ### Webhook Reliability
 
-GitHub guarantees webhook delivery with retries, but your receiver needs to be available. Things to get right:
+GitHub [does not automatically redeliver failed webhooks](https://docs.github.com/en/webhooks/testing-and-troubleshooting-webhooks/redelivering-webhooks). Redelivery is available for the past three days. Build failure monitoring, authorized redelivery, and bounded REST reconciliation into the design:
 
 - **Health checks** - Your receiver should have a `/health` endpoint for monitoring
 - **Idempotency** - GitHub may redeliver events. Use `ON CONFLICT DO NOTHING` or `ON CONFLICT DO UPDATE` in your database writes
 - **Dead letter queue** - Events that fail processing N times go to a DLQ for manual inspection
 - **Monitoring** - Alert on DLQ depth, receiver errors, and event processing lag
+
+### Missing Data Is an Operational Signal
+
+If you expose aggregates to Prometheus, don't export a daily report snapshot as a monotonically increasing counter. Use gauges, retain the report day separately, and keep user IDs out of labels.
+
+For one expected enterprise, define `copilot_report_day_timestamp_seconds{scope="enterprise",entity="example"}` as the UTC-midnight Unix timestamp of the newest report day successfully ingested. Leave it unchanged on failed collection; omit it if no report has ever succeeded.
+
+This complete rule file checks stale reports and an absent series:
+
+```yaml
+# copilot.rules.yml
+groups:
+  - name: copilot-data-quality
+    rules:
+      - alert: CopilotReportStaleOrMissing
+        expr: |
+          (time() - copilot_report_day_timestamp_seconds{scope="enterprise",entity="example"} > 345600)
+          or absent_over_time(copilot_report_day_timestamp_seconds{scope="enterprise",entity="example"}[30m])
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Copilot report is missing or more than four days old"
+      - alert: CopilotExporterDown
+        expr: up{job="copilot-metrics"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Copilot metrics exporter cannot be scraped"
+```
+
+Load it with a minimal Prometheus configuration, replacing the target with your exporter:
+
+```yaml
+# prometheus.yml
+global:
+  scrape_interval: 1m
+  evaluation_interval: 1m
+rule_files:
+  - copilot.rules.yml
+scrape_configs:
+  - job_name: copilot-metrics
+    static_configs:
+      - targets: ['localhost:9108']
+```
+
+Validate with `promtool check rules copilot.rules.yml` and `promtool check config prometheus.yml`. Add [Alertmanager routing](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) for notifications; loading a rule alone does not send one. Four days is a starter allowance for daily ingestion plus GitHub's processing lag, not a product SLA.
+
+Use explicit expected scopes at scale; a global `absent()` query can't identify one missing team among hundreds. For Grafana-managed rules, configure and route [No Data and Error states](https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/) separately. Those settings do not configure Prometheus-managed rules.
 
 ### Multi-Org Management
 
@@ -429,14 +516,14 @@ for org in ENTERPRISE_ORGS:
     if resp.status_code == 201:
         print(f"  Created webhook for {org}")
     elif resp.status_code == 422:
-        print(f"  Webhook already exists for {org}")
+        print(f"  Validation failed for {org}; inspect response and existing hooks")
     else:
         print(f"  Error for {org}: {resp.status_code}")
 ```
 
 ### Cost at Scale
 
-Let's estimate costs for a 15,000-developer enterprise:
+These are illustrative planning allowances, **not current provider quotes or a measured deployment bill**. Recalculate for your region, event volume, retention, HA, logs, and database I/O:
 
 | Component | Service | Estimated Monthly Cost |
 |-----------|---------|----------------------|
@@ -447,7 +534,7 @@ Let's estimate costs for a 15,000-developer enterprise:
 | Dashboard | Static site (S3 + CloudFront) | $1-5 |
 | **Total** | | **$186-475/month** |
 
-Compare that to the cost of even 100 unused Copilot seats ($1,900/month) and this system pays for itself by identifying waste alone.
+Compare the real operating bill with confirmed license savings and the value of improved visibility. Do not promise that this system pays for itself from unverified inactivity counts.
 
 ## Summary: The Evolution Path
 
@@ -462,7 +549,7 @@ Here's the journey we've taken across all four posts:
 
 You don't need to jump straight to the enterprise pattern. Start with Parts 1-3. Fork [the companion repo](https://github.com/jmassardo/copilot-metrics-dashboard), set up your secrets, and let the nightly cron run. When you outgrow it, you'll know - the collection workflow will start timing out or hitting rate limits, and this post gives you the blueprint for what comes next.
 
-The bottom line: measuring GenAI effectiveness is not about Copilot metrics in isolation. It's about correlating AI adoption with actual developer outcomes. Whether you're running this for a 20-person team or a 15,000-person enterprise, the metrics that matter are the same. Only the plumbing changes.
+The bottom line: measuring GenAI effectiveness is not about Copilot metrics in isolation. Correlate adoption with developer outcomes, then investigate comparable cohorts, work mix, rework, and developer feedback. More plumbing does not turn correlation into causation.
 
 ## Closing
 

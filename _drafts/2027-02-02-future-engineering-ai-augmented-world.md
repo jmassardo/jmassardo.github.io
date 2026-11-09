@@ -1,10 +1,10 @@
 ---
 layout: post
 title: "The Future of Engineering Systems in an AI-Augmented World"
-date: 2026-06-25 10:00:00 -0500
+date: 2027-02-02 10:00:00 -0600
 category: Blog
 tags: [ai, engineering, future, devops, leadership]
-excerpt: "AI will reshape workflows, decision-making, and organizational structure over the coming years. The focus isn't on tools themselves but on second-order effects. Complexity will increase, not disappear."
+excerpt: "AI is reshaping engineering workflows. The important questions are how we manage its second-order effects on complexity, verification, and human accountability."
 ---
 
 This is the last post in a series exploring engineering systems, organizations, and the forces that shape them. It feels right to end by looking forward.
@@ -21,19 +21,19 @@ Let's start with what's real today and likely to expand:
 
 ### Code Generation and Assistance
 
-AI can already write code snippets, complete functions, suggest implementations. This will get better. The quality will improve. The context windows will expand. The integration will become smoother.
+AI assistance already extends beyond snippets and completions. Agents can plan changes, edit repositories, run tests, and propose pull requests. [GitHub's current Copilot documentation](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github) describes these workflows. How reliably they work still depends on the task, available context, and controls.
 
 What this means: the marginal cost of generating code decreases. Writing boilerplate becomes trivial. Exploring implementation options becomes faster.
 
 ### Analysis and Pattern Recognition
 
-AI can process large amounts of data and surface patterns. Logs, metrics, code patterns, historical incidents. This will get better too.
+AI can process large amounts of data and surface patterns in logs, metrics, code, and historical incidents. Useful correlations still need validation; a plausible explanation isn't proof of causation.
 
 What this means: finding information becomes easier. Correlations become more visible. The haystack becomes easier to search.
 
 ### Documentation and Knowledge
 
-AI can read and summarize documentation, explain code, answer questions about systems. The quality of these interactions will improve.
+AI can read and summarize documentation, explain code, and answer questions about systems. Retrieval and tool access can supply relevant context, but stale sources can still produce misleading answers.
 
 What this means: knowledge becomes more accessible. The barrier to understanding unfamiliar systems drops. Onboarding potentially accelerates.
 
@@ -43,21 +43,21 @@ Now here's where it gets interesting. These aren't direct predictions about AI c
 
 ### The Bottleneck Shifts
 
-Today, a lot of engineering work is constrained by how fast code can be written. If AI removes that constraint, what becomes the new bottleneck?
+For some tasks, implementation speed is a constraint. For others, requirements, reviews, dependencies, or deployment already dominate. If AI speeds up implementation, where does the bottleneck move?
 
 I'd argue: understanding. Judgment. Design. Communication.
 
 Writing code is not usually the hard part of engineering. Figuring out what code to write is. Understanding the system well enough to make good decisions. Communicating effectively about tradeoffs.
 
-If AI makes code generation trivially fast, these human capabilities become relatively more valuable. The engineers who can understand complex systems, make sound judgments, and communicate effectively will be differentiated. The engineers who were mainly valued for typing speed... less so.
+If AI speeds up code generation, these capabilities may become relatively more valuable. Measure the whole delivery path before assuming faster implementation means faster customer value.
 
 ### More Code, More Complexity
 
 Here's a less optimistic prediction: if generating code is cheap, we'll generate more code.
 
-More code means more complexity. More interactions. More failure modes. More to understand and maintain.
+More code can mean more interactions, failure modes, and maintenance. Agents can also remove code and consolidate implementations. The direction depends on what we ask them to optimize and what we accept.
 
-The "AI will let us ship faster" narrative often ignores the carrying cost of what we ship. If we ship 10x more code but only 2x more understanding, we're net negative. We'll have more systems that nobody fully comprehends.
+The "AI will let us ship faster" narrative often ignores the carrying cost of what we ship. If output grows faster than our ability to verify and maintain it, we risk creating systems nobody can confidently operate.
 
 This is a risk. AI might make it easier to create complexity than to manage it.
 
@@ -78,6 +78,8 @@ Every new technology creates new failure modes. AI is no exception.
 - AI automations that do the wrong thing at scale
 - AI hallucinations that get encoded into systems
 - AI optimizations that achieve local goals while undermining global ones
+- Agents acting on malicious instructions embedded in untrusted issues, documents, or tool output
+- Tool access exposing data or allowing changes beyond the intended task
 
 We'll need new practices for catching these failures. New testing approaches. New review processes. New monitoring for AI-specific risks.
 
@@ -97,7 +99,7 @@ Less valuable: rote memorization, syntax knowledge, ability to write large volum
 
 More valuable: problem decomposition, system understanding, judgment about tradeoffs, communication, the ability to evaluate AI output critically.
 
-The engineers who thrive will be those who can work effectively with AI as a tool while providing the judgment and context that AI lacks.
+The engineers who thrive will be those who can delegate effectively, supply relevant context, and verify results while retaining responsibility for the outcome.
 
 ## What Won't Change
 
@@ -115,11 +117,11 @@ Understanding becomes the quality check on AI-assisted work.
 
 ### Communication Still Matters
 
-Systems are built by teams. Teams require communication. AI can assist communication but doesn't replace it. Misunderstanding between humans causes as many problems as bugs in code.
+Systems are built by teams. Teams require communication. AI can assist communication but doesn't replace it. Misunderstanding between humans can cause serious problems even when the code works as specified.
 
 ### Context Still Matters
 
-Why does this system exist? What are the organizational constraints? What's the history of this decision? AI can process information but struggles with the contextual judgment that makes engineering decisions good.
+Why does this system exist? What are the organizational constraints? What's the history of this decision? Agents can reason over supplied context, but we need to check that it is complete, current, and applied correctly.
 
 ### Tradeoffs Still Exist
 
@@ -139,6 +141,10 @@ Don't neglect fundamentals in favor of AI tools. The tools are only useful if yo
 
 Critical evaluation of AI suggestions is a skill. Practice it. Don't accept AI output uncritically. Understand why it's suggesting what it's suggesting. Verify.
 
+For example, delegate a small refactor with explicit compatibility constraints. Review the diff, run regression tests, and check that the tests would catch a behavior change. Compare total review and rework time with your baseline.
+
+Use approved tooling and data, restrict credentials and network access, and require authorization for high-impact actions. Keep a safe fallback. [NIST's Generative AI Profile](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence) is a useful risk-management reference.
+
 ### Invest in Understanding
 
 Understand your systems deeply. Documentation, architecture diagrams, mental models. AI can help you understand faster, but you still need to do the understanding.
@@ -155,22 +161,22 @@ The specifics of how AI transforms engineering are uncertain. The fact that tran
 
 The future of engineering in an AI-augmented world isn't about AI doing engineering for us. It's about AI changing what engineering looks like while the fundamental challenges remain.
 
-Complexity won't disappear. If anything, it will increase. Understanding will still matter. Communication will still matter. Judgment will still matter.
+AI can help reduce complexity or generate more of it. Neither outcome is automatic. Understanding, communication, and judgment remain necessary to tell the difference.
 
 Engineering maturity will be defined by how well we design systems that can adapt, both technical systems and human organizations. AI is a powerful new input to that design process. But the design responsibility remains ours.
 
-The organizations that thrive will be those that use AI to augment human capabilities while investing in the human fundamentals that AI can't replace. That's always been the pattern with new technologies. AI is no exception.
+The organizations best positioned to benefit will pair delegation with verification and clear ownership. The tools can do more of the work without becoming accountable for the business consequences.
 
 We have interesting times ahead.
 
 ## TL;DR
 
 - AI will change engineering through code generation, analysis, and knowledge access improvements
-- Second-order effects matter more than tools: bottleneck shifts to understanding and judgment, more code means more complexity, systems thinking becomes more critical
+- Watch second-order effects: shifting bottlenecks, maintenance load, verification effort, and changes to team coordination
 - New failure modes will emerge from AI-generated mistakes, confident wrong recommendations, and scaled automation errors
 - What won't change: complexity, the importance of understanding, communication, context, and tradeoffs
 - To prepare: double down on fundamentals, learn to evaluate AI critically, invest in understanding, build for maintainability, stay adaptable
-- Engineering maturity in an AI world means designing adaptive systems while maintaining the human capabilities AI can't replace
+- Engineering maturity in an AI world means designing adaptive systems while retaining human accountability for delegated work
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Technical Debt Is a Leadership Problem, Not an Engineering One"
-date: 2026-06-14 10:00:00 -0500
+date: 2027-01-07 10:00:00 -0600
 category: Blog
 tags: [engineering, technical-debt, leadership, prioritization, devops]
 excerpt: "Technical debt is often blamed on careless engineers. But debt accumulates because of prioritization, incentives, and planning decisions made upstream. Addressing it requires ownership at the decision-making level."
@@ -9,15 +9,15 @@ excerpt: "Technical debt is often blamed on careless engineers. But debt accumul
 
 Let's play a game. Next time someone complains about technical debt at your company, ask them whose fault it is.
 
-Nine times out of ten, the answer will be some variation of: "Engineers made bad decisions" or "We didn't have time to do it right" or "The previous team cut corners."
+You may hear some variation of: "Engineers made bad decisions" or "We didn't have time to do it right" or "The previous team cut corners."
 
 In other words: it's someone else's fault. Someone technical. Someone who should have known better.
 
-Here's my counter-argument: technical debt is almost never an engineering problem. It's a leadership problem dressed up in engineering clothes.
+Here's my counter-argument: technical debt isn't just an engineering problem. When teams can't get capacity to address it, it's a leadership problem dressed up in engineering clothes.
 
 ## What Is Technical Debt, Really?
 
-Ward Cunningham's original metaphor was about shipping something you know isn't ideal in order to learn faster, with the intention of paying it down once you understand the problem better. It was a deliberate, strategic choice.
+In [Ward Cunningham's original report](https://c2.com/doc/oopsla92.html), shipping early code could speed development if the team promptly consolidated its growing understanding through rewrites. The metaphor wasn't a free pass for careless code. It explained why learning needs follow-up investment.
 
 What we call "technical debt" today is usually something else:
 - Deferred maintenance
@@ -66,7 +66,7 @@ Every sprint, every quarter, you're deciding what gets worked on. If maintenance
 
 ### Timeline Expectations
 
-When timelines are set without engineering input, or when engineering estimates are overridden by business needs, shortcuts become necessary. Those shortcuts become debt. The timeline decision caused the debt.
+When timelines are set without engineering input, pressure can lead teams to accept shortcuts. Leaders own that tradeoff alongside engineers who identify the risks and choose implementations.
 
 ### Incentive Structures
 
@@ -98,11 +98,11 @@ So how do you address technical debt as a leadership problem?
 
 ### Make Debt Visible
 
-You can't prioritize what you can't see. Create mechanisms to surface technical debt to decision-makers. Track it. Quantify it. Show the impact. "This system is responsible for 40% of our incidents" is more compelling than "the code is messy."
+You can't prioritize what you can't see. Surface debt to decision-makers and show its impact. For example, track incidents and support hours associated with a fragile subsystem. Use your actual evidence, not a guessed percentage.
 
 ### Allocate Capacity Explicitly
 
-Don't make engineers beg for maintenance time. Budget it. Google's famous "20% time" is one model, but even simpler: reserve some percentage of each sprint for non-feature work.
+Don't make engineers beg for maintenance time. Budget it. Reserve explicit capacity for non-feature work based on your maintenance backlog and operational load, then protect that capacity when priorities shift.
 
 ### Connect Decisions to Consequences
 
@@ -128,9 +128,9 @@ But engineers often don't have the authority to prioritize their own work. They 
 
 ## TL;DR
 
-- Technical debt is framed as an engineering problem but it's actually a prioritization problem
+- Technical debt needs engineering judgment and leadership prioritization
 - Debt accumulates because of decisions made about timelines, priorities, incentives, and resource allocation
-- Those decisions are made by leadership, not by individual engineers
+- Leaders own capacity and incentives; engineers share responsibility for implementation choices and communicating risk
 - Engineers get blamed because they're visible and close to the debt, but they often lack authority to address it
 - Fixing debt requires leadership accountability: making debt visible, allocating capacity, connecting decisions to consequences, and changing incentives
 

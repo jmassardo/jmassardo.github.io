@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Measuring GenAI Effectiveness Part 1: Data Collection"
-date: 2026-06-20 10:00:00 -0500
+date: 2026-12-08 10:00:00 -0600
 category: Blog
 tags: [ai, copilot, devops, github, metrics, developer-tools, best-practices]
 excerpt: "Copilot adoption numbers don't tell you if AI is making your team better. Here's how to collect the metrics that actually matter."
@@ -20,7 +20,7 @@ This is Part 1 of a 4-part series where we build a complete GenAI effectiveness 
 3. **[Alerting](/blog/2026/03/10/measuring-genai-effectiveness-alerting/)** - Automated detection of declining metrics and wasted spend
 4. **[Enterprise scaling](/blog/2026/03/10/measuring-genai-effectiveness-scaling/)** - How to evolve this pattern when you have 100k repos across 100 orgs
 
-Everything we build lives in a companion repo you can fork and deploy today: [**jmassardo/copilot-metrics-dashboard**](https://github.com/jmassardo/copilot-metrics-dashboard)
+The [**jmassardo/copilot-metrics-dashboard** companion repo](https://github.com/jmassardo/copilot-metrics-dashboard) supplies the original implementation pattern. **Freshness check, November 3, 2026:** the examples below use the current report API. Migrate any legacy collectors in your fork before deploying; this post is not a claim that every companion script has already been updated.
 
 ## What Should We Actually Measure?
 
@@ -32,22 +32,27 @@ Before we write a single line of code, let's figure out what we're trying to lea
 | **PR Health** | Is code moving faster through review? | PR lifespan, time to first review, merge rate |
 | **Issue Lifecycle** | Is the team resolving work faster? | Issue lifespan, backlog trend, stale issue count |
 
-The magic happens when you look at these **side by side**. If Copilot acceptance rates are high but PR lifespan is getting worse, something's off. Maybe developers are accepting more suggestions but the code quality is tanking and reviews are taking longer. That's a signal you'd never see from Copilot metrics alone.
+The useful part is looking at these **side by side**. High acceptance alongside longer PR lifespans gives you a question to investigate, not a diagnosis of declining code quality.
+
+**Measurement is not causation.** Compare equivalent repositories, work types, PR sizes, and periods. Add developer feedback, rework, and defect or incident measures before claiming effectiveness. A phased rollout with a credible comparison group is stronger evidence than two lines moving together.
 
 ## The APIs We Need
 
-We're targeting **GitHub Enterprise Cloud with Copilot Business**, so we'll use these REST API endpoints:
+We're targeting **GitHub Enterprise Cloud with Copilot Business or Enterprise**. Enable the enterprise's **Copilot usage metrics** policy and confirm report access before scheduling collection.
 
 ### Copilot Metrics
 
 ```
-GET /orgs/{org}/copilot/metrics
+GET /orgs/{org}/copilot/metrics/reports/organization-28-day/latest
 ```
 
-This returns up to 28 days of daily usage data including:
-- `total_active_users` and `total_engaged_users`
-- Code completion stats (suggestions, acceptances, lines) broken down by editor and language
-- Chat stats (turns, insertions, copy events)
+The old `/copilot/metrics` endpoint [sunset on April 2, 2026](https://github.blog/changelog/2026-01-29-closing-down-notice-of-legacy-copilot-metrics-apis/). Don't confuse it with the still-current report endpoints.
+
+The [current API](https://docs.github.com/en/rest/copilot/copilot-usage-metrics) returns **`download_links`, `report_start_day`, and `report_end_day`**, not inline daily metrics. Download every signed link promptly and parse the NDJSON. Aggregate 28-day records contain a `day_totals` array.
+
+Use [the documented report fields](https://docs.github.com/en/copilot/reference/copilot-usage-metrics/copilot-usage-metrics), including `daily_active_users` and `totals_by_feature`. For inline completion acceptance, select `feature == "code_completion"` and divide accepted activities by generated activities. Don't mix agent edits with inline suggestions or substitute lines of code for suggestion counts.
+
+Reports can lag by **two full UTC days**. Enterprise history begins October 10, 2025, and is accessible for up to one year; organization history begins December 12, 2025. A 90-day dashboard needs retained daily reports or backfill, not just the latest 28-day download.
 
 ```
 GET /orgs/{org}/copilot/billing/seats
@@ -57,6 +62,10 @@ This returns every seat assignment with:
 - Who has a seat and when it was assigned
 - Last activity date and editor
 - Whether the seat is pending cancellation
+
+The [user-management API](https://docs.github.com/en/rest/copilot/copilot-user-management) remains the license source of truth. A null `last_activity_at` means **no recorded activity**, not proof that someone never used Copilot. IDE telemetry settings affect this field.
+
+Current reports include IDE, CLI, and agent-app signals, with coverage varying by field. GitHub.com Chat and GitHub Mobile aren't included in these usage reports. Empty breakdowns can mean missing client telemetry, not zero usage.
 
 ### PR and Issue Data
 
@@ -77,21 +86,13 @@ You need a token with the right scopes. Here are your options:
 
 | Scope | Why |
 |-------|-----|
-| `manage_billing:copilot` | Copilot metrics and seat data |
+| `read:org` | Organization reports and seat data (authorized organization owner) |
 | `repo` | PR and issue data on private repos |
-| `read:org` | Org repo discovery |
+| `manage_billing:copilot` or `read:enterprise` | Enterprise reports, if collecting at enterprise scope |
 
-**Fine-grained PAT:**
+**Fine-grained access and GitHub Apps:** report visibility uses the documented **View Organization Copilot Metrics** or **View Enterprise Copilot Metrics** authorization. It is not the same as a blanket `Copilot Business` permission. Repository collection needs read access to **Issues**, **Pull requests**, and **Metadata** for the selected repositories.
 
-| Permission | Level | Why |
-|-----------|-------|-----|
-| `Copilot Business` | Organization (read) | Copilot metrics |
-| `Members` | Organization (read) | Org member data |
-| `Issues` | Repository (read) | Issue data |
-| `Pull requests` | Repository (read) | PR data |
-| `Metadata` | Repository (read) | Repo discovery |
-
-A **GitHub App** works too (same permissions), and is the better choice if you want to avoid tying this to a personal account.
+Check supported token types and permissions for each endpoint, especially seat management. Don't assume one fine-grained token or installation token covers every report and billing endpoint. Prefer an App for repository automation where supported, and validate the reporting identity separately. The default Actions `GITHUB_TOKEN` does not automatically provide organization-wide metrics access.
 
 ## The Collection Scripts
 
@@ -103,6 +104,7 @@ Everything is driven by environment variables so there's nothing to hardcode:
 
 ```python
 # scripts/config.py
+import os
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_API_BASE = os.environ.get("GITHUB_API_BASE", "https://api.github.com")
@@ -119,29 +121,44 @@ def get_headers():
     return {
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "X-GitHub-Api-Version": "2022-11-28",
+        "X-GitHub-Api-Version": "2026-03-10",
     }
 ```
 
-If you don't specify repos, the config module auto-discovers them from the org (sorted by most recently pushed, capped at 50 to be kind to rate limits).
+The original configuration auto-discovers recently pushed repositories, capped at 50. **Record that coverage explicitly**: a convenience sample is not the whole organization.
 
 ### Collecting Copilot Metrics
 
-The Copilot metrics collector hits two endpoints and produces a processed summary:
+Here is the current report-download pattern. It uses `requests`, plus the configuration above:
 
 ```python
 # scripts/collect_copilot_metrics.py
+import json
+from datetime import datetime, timezone
+import requests
 
 def collect_copilot_metrics() -> dict:
-    """GET /orgs/{org}/copilot/metrics"""
+    """Fetch metadata, then download all aggregate NDJSON report files."""
     resp = requests.get(
-        f"{GITHUB_API_BASE}/orgs/{GITHUB_ORG}/copilot/metrics",
+        f"{GITHUB_API_BASE}/orgs/{GITHUB_ORG}/copilot/metrics/reports/"
+        "organization-28-day/latest",
         headers=get_headers(),
-        params={"per_page": 28, "page": 1},
+        timeout=30,
     )
     resp.raise_for_status()
+    metadata = resp.json()
+    daily = []
+    for link in metadata["download_links"]:
+        # Signed URL supplies access. Do not forward the GitHub token.
+        report = requests.get(link, timeout=60)
+        report.raise_for_status()
+        for line in report.text.splitlines():
+            if line.strip():
+                daily.extend(json.loads(line)["day_totals"])
     return {
-        "metrics": resp.json(),
+        "metrics": daily,
+        "report_start_day": metadata["report_start_day"],
+        "report_end_day": metadata["report_end_day"],
         "collected_at": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -155,6 +172,7 @@ def collect_copilot_seats() -> dict:
             f"{GITHUB_API_BASE}/orgs/{GITHUB_ORG}/copilot/billing/seats",
             headers=get_headers(),
             params={"per_page": 100, "page": page},
+            timeout=30,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -165,10 +183,12 @@ def collect_copilot_seats() -> dict:
         if len(all_seats) >= data.get("total_seats", 0):
             break
         page += 1
-    # ... classify as active/inactive/never_used
+    return {"seats": all_seats}
 ```
 
-The processor then walks through the raw metrics to extract acceptance rates, language breakdowns, and editor breakdowns into a clean daily time series.
+Normalize API `day` to the dashboard's `date`, and preserve the completion numerator and denominator as `total_acceptances` and `total_suggestions`. Return `acceptance_rate = None` when the denominator is zero. Treat HTTP 204 on daily report endpoints as no report, and 403/404 as conditions to investigate, not successful zero-usage days.
+
+For team reporting, [join daily per-user reports with daily user-teams reports](https://docs.github.com/en/copilot/reference/copilot-usage-metrics/team-level-metrics) on stable `user_id`, day, and scope. Teams with fewer than five seated users are excluded from the membership report. Membership overlaps mean summed team or organization counts are not unique enterprise users.
 
 ### Collecting PR Metrics
 
@@ -176,6 +196,7 @@ For each tracked repo, we pull closed PRs (recent) and open PRs, then fetch revi
 
 ```python
 # scripts/collect_pr_metrics.py
+from datetime import datetime
 
 def calculate_pr_metrics(pr: dict, reviews: list[dict]) -> dict:
     created = datetime.fromisoformat(pr["created_at"].replace("Z", "+00:00"))
@@ -193,6 +214,8 @@ def calculate_pr_metrics(pr: dict, reviews: list[dict]) -> dict:
         r for r in reviews
         if r.get("state") in ("APPROVED", "CHANGES_REQUESTED", "COMMENTED")
         and r.get("submitted_at")
+        and r.get("user", {}).get("type") != "Bot"
+        and r.get("user", {}).get("id") != pr.get("user", {}).get("id")
     ]
     if submitted_reviews:
         first = min(submitted_reviews, key=lambda r: r["submitted_at"])
@@ -205,13 +228,20 @@ def calculate_pr_metrics(pr: dict, reviews: list[dict]) -> dict:
         "lifespan_hours": lifespan_hours,
         "time_to_first_review_hours": time_to_first_review_hours,
         "review_cycles": len([r for r in reviews if r.get("state") == "CHANGES_REQUESTED"]),
-        "total_changes": pr.get("additions", 0) + pr.get("deletions", 0),
+        "total_changes": (
+            pr["additions"] + pr["deletions"]
+            if "additions" in pr and "deletions" in pr else None
+        ),
         "was_merged": pr.get("merged_at") is not None,
         # ... other fields
     }
 ```
 
-We then aggregate into medians, P90s, merge rates, and weekly throughput. The important thing here is we're using **median** instead of mean. One monster PR that sat open for 3 weeks shouldn't skew your entire picture.
+Fetch [individual PR details](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request) for `additions` and `deletions`; list responses don't supply those fields reliably. Do not silently treat missing size data as zero.
+
+We then aggregate into medians, P90s, merge rates, and weekly throughput. Separate **open-to-close** duration from **open-to-merge**, exclude author and bot reviews for human TTFR, and show sample sizes. A median of one PR is technically a median and practically a warning label.
+
+The snippet's `review_cycles` is a count of change-request reviews, not a reconstruction of review rounds. Open-to-first-review also includes draft time; use a ready-for-review baseline if that better matches your process.
 
 ### Collecting Issue Metrics
 
@@ -219,9 +249,16 @@ Similar pattern - pull open and closed issues, fetch comments, calculate lifecyc
 
 ```python
 # scripts/collect_issue_metrics.py
+from datetime import datetime, timezone
 
 def calculate_issue_metrics(issue: dict, comments: list[dict]) -> dict:
     created = datetime.fromisoformat(issue["created_at"].replace("Z", "+00:00"))
+    now = datetime.now(timezone.utc)
+    closed = issue.get("closed_at")
+    lifespan_hours = None
+    if closed:
+        closed_dt = datetime.fromisoformat(closed.replace("Z", "+00:00"))
+        lifespan_hours = (closed_dt - created).total_seconds() / 3600
 
     # Time to first response (first comment NOT from the author)
     author = issue["user"]["login"]
@@ -248,7 +285,9 @@ def calculate_issue_metrics(issue: dict, comments: list[dict]) -> dict:
     }
 ```
 
-We also track **weekly throughput** (issues opened vs. closed) and calculate a **backlog delta** to detect whether the issue backlog is growing or shrinking over time.
+The [issues API](https://docs.github.com/en/rest/issues/issues#list-repository-issues) also returns pull requests. Exclude records containing `pull_request` before calculating issue metrics. Paginate issues, reviews, and comments; a truncated page is not a complete baseline.
+
+We also track **weekly throughput** and backlog changes. Count complete weeks, account for reopening, and label the observation window. Issue age and backlog are flow signals, not direct measures of defect quality.
 
 ### Data Storage
 
@@ -266,14 +305,14 @@ data/
     └── issue_metrics_2026-03-10.json # Issue data + aggregates
 ```
 
-No database required. The daily JSON files accumulate over time, and the site generator (covered in Part 2) merges them into a rolling historical view. Simple, portable, and easy to debug.
+No database required for a small installation. **Keep raw seat, per-user, and private-repository data in restricted storage**, with an explicit retention policy. Never commit it to a public companion fork or Pages artifact. Publish only approved aggregates and suppress small groups; pseudonymous IDs alone don't make activity anonymous.
 
 ## Running It
 
 ### Locally
 
 ```bash
-export GITHUB_TOKEN="ghp_your_token_here"
+# Supply an authorized reporting token through your secret manager:
 export GITHUB_ORG="your-org"
 
 python scripts/collect_copilot_metrics.py
@@ -286,38 +325,40 @@ python scripts/collect_issue_metrics.py
 The companion repo includes a workflow that runs all three collectors on a nightly cron:
 
 ```yaml
+name: Collect metrics
 on:
   schedule:
-    - cron: '0 5 * * *'  # 5 AM UTC (midnight ET)
+    - cron: '0 5 * * *'  # 05:00 UTC; local time varies with DST
   workflow_dispatch: {}
 
-steps:
-  - uses: actions/checkout@v4
-  - uses: actions/setup-python@v5
-    with:
-      python-version: '3.12'
-  - run: pip install -r requirements.txt
-
-  - name: Collect Copilot metrics
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
       GITHUB_ORG: ${{ vars.GITHUB_ORG }}
-    run: python scripts/collect_copilot_metrics.py
-
-  - name: Collect PR metrics
-    env:
-      GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
-      GITHUB_ORG: ${{ vars.GITHUB_ORG }}
-    run: python scripts/collect_pr_metrics.py
-
-  - name: Collect issue metrics
-    env:
-      GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
-      GITHUB_ORG: ${{ vars.GITHUB_ORG }}
-    run: python scripts/collect_issue_metrics.py
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python scripts/collect_copilot_metrics.py
+      - run: python scripts/collect_pr_metrics.py
+      - run: python scripts/collect_issue_metrics.py
 ```
 
-The workflow commits the collected data back to the repo, so your historical data grows automatically with each run.
+This workflow assumes you have migrated the companion collectors to the report API. Add a restricted persistence step for history; runner files disappear after the job. The [checkout](https://github.com/actions/checkout) and [setup-python](https://github.com/actions/setup-python) examples use current v7 releases. Pin reviewed revisions in production, and check runner requirements if using self-hosted runners. Scheduled execution is not guaranteed at exactly 05:00.
+
+## Summary and Key Takeaways
+
+- Migrate legacy Copilot endpoints and parse downloaded NDJSON, not report metadata as metrics.
+- Store report dates, freshness, coverage, and sample sizes alongside each summary.
+- Keep identities private and compare equivalent work before making effectiveness claims.
 
 ## What's Next
 

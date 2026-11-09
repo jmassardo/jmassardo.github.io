@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Building an Internal Engineering Safety Playbook"
-date: 2026-06-22 10:00:00 -0500
+date: 2027-01-21 10:00:00 -0600
 category: Blog
 tags: [engineering, incidents, reliability, operations, devops]
 excerpt: "Organizations often respond to incidents inconsistently. A safety playbook provides shared language, decision thresholds, and escalation paths. Clarity during stress is an engineered outcome."
@@ -29,7 +29,7 @@ It's not a runbook for specific services (though it might reference those). It's
 
 ### Consistency Under Stress
 
-Stress impairs judgment. This is well-documented in cognitive science. When you're tired, anxious, and under pressure, you make worse decisions. You forget things. You miss steps.
+Fatigue and pressure can make it harder to remember steps and coordinate decisions. A playbook reduces how much you have to hold in your head when attention is stretched.
 
 A playbook externalizes decisions. Instead of asking "what should I do?" you ask "what does the playbook say?" This frees up cognitive resources for the actual problem.
 
@@ -49,7 +49,7 @@ A playbook is a shortcut. "Here's how we handle incidents. Read this."
 
 When there's no playbook, incidents depend on whoever happens to be there. If they're experienced, things go smoothly. If not, chaos.
 
-Playbooks democratize incident response. You don't need a hero. You need someone who can follow documentation.
+Playbooks make incident response less dependent on heroes. Responders still need training, judgment, and backup when the situation doesn't fit the documentation.
 
 ## What Should a Playbook Include?
 
@@ -57,8 +57,8 @@ Playbooks democratize incident response. You don't need a hero. You need someone
 
 Clear, unambiguous definitions of incident severity. Not "P1 is bad" but specific criteria.
 
-Example:
-- **P1 (Critical):** Complete service outage affecting all users. Revenue-impacting. Customer data at risk.
+Example (adapt thresholds to your services; meeting any critical criterion can be enough):
+- **P1 (Critical):** Widespread outage of a critical service, material revenue impact, OR suspected exposure or corruption of customer data. A security incident can be critical even when availability is normal.
 - **P2 (High):** Significant degradation affecting many users. Major feature unavailable.
 - **P3 (Medium):** Limited impact. Single feature degraded. Workarounds available.
 - **P4 (Low):** Minor issue. No significant user impact.
@@ -77,6 +77,8 @@ Example:
 
 Include contact information or where to find it. At 2 AM, nobody wants to search for a phone number.
 
+For suspected compromise or data exposure, engage the security response lead immediately rather than waiting for the outage timer. Assign responsibility for legal and customer-notification decisions according to your incident policy.
+
 ### Communication Templates
 
 What do you say when an incident starts? When it's ongoing? When it's resolved?
@@ -84,7 +86,7 @@ What do you say when an incident starts? When it's ongoing? When it's resolved?
 Templates reduce cognitive load and ensure consistency. They also make sure you communicate the right information.
 
 Example status update template:
-```
+```text
 **Incident:** [Description]
 **Status:** [Investigating/Identified/Monitoring/Resolved]
 **Impact:** [Who/what is affected]
@@ -116,6 +118,8 @@ Common roles:
 
 Clear roles prevent duplication and gaps. "I thought you were handling that" is not a phrase you want during a P1.
 
+[Google's incident-management guidance](https://sre.google/sre-book/managing-incidents/) is a useful starting point for separating coordination, operational changes, and communications. Small teams can combine roles, but name who owns each responsibility.
+
 ### Post-Incident Process
 
 What happens after the incident is resolved?
@@ -126,7 +130,7 @@ What happens after the incident is resolved?
 - How action items are tracked
 - Blameless analysis principles
 
-The incident isn't over when the system recovers. It's over when you've learned from it.
+Service recovery can close the active incident. Learning continues through owned, tracked follow-up work. Verify that action items improve the next drill or response, not just that tickets got closed.
 
 ## Building Your Playbook
 
@@ -162,6 +166,8 @@ The best playbook in the world is useless if nobody can find it at 2 AM.
 
 Put it somewhere obvious. Link to it from your on-call documentation. Mention it in onboarding. Make sure everyone knows it exists and where it is.
 
+Keep a controlled backup accessible if your usual identity provider or documentation platform is down. Document approved emergency access and test it. Store secrets in your secrets manager, never in the playbook or status updates.
+
 ## Common Pitfalls
 
 ### Too Detailed
@@ -183,7 +189,7 @@ If the playbook is used to assign blame after incidents ("you didn't follow step
 ## TL;DR
 
 - Safety playbooks provide structure for incident response: severity definitions, escalation paths, communication templates, decision frameworks, roles, and post-incident process
-- Playbooks matter because stress impairs judgment, and externalizing decisions reduces cognitive load
+- Playbooks reduce memory and coordination demands under stress, but don't replace training or judgment
 - Shared language and clear roles reduce coordination overhead during high-stress situations
 - Start lean, test with drills, review regularly, and make sure people can actually find the playbook
 - Clarity during stress is an engineered outcome, not an accident. Build that clarity intentionally.
