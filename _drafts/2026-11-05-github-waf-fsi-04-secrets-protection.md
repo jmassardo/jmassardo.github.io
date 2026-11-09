@@ -4,7 +4,7 @@ title: "GitHub Well-Architected for Financial Services, Part 4: Secrets Protecti
 date: 2026-11-05 10:04:00 -0600
 category: Blog
 tags: [github, well-architected, financial-services, compliance, security, governance, secret-scanning, push-protection, devsecops]
-excerpt: "Block secrets at the push, gate every bypass behind a reviewer, and treat every leak as compromised: an opinionated GitHub Secret Protection baseline for banks, insurers, and payments firms, with the evidence auditors expect."
+excerpt: "Apply GitHub Well-Architected to credential protection across banking applications, payments pipelines, and infrastructure repositories, with safe development paths, owned rotation, tested recovery, and verifiable containment."
 permalink: /blog/github-waf-financial-services/secrets-protection/
 ---
 
@@ -24,16 +24,34 @@ permalink: /blog/github-waf-financial-services/secrets-protection/
 
 ## Leadership brief
 
-- **The risk:** A leaked credential is the shortest path from an honest developer mistake to a reportable incident. One database password in one commit lives in every clone, fork, and backup of that repository.
-- **Our position:** Block secrets at push time in every repository, require a named reviewer to approve any bypass, and treat every detected secret as compromised. Rotate first, clean history second.
-- **The investment:** GitHub Secret Protection licensed for all private and internal repositories, enabled and enforced centrally from the enterprise, not repo by repo.
-- **The evidence:** Reconciled coverage and bypass decisions, plus provider-confirmed revocation times joined to alert detection and exposure records. Alert closure is not containment evidence.
+- **The outcome:** Banking teams can develop and release without passing production credentials around. A rotation should not become an unplanned payments outage.
+- **The policy:** Centrally enforce scanning and push protection, independently review bypasses, and treat plausible credential exposures as compromised pending validation. Contain first; history cleanup cannot revoke a key.
+- **The operating model:** Fund Secret Protection across private/internal repositories and assign issuer, consumer, rotation, and recovery ownership. Platform engineering supplies supported credential-access patterns.
+- **The evidence:** Reconcile coverage and decisions with issuer-confirmed revocation, consumer cutover tests, and recovery exercises. Alert closure is not containment evidence.
 
 ---
 
-A developer hardcodes a staging connection string "just for now" and pushes it to an internal repository. Two years and 4,000 clones later, the examiner finds it. Internal means enterprise-readable, not safe for secrets.
+A payments service, a nightly reconciliation job, and an infrastructure pipeline share a registry credential. Its owner leaves, the token expires, and three teams discover the dependency during a release window.
 
-[GitHub Secret Protection](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security) helps **block leaks before they land**. Anything that slips through needs issuer-confirmed revocation and evidence, not just alert closure. [Part 6](/blog/github-waf-financial-services/actions-hardening/) owns pipeline identity.
+Now add a copy of that token committed "temporarily" to an internal repository. We have both an exposure problem and an availability problem. Internal means enterprise-readable, not safe for secrets.
+
+[GitHub Secret Protection](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security) helps **block leaks before they land**. Applying WAF in a financial institution also means making credentials owned, replaceable, and unnecessary wherever possible.
+
+This chapter covers the credential lifecycle across application, infrastructure, and shared tooling repositories. [Part 6](/blog/github-waf-financial-services/actions-hardening/) implements pipeline identity; [Part 7](/blog/github-waf-financial-services/copilot-and-agents/) covers AI-specific data handling.
+
+## Apply the five WAF pillars to the credential lifecycle
+
+| Pillar | FI platform decision | How we test the outcome |
+|---|---|---|
+| **Governance** | Name the service owner, credential issuer, independent exception approver, and incident contact | Reconcile every in-scope credential and bypass to accountable owners |
+| **Architecture** | Prefer short-lived identity; isolate remaining credentials by service and environment | Exercise rotation without relying on a shared production key |
+| **Application Security** | Block supported secret types, investigate exposure, and prove revocation | Negative-test detection with synthetic fixtures and retain issuer evidence |
+| **Collaboration** | Give developers an actionable block message and a staffed review route | Sample blocked-push cases for correct routing and independent decisions |
+| **Productivity** | Provide local setup, synthetic test data, and documented credential retrieval | Measure time to a working non-production environment and repeated bypass causes |
+
+**Policy versus service objectives:** coverage, independent exceptions, approved scoping, and containment deadlines are mandatory once adopted in institutional policy. Reviewer response time and onboarding speed are engineering service objectives unless policy explicitly makes them obligations. A missed response target needs escalation, not an automatic bypass.
+
+Start with one payments service and its infrastructure repository. Map every credential from issuer to consumer, then test replacement before expanding the pattern. Scanning finds strings; it does not discover your complete runtime dependency graph.
 
 ## The requirements
 
@@ -69,12 +87,12 @@ DORA's key-management RTS and NYDFS 500.15 address broader cryptographic control
 | **Push protection for users** | On by default, protects pushes to public repos | Managed users can't create public repos, so limited relevance | Same as EMU | Not available ("only available on GitHub.com") |
 | **Partner program** | Covers public repos and npm packages | No public repos in the enterprise, so not your backstop | Same as EMU | Not applicable |
 | **Public monitoring** | Available | Available | Verified-domain attribution only | No GHES documentation |
-| **AI-detected secrets and AI regex generator** | Available | Available | No exception listed in the [GHE.com feature overview](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/feature-overview-for-github-enterprise-cloud-with-data-residency) | No GHES 3.22 documentation |
+| **Supplemental AI secret detection** | Check current release status and terms | Same | Check the [GHE.com feature overview](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/feature-overview-for-github-enterprise-cloud-with-data-residency) | No GHES 3.22 documentation |
 | **Validity checks** | Available | Available | Available | Site admin must enable for the instance first ([docs](https://docs.github.com/en/enterprise-server@3.22/code-security/how-tos/secure-your-secrets/customize-leak-detection/enable-validity-checks)) |
 | **User-owned repos scanned** | Public repos only (free tier) | Yes | Yes | Yes, when licensed |
 | **Platform prerequisites** | None | None | None | SSSE3 CPU flag and Management Console enablement ([docs](https://docs.github.com/en/enterprise-server@3.22/code-security/how-tos/secure-at-scale/configure-enterprise-security/configure-specific-tools/configure-secret-scanning)) |
 
-Sources: [secret scanning availability](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) and [public monitoring](https://docs.github.com/en/code-security/concepts/secret-security/public-monitoring). **GHES shops** get the core (scanning, push protection, custom patterns, delegated bypass, validity checks) but not AI detection or public monitoring, so lean harder on custom patterns.
+Sources: [secret scanning availability](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) and [public monitoring](https://docs.github.com/en/code-security/concepts/secret-security/public-monitoring). **GHES shops** should validate each core control against 3.22 and maintain institution-owned external leak detection where public monitoring is unavailable. Internal credential formats need custom patterns regardless of deployment model.
 
 <a id="control-8-historical-scanning-and-your-day-zero-baseline"></a>
 
@@ -92,7 +110,7 @@ Enablement [scans all Git history and branches, issues, PRs, discussions, and wi
 
 **Why.** "Only critical repos" leaves exposure wherever credentials actually land. [WAF security configurations](https://learn.github.com/well-architected/library/application-security/recommendations/enforce-ghas-at-scale/) and [SSDF PO.3](https://learn.github.com/well-architected/library/scenarios/nist-ssdf-implementation/) support complete coverage for US-FFIEC-INFOSEC, EU-DORA-9, and CA-OSFI-B13.
 
-**How.** GitHub Advanced Security is now sold as two products. **GitHub Secret Protection** covers secret scanning, push protection, AI-detected secrets, custom patterns, delegated bypass, and delegated alert dismissal. **GitHub Code Security** covers code scanning and supply chain ([Part 5](/blog/github-waf-financial-services/code-scanning-supply-chain/)). Billing is per [unique active committer over 90 days](https://docs.github.com/en/billing/concepts/product-billing/github-advanced-security).
+**How.** GitHub Advanced Security is sold as two products. **GitHub Secret Protection** covers the secret-detection and prevention capabilities below, subject to availability. **GitHub Code Security** covers code scanning and supply chain ([Part 5](/blog/github-waf-financial-services/code-scanning-supply-chain/)). Billing is per [unique active committer over 90 days](https://docs.github.com/en/billing/concepts/product-billing/github-advanced-security).
 
 In the enterprise's **Settings > Advanced Security**, [create a custom configuration](https://docs.github.com/en/enterprise-cloud@latest/code-security/how-tos/secure-at-scale/configure-enterprise-security/establish-complete-coverage/create-custom-configuration) with these settings:
 
@@ -102,7 +120,7 @@ In the enterprise's **Settings > Advanced Security**, [create a custom configura
 | Validity checks | Enabled |
 | Extended metadata | Non-production evaluation only where agreement permits; GA owner inventory is the production baseline |
 | Generic patterns | Enabled |
-| Scan for AI-detected secrets | Enabled |
+| Scan for AI-detected secrets | Supplemental only after release-status, terms, and data-flow review |
 | Push protection | Enabled |
 | Push protection for AI-detected secrets | Permitted non-production pilot only (public preview, consumes AI credits); GA detection and DLP remain |
 | Bypass privileges | Specific actors (see Control 3) |
@@ -125,19 +143,19 @@ Reconcile configuration attachment and backfill completion to a **paginated ente
 
 **Why.** Post-commit detection starts after copying has begun. Organization-wide blocking contributes to EU-DORA-9, EU-DORA-RTS-CRYPTO, US-NYDFS-500.15, INT-PCI-6.2, and [SSDF PW.5](https://learn.github.com/well-architected/library/scenarios/nist-ssdf-implementation/).
 
-**How.** [Push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection) blocks four categories of secrets:
+**How.** Configure [push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection) for supported secret types:
 
 1. **Partner patterns** (provider-issued tokens like cloud keys)
 2. **Generic patterns** (private keys, connection strings), once [generic pattern scanning](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-generic-patterns) is enabled
 3. **Custom patterns** you define (Control 5)
-4. **AI-detected generic secrets** such as passwords (public preview)
+4. **Supplemental AI-detected passwords**, only in a permitted non-production preview evaluation
 
 Supported push surfaces include command-line pushes, web UI commits, file uploads, and REST API requests, with coverage varying by secret type. Then tune under **Global settings**, per [configuring global settings](https://docs.github.com/en/code-security/how-tos/secure-at-scale/configure-organization-security/establish-complete-coverage/configure-global-settings):
 
 - **Resource link for blocked commits:** point it at your runbook (remove the secret, request a bypass, who to call).
 - **Pattern configurations** (public preview): evaluate only where permitted by the applicable agreement. GA supported provider/custom pattern blocking and reviewed DLP policies are the production alternatives.
 
-**Push protection for AI-detected secrets** may detect passwords without fixed token formats. Per the [enablement docs](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enable-ai-push-protection), it is public preview and consumes **Secret Protection AI credits** on every scanned push. Use synthetic data in a permitted non-production pilot with a hard budget. GA patterns and institution-owned DLP/detective scans remain the production baseline, including when credits run out. Have legal and model-risk owners review the [AI features application card](https://docs.github.com/en/code-security/responsible-use/security-and-quality-ai-features).
+**Bounded optional capability:** [AI push protection](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enable-ai-push-protection) is public preview and consumes Secret Protection AI credits. Evaluate with synthetic data only where terms permit, with a hard budget and review of the [application card](https://docs.github.com/en/code-security/responsible-use/security-and-quality-ai-features). GA patterns and institution-owned DLP/detective scans remain the production baseline. This is a detector option, not the reason to protect platform credentials.
 
 **Push protection for users** is [developer-managed](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/manage-user-push-protection), on by default, and blocks supported secrets in *any* public repository. Personal-account onboarding must confirm it is on, including for weekend side projects.
 
@@ -158,7 +176,7 @@ Require an approver independent of requester/author. Verify role and delegated-r
 
 **Privilege gap:** reviewers may themselves bypass. Separate review duties from application contribution. Require an independent ticket decision for reviewer-originated pushes, alert on actual bypass, and fail reconciliation for absent/self-approved decisions. Implement and test this supplement; delegated settings alone cannot prove it.
 
-Per [bypass requests](https://docs.github.com/en/code-security/concepts/secret-security/bypass-requests), reviewers see the requester, repository, commit hash, timestamp, and file path. Requests **expire after 7 days**; we set an internal SLA of one business day. A GitHub App with the bypass-request permission can also automate first-pass review.
+Per [bypass requests](https://docs.github.com/en/code-security/concepts/secret-security/bypass-requests), reviewers see the requester, repository, commit hash, timestamp, and file path. Requests **expire after 7 days**; we set a reviewer response objective of one business day. A GitHub App with the bypass-request permission can also automate first-pass review. The objective does not authorize self-approval when the queue is slow.
 
 For dismissals, enable **Prevent direct alert dismissals** ([delegated alert dismissal](https://docs.github.com/en/code-security/how-tos/manage-security-alerts/manage-secret-scanning-alerts/enable-delegated-dismissal)). Dismissal requests also expire after a week, so staff the reviewer bench before you flip it on.
 
@@ -248,9 +266,9 @@ gh api -X POST "/orgs/$ORG/secret-scanning/custom-patterns" --input patterns.jso
 - **Account number pattern:** require a label; a bare 12-digit regex matches timestamps too. Keep it **alert-only** to avoid disruptive blocking.
 - **Card numbers (PANs):** regex can't run a Luhn check. Use a labeled, alert-only pattern at most, and keep your PCI DSS DLP tooling as the primary control. Any suspected PAN opens the PCI scope procedure below; a pattern match alone does not establish the tenant's scope.
 
-Dry run every regex in the UI before enabling push protection. The [AI regex generator](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/customize-leak-detection/generating-regular-expressions-for-custom-patterns-with-ai) proposes up to three candidates from a plain-language description, no Copilot subscription required. Review its output like any other code.
+Dry run every regex in the UI before enabling push protection. Include known synthetic matches, harmless lookalikes, and the issuer's next planned token format. A pattern with no maintenance owner will eventually become an expensive decoration.
 
-**Generic and AI-detected secrets.** Enable [generic patterns](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-generic-patterns) for private keys and connection strings, and [AI-detected secrets](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-ai-detected-secrets) for unstructured passwords (separate alert list, no Copilot subscription needed). Until you've measured their precision, give them a longer triage SLA than provider patterns (Control 7).
+**Generic detection.** Enable [generic patterns](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-generic-patterns) for private keys and connection strings. Supplemental [AI-detected passwords](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-ai-detected-secrets) have a separate alert surface; verify availability and terms before use. Measure precision, but never let detector type downgrade a confirmed active production credential (Control 7).
 
 **Verify.** Audit events `business_secret_scanning_custom_pattern.publish` / `.update` / `.delete` and `*_custom_pattern_push_protection.enabled` / `.disabled` show who changed detection logic. Keep the pattern JSON in a repo with CODEOWNERS, and review it quarterly against current token formats.
 
@@ -301,7 +319,7 @@ Adapt GitHub's [leaked-secret procedure](https://docs.github.com/en/code-securit
 
 1. **Record detection and exposure separately**, assign the credential owner, and immediately engage incident response/legal for reportability assessment. Use sanitized metadata and owner inventories; do not copy the secret into a ticket or evidence export.
 2. **Rotate and revoke the old credential.** If downtime is a real concern, issue a replacement, cut over, then revoke the exposed credential within the deadline. Record replacement/cutover and provider-effective revocation separately.
-3. **Find every consumer:** org code search, repo and org secrets, deploy keys, installed apps.
+3. **Find every consumer:** use the credential register, deployment configuration, repo/org/environment secrets, deploy keys, and installed apps. Code search is a lead, not a complete population: external schedulers and deployed banking services may never mention the token in source.
 4. **Check for misuse** in GitHub and provider logs over the entire known exposure window, not only since detection. A credential leak merits immediate incident assessment; reportability depends on each law's trigger, not just confirmed exploitation.
 5. **Decide on history** (below).
 6. **Verify containment before closure.** Require provider confirmation with an effective revocation timestamp or a fresh, post-remediation `inactive` validity result where supported. A previously cached inactive value, owner assertion, unknown result or `resolution: revoked` is insufficient. If only inactivity is proven, record verification time as an upper bound, not an invented exact revocation time.
@@ -317,7 +335,7 @@ The institution-owned incident register must join all alerts, open or resolved, 
 
 | Field | Evidence and use |
 |---|---|
-| `first_exposure_at` and confidence | Earliest known secret-bearing commit date and first server push where available, or issue/log/prompt creation time. Commit dates are not trusted proof of first exposure. Keep the source and any uncertainty; unknown is not zero. |
+| `first_exposure_at` and confidence | Earliest known secret-bearing commit date and first server push where available, or issue/log creation time. Commit dates are not trusted proof of first exposure. Keep the source and any uncertainty; unknown is not zero. |
 | `detected_at` | Earliest credible detection; GitHub `created_at` records alert creation, not the original exposure. |
 | `rotated_at`, `revoked_at`, `verified_inactive_at` | Replacement time, provider-effective old credential revocation, and fresh inactivity verification with issuer/validation evidence. These are different events. |
 | `resolved_at` | Administrative alert closure only. |
@@ -347,7 +365,7 @@ The **PCI program owner**, with the QSA as appropriate, validates suspected PANs
 
 ## Burn down the backlog
 
-Use [security campaigns](https://docs.github.com/en/code-security/concepts/security-at-scale/about-security-campaigns) to group alerts, assign owners, and set deadlines. WAF suggests targeting all valid provider-pattern secret alerts within 30 days, a solid first campaign. Campaigns are GHEC-only per WAF, so GHES shops need issue-based tracking.
+Use owned, time-bound remediation work to clear historical exposure. [Security campaigns](https://docs.github.com/en/code-security/concepts/security-at-scale/about-security-campaigns) may help where the secret-scanning capability is available and permitted; secret campaigns are preview, so institution-owned issue/incident tracking is the production fallback. A 30-day backlog target never extends Control 7's shorter containment deadlines. GHES teams need institution-owned tracking.
 
 **Verify.** Pull data with the [secret scanning REST API](https://docs.github.com/en/rest/secret-scanning/secret-scanning), always with `hide_secret=true`. The last place you want a live credential is your evidence folder.
 
@@ -395,20 +413,56 @@ done
 
 Flag any org secret with `visibility: all` or an `updatedAt` older than your rotation standard. The [Actions secrets REST API](https://docs.github.com/en/rest/actions/secrets) exposes the same fields. Track stored cloud credentials over time; the count should fall as OIDC adoption rises.
 
+## Operate rotation, recovery, and safe development as a service
+
+**What we do.** Give every remaining credential a lifecycle record and a tested replacement procedure. Platform engineering owns the supported path; application teams own consumer behavior; the issuer owner confirms revocation.
+
+**Why.** A payment adapter that cannot replace a key without downtime has an architectural weakness, even if secret scanning is perfectly configured. WAF's [application security checklist](https://learn.github.com/well-architected/library/application-security/checklist/) includes managed secrets and rotation. Availability needs explicit design alongside confidentiality.
+
+**How.** Keep sanitized metadata outside the secret value itself:
+
+| Register field | Example for a payments registry credential |
+|---|---|
+| Accountable owner and deputy | Payments platform team; infrastructure on-call fallback |
+| Issuer and approved store | Private registry; selected-repository Dependabot secret |
+| Consumers and privilege | Named package-update jobs; package-read only |
+| Renewal and rotation | Issuer expiry, institution rotation interval, next due date, runbook version |
+| Recovery dependencies | Registry administrator, approved replacement route, incident contact |
+| Proof | Issuer event reference, consumer test results, last exercise, old-token revocation |
+
+Do not treat GitHub's `updatedAt` as proof that the upstream credential rotated or the old token was revoked. It proves a store update. Join it to issuer events and consumer verification.
+
+For **planned rotation**, rehearse in non-production, issue the replacement, update each authorized consumer, and verify representative operations. For the registry example, test a fresh dependency download, not only a job whose cache already contains every package.
+
+Where the issuer supports overlapping credentials, use a short approved overlap window, then revoke the old token and verify denial. Where overlap is unsupported, schedule a coordinated cutover with a tested recovery route. Never assume every provider supports dual keys.
+
+For **exposure**, Control 7's containment clock wins. Incident command decides whether immediate revocation outweighs temporary service interruption. Recovery means issuing a new credential or rebuilding access through the issuer, not restoring the compromised token from backup.
+
+Make safe development the easiest path:
+
+1. Ship `.env.example` with obvious non-secret placeholders and approved secret-retrieval instructions. Ignore local secret files, but explain that `.gitignore` does not protect already tracked content.
+2. Provide synthetic banking fixtures and least-privilege non-production identities. Developers should not need a production database password to run unit tests.
+3. Link blocked pushes to exact removal steps, issuer contacts, and the independent review route. Avoid vague instructions to "contact security" and hope.
+4. Review recurring false positives with developer champions. Tune patterns through approved changes, rather than normalizing bypasses or broad path exclusions.
+
+**Verify.** Quarterly, select a credential per critical service and exercise renewal, consumer cutover, old-token denial, and recovery. Record interruption and manual work. Track owner coverage, overdue rotations, failed exercises, and time to a usable development environment separately.
+
+Ownership and approved rotation standards are **policy obligations**. A suggested 30-minute non-production setup target or a zero-interruption planned rotation goal is a **service objective**, calibrated per service. Missing a target creates engineering work; it neither proves a regulatory breach nor excuses an exposed key.
+
 <a id="control-10-secrets-outside-repository-history"></a>
 
 ## Control 9: Secrets outside repository history
 
-GitHub's [documented scanning surfaces](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) include Git history, issues, PRs, discussions and wikis. Do **not** infer full coverage of runtime outputs, workspaces or AI sessions.
+GitHub's [documented scanning surfaces](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) include Git history, issues, PRs, discussions and wikis. Do **not** infer full coverage of runtime outputs, package publishing, or developer workspaces.
 
 | Surface | Production coverage / institution-owned prerequisite |
 |---|---|
 | Actions logs and artifacts | Secret masking is not comprehensive detection. Avoid echoing credentials, use synthetic negative tests for transformations/masking failures, and deploy approved detective scans of retained logs/artifacts. Restrict download and archive access. See [secure use of Actions](https://docs.github.com/en/actions/reference/security/secure-use). |
-| Codespaces and runner workspaces/caches | Non-production credentials only; approved endpoint/workspace scanning and DLP, cleanup on teardown and cache expiry, least-privilege secret distribution. Confirm coverage with platform owners. |
-| Copilot prompts, session logs and transcripts | No credentials/customer data in prompts; institution-approved endpoint DLP and available session/telemetry scanning. Restrict log visibility and collection. Record UI-only/export or agent-path gaps and privacy constraints rather than claiming repository scanning covers them. |
+| Codespaces and runner workspaces/caches | Developer workspaces and PR jobs use non-production credentials only. Approved deployment jobs use Control 8/Part 6's scoped identity. Apply endpoint/workspace scanning and DLP, teardown/cache cleanup, and least-privilege distribution; confirm coverage with platform owners. |
+| Package archives and infrastructure outputs | Inspect approved package contents and state/output handling before publication. Keep credentials out of build contexts, images, plans, and diagnostic bundles; restrict retained copies and test the institution's detectors. |
 | Clones, forks, mirrors and evidence/SIEM archives | Owner-managed DLP/detective scanning and classified access boundaries. Sanitized metadata in ordinary evidence; raw secret-bearing evidence only in a separately authorized incident vault. Account for every copy in containment and purge decisions. |
 
-AppSec maintains a coverage register with **surface, owner, detector, cadence, retention, last negative test, gap and target date**. Missing coverage needs a tested GA alternative or named, time-limited second-line risk acceptance that cannot waive legal/contractual obligations. Validate detection with synthetic canaries, not live credentials. A secret on any surface uses the same provider-verification and incident-clock process.
+AppSec maintains a coverage register with **surface, owner, detector, cadence, retention, last negative test, gap and target date**. Missing coverage needs a tested GA alternative or named, time-limited second-line risk acceptance that cannot waive legal/contractual obligations. Validate detection with synthetic canaries, not live credentials. A secret on any surface uses the same provider-verification and incident-clock process. Part 7 extends this register to prompts and agent sessions without assuming repository scanning covers them.
 
 <a id="incident-determination-and-notification-clocks"></a>
 
@@ -443,6 +497,7 @@ Every row **contributes to** its cited requirements, not complete satisfaction. 
 | Legal notification | US-SEC-RegSP-2024, US-GLBA-314, EU-GDPR-32; NYDFS 500.17, GDPR 33-34 and DORA 19/2025/301 where applicable | Institutional legal/incident clock register | Exact trigger decisions, deadlines, notification receipts or justified non-reportability | Immediate assessment, ongoing updates |
 | PAN scope and cleanup | INT-PCI-6.2; PCI DSS scope/12.5.2 where applicable | PCI owner/QSA, DLP, approved purge process | Scope/data-flow assessment, clone/fork cleanup, Support purge receipts and revalidation | Every PAN event |
 | Credential minimization and scoping | EU-DORA-RTS-CRYPTO, US-NYDFS-500.15, INT-NIST-SSDF | Actions OIDC, environment secrets, scoped org secrets | `gh secret list` inventory; count of stored cloud credentials | Quarterly |
+| Rotation and recovery ownership | EU-DORA-RTS-CRYPTO, CA-OSFI-B13; entity-specific applicability | Credential register, issuer runbooks, consumer cutover and recovery exercises | Owner/deputy coverage, issuer events, old-token denial and service tests | Per rotation; quarterly exercise |
 | Secrets outside repositories | US-FFIEC-INFOSEC, US-GLBA-314, EU-DORA-9, EU-GDPR-32 | Institution-owned log/artifact/workspace/session detection and DLP | Surface coverage register, synthetic-canary tests, approved gaps | Defined by surface, quarterly gap review |
 | Evidence integrity and retention | NYDFS 500.6 and PCI 10.5.1 where applicable | Independent immutable archive and population reconciler | Sanitized manifests/hashes, access/retention policy, receipts, complete capture report | Continuous capture, monthly reconciliation |
 
@@ -450,7 +505,9 @@ Apply [Part 1's evidence retention and integrity standard](/blog/github-waf-fina
 
 ## Summary and key takeaways
 
-Blocking is the first layer. Staff independent reviewers, prove old credentials stopped working, and reconcile the evidence. A history rewrite is not revocation.
+For an FI, secrets protection is a platform service, not just a push-time warning. Reduce standing credentials, make the remaining ones owned and replaceable, and help teams develop without borrowing production access.
+
+Keep the hard boundaries: independently approve exceptions, prove old credentials stopped working, and reconcile evidence. Measure developer friction and rotation reliability so the safe path stays usable. A history rewrite is still not revocation.
 
 **Your checklist:**
 
@@ -459,7 +516,7 @@ Blocking is the first layer. Staff independent reviewers, prove old credentials 
 - [ ] Create one enterprise security configuration, apply it to all repos, set it as the default, and enforce it for repo and org owners.
 - [ ] Turn on push protection with generic patterns; add a resource link to your internal runbook.
 - [ ] Evaluate preview features with synthetic data only where the applicable agreement permits; keep GA alternatives in production.
-- [ ] Enable delegated bypass with a staffed reviewer group and a one-business-day SLA; keep exemptions rare and ticketed.
+- [ ] Enable delegated bypass with a staffed reviewer group and a one-business-day response objective; keep exemptions rare and ticketed.
 - [ ] Enable delegated alert dismissal.
 - [ ] Block `.github/secret_scanning.yml` with an org push ruleset.
 - [ ] Publish custom patterns for internal token formats (push protection on) and labeled account-number formats (alert-only).
@@ -467,11 +524,14 @@ Blocking is the first layer. Staff independent reviewers, prove old credentials 
 - [ ] Measure provider-confirmed revocation separately from detection, exposure and alert closure. Require fresh verification before `revoked` closure.
 - [ ] Have legal validate and exercise regime-specific notification clocks; give every PAN finding to the PCI owner for scope assessment.
 - [ ] Move cloud deployments to OIDC; scope org secrets to selected repos; put production credentials behind environments.
+- [ ] Assign issuer, consumer, owner/deputy, renewal, and recovery metadata to every remaining credential.
+- [ ] Exercise planned cutover and old-token denial; test uncached consumers and recovery without restoring compromised credentials.
+- [ ] Supply synthetic fixtures, placeholder configuration, and a documented non-production access path.
 - [ ] Build the institution-owned incident/provider evidence join and tier/calendar SLA report, including open and unverified records.
 - [ ] Reconcile paginated coverage/bypass populations into an immutable controlled archive.
-- [ ] Document detection coverage or approved gaps for logs, artifacts, workspaces, Copilot sessions and external copies.
+- [ ] Document detection coverage or approved gaps for logs, artifacts, packages, workspaces and external copies; hand AI-session specifics to Part 7.
 
-**Start here:** run the free secret risk assessment this week. The number it produces will make every other conversation on this list easier.
+**Start here:** run the secret risk assessment and map one critical service's credentials to consumers this week. Rehearse a non-production rotation before declaring the lifecycle operational.
 
 Previously: [Part 3: Source Code Management and Change Control](/blog/github-waf-financial-services/change-control/). Next up: [Part 5: Code Scanning and Software Supply Chain](/blog/github-waf-financial-services/code-scanning-supply-chain/), where we apply the same enforce-centrally, verify-continuously approach to vulnerabilities in your code and dependencies.
 
