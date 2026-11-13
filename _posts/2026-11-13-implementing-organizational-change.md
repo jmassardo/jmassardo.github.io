@@ -1,15 +1,15 @@
 ---
 layout: post
 title: "Implementing Organizational Change: How to Actually Make It Stick"
-date: 2026-07-03 10:00:00 -0500
+date: 2026-11-13 10:00:00 -0500
 category: Blog
 tags: [leadership, change-management, devops, platform-engineering, transformation, operating-model]
-excerpt: "Most change programs fail because they optimize for announcements instead of behavior. Here's a practical operating model for implementing organizational change that survives first contact with reality."
+excerpt: "Change programs can stall when they optimize for announcements instead of behavior. Here's a practical operating model for turning organizational change into measurable improvements."
 ---
 
 If you've ever sat through a "transformation kickoff" and immediately thought, "Cool slide deck, see you in six months when this quietly dies," you're not cynical. You're experienced.
 
-Most organizational change efforts fail for boring reasons: unclear ownership, no behavioral design, no adoption feedback loop, and leaders declaring victory based on launch events instead of outcomes.
+Organizational change efforts can stall for boring reasons: unclear ownership, no behavioral design, no adoption feedback loop, and leaders declaring victory based on launch events instead of outcomes.
 
 This post is a practical playbook for implementing real change. Not announcing it. Not planning it forever. Implementing it in a way that changes day-to-day behavior and keeps changing after the first wave.
 
@@ -36,7 +36,7 @@ Every major change needs a one-page outcome contract that leadership and deliver
 4. Who owns which decisions?
 5. What does success look like by date?
 
-A simple template:
+A simple template (the percentages are illustrative targets, not promised results; choose yours after measuring a baseline):
 
 | Area | Example |
 |---|---|
@@ -62,7 +62,7 @@ Pick champions for trust, not title. The most useful person is often the respect
 
 ## Design the New Default Path
 
-People will choose the path of least resistance every time. Your job is to make the desired behavior the easiest behavior.
+People often choose the path of least resistance. Your job is to make the desired behavior useful and easy, while learning where legitimate constraints require another path.
 
 Build the default path so it is:
 
@@ -99,7 +99,7 @@ Resistance usually means one of four things:
 - Trust deficit from prior failed initiatives
 - Poorly designed workflow
 
-Only one of those is "people being difficult."
+None of those should automatically be dismissed as "people being difficult." You want the difficult people. You want the naysayers. If you can't change their mind, then you need to review your plan.
 
 Run structured resistance reviews every two weeks:
 
@@ -125,7 +125,7 @@ Every cadence should end with explicit decisions, not vague status updates.
 
 ## Instrument Adoption Like a Product
 
-You cannot improve what you cannot observe. Track adoption with the same rigor you apply to reliability.
+You cannot improve what you cannot observe. Track adoption with the same rigor you apply to reliability. Trends over time matter more than a single snapshot.
 
 Core metrics:
 
@@ -139,9 +139,15 @@ Core metrics:
 
 Do not use vanity metrics like "number of announcements sent" or "number of meetings held." Nobody ships value with calendar invites.
 
+**Adoption is a signal, not the outcome.** Pair it with service-level delivery, reliability, support burden, and user experience. [DORA's metrics guidance](https://dora.dev/guides/dora-metrics/) recommends measuring improvement in context rather than turning metrics into competitive targets.
+
+For example, pilot a deployment template with representative teams. Compare lead time, failed changes, and support effort with the baseline. Keep workload differences visible so you don't mistake easier projects for a better platform.
+
 ## Handle Exceptions Without Breaking the Model
 
-Exceptions are inevitable. Unmanaged exceptions are entropy.
+Exceptions are inevitable. We can't plan for every single permutation of how the business operates. Obviously, our goal is standardization, but we'll never hit 100% so it's critical we have a clear process for handling exceptions. Our job isn't to tell the business that every exception is unacceptable. It's to distinguish justified exceptions from avoidable workarounds and make sure each one has an owner, an expiry date, and a path back to the standard.
+
+
 
 Use a lightweight exception model:
 
@@ -184,9 +190,11 @@ The fastest way to destroy a change initiative is to say "quality matters" while
 ### Days 61-90: Consolidation
 
 - Enforce non-negotiables with guardrails
-- Decommission redundant legacy paths
-- Re-baseline metrics and report impact
+- Decommission redundant legacy paths only after validating dependencies, migration completeness, and recovery options
+- Report impact against the original baseline; establish a new baseline for the next improvement cycle
 - Capture lessons learned and update operating model
+
+Most changes will take longer than 90 days. Treat this plan as a guide, not a deadline for declaring success.
 
 ## Common Failure Patterns to Avoid
 
@@ -218,4 +226,4 @@ When those are true, you're not "rolling out a program" anymore. You've changed 
 - [ ] Run a real operating cadence with decisions and ownership.
 - [ ] Measure adoption outcomes, not activity theater.
 
-Organizational change is a systems problem. If you design the system, behavior follows. If you skip the system design, culture eats your slide deck for breakfast.
+Organizational change is a systems problem. Design the system, test whether behavior and outcomes improve, and adapt when they don't. Otherwise, culture eats your slide deck for breakfast.
