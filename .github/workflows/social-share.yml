@@ -1,0 +1,394 @@
+name: Share Blog Posts to Social Media
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '_posts/**/*.md'
+  workflow_dispatch:
+    inputs:
+      post_path:
+        description: 'Path to the post file (e.g., _posts/2026-01-12-my-post.md)'
+        required: true
+        type: string
+      platforms:
+        description: 'Which platforms to post to'
+        required: true
+        type: choice
+        default: 'both'
+        options:
+          - both
+          - linkedin
+          - bluesky
+
+jobs:
+  share-post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install atproto pyyaml requests
+
+      - name: Detect new posts
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Manual trigger - use provided post path
+            echo "post_file=${{ github.event.inputs.post_path }}" >> $GITHUB_OUTPUT
+            echo "platforms=${{ github.event.inputs.platforms }}" >> $GITHUB_OUTPUT
+          else
+            # Automatic trigger - detect newly added posts
+            NEW_POSTS=$(git diff --name-only --diff-filter=A HEAD~1 HEAD | grep '^_posts/.*\.md$' || true)
+            if [ -z "$NEW_POSTS" ]; then
+              echo "No new posts detected"
+              echo "post_file=" >> $GITHUB_OUTPUT
+            else
+              # Get the first new post (in case multiple were added)
+              FIRST_POST=$(echo "$NEW_POSTS" | head -n 1)
+              echo "post_file=$FIRST_POST" >> $GITHUB_OUTPUT
+              echo "New post detected: $FIRST_POST"
+            fi
+            echo "platforms=both" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract post data
+        id: extract
+        if: steps.detect.outputs.post_file != ''
+        env:
+          POST_FILE: ${{ steps.detect.outputs.post_file }}
+        run: |
+          python3 << 'EOF'
+          import yaml
+          import re
+          import os
+          import sys
+          import uuid
+
+          post_file = os.environ.get('POST_FILE')
+          
+          if not os.path.exists(post_file):
+              print(f"Error: Post file not found: {post_file}")
+              sys.exit(1)
+
+          # Read the post file
+          with open(post_file, 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          # Extract front matter
+          match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
+          if not match:
+              print(f"Error: No front matter found in {post_file}")
+              sys.exit(1)
+
+          front_matter = yaml.safe_load(match.group(1))
+
+          # Extract fields
+          title = front_matter.get('title', '')
+          excerpt = front_matter.get('excerpt', '')
+          tags = front_matter.get('tags', [])
+          image = front_matter.get('image', '')
+
+          # Generate URL from filename
+          # Example: _posts/2026-01-12-ai-is-a-failure.md -> https://dxrf.com/ai-is-a-failure/
+          filename = os.path.basename(post_file)
+          slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', filename)  # Remove date prefix
+          slug = re.sub(r'\.md$', '', slug)  # Remove .md extension
+          post_url = f"https://dxrf.com/{slug}/"
+
+          # Generate hashtags (limit to 5)
+          hashtags = []
+          for tag in tags[:5]:
+              # Clean tag for social media (keeps alphanumeric, hyphens, and underscores)
+              # Note: \w already includes underscores, so this pattern preserves them
+              clean_tag = re.sub(r'[^\w-]', '', str(tag))
+              if clean_tag:
+                  hashtags.append(f"#{clean_tag}")
+          hashtags_str = ' '.join(hashtags)
+
+          # Handle image URL
+          full_image_url = ''
+          if image:
+              if image.startswith('http'):
+                  full_image_url = image
+              else:
+                  # Remove leading slash if present
+                  image_path = image.lstrip('/')
+                  full_image_url = f"https://dxrf.com/{image_path}"
+
+          # Output to GitHub Actions (using delimiter for multiline values)
+          delimiter = uuid.uuid4().hex
+          
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"title<<{delimiter}\n{title}\n{delimiter}\n")
+              f.write(f"excerpt<<{delimiter}\n{excerpt}\n{delimiter}\n")
+              f.write(f"post_url={post_url}\n")
+              f.write(f"hashtags={hashtags_str}\n")
+              f.write(f"image_url={full_image_url}\n")
+
+          print(f"Title: {title}")
+          print(f"Excerpt: {excerpt}")
+          print(f"URL: {post_url}")
+          print(f"Hashtags: {hashtags_str}")
+          print(f"Image: {full_image_url}")
+          EOF
+
+      - name: Post to Bluesky
+        if: steps.detect.outputs.post_file != '' && (steps.detect.outputs.platforms == 'both' || steps.detect.outputs.platforms == 'bluesky')
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          POST_TITLE: ${{ steps.extract.outputs.title }}
+          POST_EXCERPT: ${{ steps.extract.outputs.excerpt }}
+          POST_URL: ${{ steps.extract.outputs.post_url }}
+          POST_HASHTAGS: ${{ steps.extract.outputs.hashtags }}
+          POST_IMAGE_URL: ${{ steps.extract.outputs.image_url }}
+        run: |
+          python3 << 'EOF'
+          import os
+          import sys
+          from atproto import Client, client_utils
+
+          # Get credentials
+          handle = os.environ.get('BLUESKY_HANDLE')
+          password = os.environ.get('BLUESKY_APP_PASSWORD')
+
+          if not handle or not password:
+              print("Error: Bluesky credentials not configured")
+              sys.exit(1)
+
+          # Get post data from environment variables
+          title = os.environ.get('POST_TITLE', '')
+          excerpt = os.environ.get('POST_EXCERPT', '')
+          post_url = os.environ.get('POST_URL', '')
+          hashtags = os.environ.get('POST_HASHTAGS', '')
+          image_url = os.environ.get('POST_IMAGE_URL', '')
+          # Note: image_url is extracted but not currently used in posting logic
+          # Future enhancement: Upload and embed images in Bluesky posts using client.upload_blob()
+
+          # Create post text (max 300 chars for Bluesky)
+          post_text = f"📝 New blog post: {title}\n\n{excerpt}\n\n🔗 {post_url}"
+          if hashtags:
+              post_text += f"\n\n{hashtags}"
+
+          # Trim if too long (Bluesky has 300 char limit)
+          if len(post_text) > 300:
+              # Helper function to safely truncate at char boundaries
+              def safe_truncate(text, max_len):
+                  if len(text) <= max_len:
+                      return text
+                  # Truncate and ensure we don't break in middle of multi-byte char
+                  truncated = text[:max_len]
+                  try:
+                      # Try to encode/decode to verify valid UTF-8
+                      truncated.encode('utf-8')
+                      return truncated
+                  except UnicodeDecodeError:
+                      # If broken, remove last char and try again
+                      return safe_truncate(text[:max_len-1], max_len-1)
+              
+              # Calculate available space for excerpt
+              prefix = f"📝 New blog post: {title}\n\n"
+              suffix = f"\n\n🔗 {post_url}"
+              if hashtags:
+                  suffix += f"\n\n{hashtags}"
+              
+              available_space = 300 - len(prefix) - len(suffix) - 3  # 3 for "..."
+              if available_space > 0:
+                  trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
+                  post_text = f"{prefix}{trimmed_excerpt}{suffix}"
+              else:
+                  # If still too long, remove hashtags and try again
+                  suffix = f"\n\n🔗 {post_url}"
+                  available_space = 300 - len(prefix) - len(suffix) - 3
+                  if available_space > 0:
+                      trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
+                      post_text = f"{prefix}{trimmed_excerpt}{suffix}"
+                  else:
+                      # Last resort: just title and link
+                      post_text = f"📝 {title}\n\n🔗 {post_url}"
+
+          try:
+              # Login to Bluesky
+              client = Client()
+              client.login(handle, password)
+
+              # Create post with embedded link
+              post_builder = client_utils.TextBuilder()
+              
+              # Add text before the link (if any)
+              link_start_pos = post_text.find(post_url)
+              if link_start_pos > 0:
+                  post_builder.text(post_text[:link_start_pos])
+              elif link_start_pos == -1:
+                  # Link not found in text, just post as plain text
+                  client.send_post(post_text)
+                  print(f"✅ Posted to Bluesky successfully (plain text)!")
+                  sys.exit(0)
+              
+              # Add the link
+              post_builder.link(post_url, post_url)
+              
+              # Add text after the link (if any)
+              link_end_pos = link_start_pos + len(post_url)
+              if link_end_pos < len(post_text):
+                  post_builder.text(post_text[link_end_pos:])
+
+              # Post to Bluesky
+              response = client.send_post(post_builder)
+              print(f"✅ Posted to Bluesky successfully!")
+              print(f"Post URI: {response.uri}")
+
+          except Exception as e:
+              print(f"❌ Error posting to Bluesky: {e}")
+              sys.exit(1)
+          EOF
+
+      - name: Post to LinkedIn
+        if: steps.detect.outputs.post_file != '' && (steps.detect.outputs.platforms == 'both' || steps.detect.outputs.platforms == 'linkedin')
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          POST_TITLE: ${{ steps.extract.outputs.title }}
+          POST_EXCERPT: ${{ steps.extract.outputs.excerpt }}
+          POST_URL: ${{ steps.extract.outputs.post_url }}
+          POST_HASHTAGS: ${{ steps.extract.outputs.hashtags }}
+        run: |
+          python3 << 'EOF'
+          import os
+          import sys
+          import json
+          import requests
+
+          # Get credentials
+          access_token = os.environ.get('LINKEDIN_ACCESS_TOKEN')
+          person_urn = os.environ.get('LINKEDIN_PERSON_URN')
+
+          if not access_token or not person_urn:
+              print("Error: LinkedIn credentials not configured")
+              sys.exit(1)
+
+          # Get post data from environment variables
+          title = os.environ.get('POST_TITLE', '')
+          excerpt = os.environ.get('POST_EXCERPT', '')
+          post_url = os.environ.get('POST_URL', '')
+          hashtags = os.environ.get('POST_HASHTAGS', '')
+
+          # Create commentary text
+          commentary = f"📝 New blog post: {title}\n\n{excerpt}\n\nRead more: {post_url}"
+          if hashtags:
+              commentary += f"\n\n{hashtags}"
+
+          # LinkedIn has a 3000 character limit for post text
+          if len(commentary) > 3000:
+              # Helper function to safely truncate at char boundaries
+              def safe_truncate(text, max_len):
+                  if len(text) <= max_len:
+                      return text
+                  # Truncate and ensure we don't break in middle of multi-byte char
+                  truncated = text[:max_len]
+                  try:
+                      # Try to encode/decode to verify valid UTF-8
+                      truncated.encode('utf-8')
+                      return truncated
+                  except UnicodeDecodeError:
+                      # If broken, remove last char and try again
+                      return safe_truncate(text[:max_len-1], max_len-1)
+              
+              # Trim excerpt to fit
+              prefix = f"📝 New blog post: {title}\n\n"
+              suffix = f"\n\nRead more: {post_url}"
+              if hashtags:
+                  suffix += f"\n\n{hashtags}"
+              
+              available_space = 3000 - len(prefix) - len(suffix) - 3  # 3 for "..."
+              if available_space > 0:
+                  trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
+                  commentary = f"{prefix}{trimmed_excerpt}{suffix}"
+              else:
+                  # If still too long, remove hashtags
+                  suffix = f"\n\nRead more: {post_url}"
+                  available_space = 3000 - len(prefix) - len(suffix) - 3
+                  if available_space > 0:
+                      trimmed_excerpt = safe_truncate(excerpt, available_space) + "..."
+                      commentary = f"{prefix}{trimmed_excerpt}{suffix}"
+                  else:
+                      # Last resort: just title and link
+                      commentary = f"📝 {title}\n\nRead more: {post_url}"
+
+          # Prepare the API request
+          headers = {
+              'Authorization': f'Bearer {access_token}',
+              'Content-Type': 'application/json',
+              'X-Restli-Protocol-Version': '2.0.0'
+          }
+
+          # Create share payload (UGC Post)
+          payload = {
+              "author": person_urn,
+              "lifecycleState": "PUBLISHED",
+              "specificContent": {
+                  "com.linkedin.ugc.ShareContent": {
+                      "shareCommentary": {
+                          "text": commentary
+                      },
+                      "shareMediaCategory": "ARTICLE",
+                      "media": [
+                          {
+                              "status": "READY",
+                              "originalUrl": post_url
+                          }
+                      ]
+                  }
+              },
+              "visibility": {
+                  "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+              }
+          }
+
+          try:
+              # Post to LinkedIn
+              response = requests.post(
+                  'https://api.linkedin.com/v2/ugcPosts',
+                  headers=headers,
+                  json=payload
+              )
+
+              if response.status_code == 201:
+                  result = response.json()
+                  post_id = result.get('id', 'unknown')
+                  print(f"✅ Posted to LinkedIn successfully!")
+                  print(f"Post ID: {post_id}")
+              else:
+                  print(f"❌ Error posting to LinkedIn: {response.status_code}")
+                  print(f"Response: {response.text}")
+                  sys.exit(1)
+
+          except Exception as e:
+              print(f"❌ Error posting to LinkedIn: {e}")
+              sys.exit(1)
+          EOF
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.detect.outputs.post_file }}" == "" ]; then
+            echo "ℹ️  No new posts detected or no post specified"
+          else
+            echo "✨ Social media sharing workflow completed"
+            echo "Post: ${{ steps.detect.outputs.post_file }}"
+            echo "Title: ${{ steps.extract.outputs.title }}"
+            echo "URL: ${{ steps.extract.outputs.post_url }}"
+          fi
